@@ -1,0 +1,57 @@
+name: 검사
+
+# 평소 push 와 PR 에서 도는 검사. **시크릿을 하나도 쓰지 않는다.**
+# 서명 키가 등록되지 않은 상태에서도 그대로 통과해야 한다.
+#
+# 설치 파일을 만들거나 서명하는 일은 여기서 하지 않는다. 그건 태그를 올렸을 때
+# `릴리스 만들기`(release.yml) 가 한다.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 준비
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Rust 준비
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust 빌드 캐시
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: 의존성 설치
+        run: npm ci
+
+      # 배포가 조용히 깨지는 경우 — 세 파일의 버전 어긋남, 산출물 이름에 한글,
+      # 업데이터 설정이 저장소와 어긋남.
+      - name: 배포 이름·버전 검사
+        run: npm run check:model
+
+      # 이 프로젝트에서 가장 중요한 검사.
+      # 원문 문장 -> 추출 텍스트 -> 쪽 번호 -> 문자 위치가 서로 맞는지 본다.
+      - name: PDF 추출 검사
+        run: npm run check:pdf
+
+      - name: 타입 검사 · 화면 빌드
+        run: npm run build
+
+      - name: 서버 테스트
+        run: cargo test --lib
+        working-directory: src-tauri

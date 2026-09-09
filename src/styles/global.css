@@ -248,3 +248,186 @@ code {
   color: var(--ink-faint);
   font-size: 14px;
 }
+
+/* ── 공통 조각 ───────────────────────────────────────────────────── */
+
+.page-lead {
+  margin: -8px 0 20px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.muted {
+  color: var(--ink-faint);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  border-color: var(--accent);
+}
+
+.btn {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel);
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:hover:not(:disabled) {
+  background: #f1f3f6;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0b6076;
+}
+
+.btn-danger {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+  font-weight: 700;
+}
+
+.btn-quiet {
+  border-color: transparent;
+  color: var(--ink-faint);
+}
+
+.btn-quiet:hover:not(:disabled) {
+  color: var(--danger);
+  background: #fdf1f0;
+}
+
+.row-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.banner {
+  padding: 11px 14px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.banner-error {
+  background: #fdf1f0;
+  border: 1px solid #f3c9c4;
+  color: #7a1c14;
+}
+
+.banner-top {
+  margin: 20px 32px 0;
+}
+
+/* ── 목록 ────────────────────────────────────────────────────────── */
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.list-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 16px;
+  min-height: 58px;
+}
+
+.list-item + .list-item {
+  border-top: 1px solid var(--line);
+}
+
+.list-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.list-sub {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 1px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.list-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.confirm-ask {
+  margin-right: 4px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.tag {
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.tag-warn {
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-line);
+  color: #8a5a00;
+}
+
+.empty {
+  padding: 44px 24px;
+  background: var(--panel);
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.empty p {
+  margin: 0 0 4px;
+}

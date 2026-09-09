@@ -26,6 +26,8 @@ export default function Settings() {
             <dd>
               <code>{info.dataDir}</code>
             </dd>
+            <dt>자료 상태</dt>
+            <dd>{info.storageReady ? '정상' : (info.storageError ?? '열지 못했습니다')}</dd>
           </dl>
         )}
       </section>

@@ -4,19 +4,11 @@ export type AppInfo = {
   displayName: string
   version: string
   dataDir: string
+  /** 자료를 정상적으로 열었는가. 못 열었어도 앱은 뜬다. */
+  storageReady: boolean
+  storageError: string | null
 }
 
-type RawAppInfo = {
-  display_name: string
-  version: string
-  data_dir: string
-}
-
-export async function getAppInfo(): Promise<AppInfo> {
-  const raw = await invoke<RawAppInfo>('app_info')
-  return {
-    displayName: raw.display_name,
-    version: raw.version,
-    dataDir: raw.data_dir,
-  }
+export function getAppInfo(): Promise<AppInfo> {
+  return invoke<AppInfo>('app_info')
 }

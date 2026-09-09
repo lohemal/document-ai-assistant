@@ -1,4 +1,5 @@
 pub mod commands;
+pub mod domain;
 pub mod db;
 pub mod error;
 pub mod repo;
@@ -44,6 +45,8 @@ pub fn run() {
             commands::chunk::chunk_list,
             commands::chunk::chunk_get,
             commands::chunk::chunk_count,
+            commands::search::search_keyword,
+            commands::search::search_neighbors,
         ])
         .setup(|app| {
             // 자료를 여는 데 실패해도 앱은 뜬다. 화면에서 이유를 보여 준다.

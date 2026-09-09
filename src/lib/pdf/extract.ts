@@ -245,6 +245,10 @@ export function normalize(text: string): string {
   return text
     .replace(/[！-～]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)) // 전각 -> 반각
     .replace(/　/g, ' ')
+    // 숫자 사이의 쉼표만 없앤다: 500,000 -> 500000.
+    // 검색어 쪽(Rust domain::query::strip_digit_commas)과 규칙이 같아야 한다.
+    // 한쪽만 바꾸면 '500,000원' 으로 찾을 때 조용히 아무것도 안 나온다.
+    .replace(/(?<=\d),(?=\d)/g, '')
     .replace(/[\t\r\n]+/g, ' ')
     .replace(/ {2,}/g, ' ')
     .trim()

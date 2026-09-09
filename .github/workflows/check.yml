@@ -53,6 +53,16 @@ jobs:
       - name: 청크·위치 검사
         run: npm run check:chunk
 
+      # 검색 시험은 `test/search/chunks.json` 을 읽는다. 나누는 규칙을 고치고
+      # 이 파일을 다시 만들지 않으면, 검색 시험이 **옛 청크**를 보면서 통과한다.
+      # 그래서 다시 만들어 보고 달라지면 여기서 막는다.
+      - name: 내보낸 청크가 최신인지
+        shell: bash
+        run: |
+          npm run fixtures:chunks
+          git diff --exit-code -- test/search/chunks.json \
+            || { echo "::error::test/search/chunks.json 이 낡았습니다. npm run fixtures:chunks 를 돌리고 커밋하세요."; exit 1; }
+
       - name: 타입 검사 · 화면 빌드
         run: npm run build
 

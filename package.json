@@ -20,7 +20,8 @@
     "check:pdf": "node --experimental-strip-types --no-warnings scripts/check-pdf-extract.ts",
     "fixtures": "node scripts/fixtures/make-fixtures.mjs",
     "app:build:nosign": "tauri build --config src-tauri/tauri.nosign.conf.json",
-    "check:chunk": "node --experimental-strip-types --no-warnings scripts/check-chunk.ts"
+    "check:chunk": "node --experimental-strip-types --no-warnings scripts/check-chunk.ts",
+    "fixtures:chunks": "node --experimental-strip-types --no-warnings scripts/export-chunks.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.1.1",

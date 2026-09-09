@@ -4,6 +4,7 @@ import Sidebar from '@/components/Sidebar'
 import Placeholder from '@/components/Placeholder'
 import Collections from '@/pages/Collections'
 import Documents from '@/pages/Documents'
+import Search from '@/pages/Search'
 import Settings from '@/pages/Settings'
 import { getAppInfo, type AppInfo } from '@/ipc/app'
 import { AI_NONE, type AiStatus } from '@/lib/aiStatus'
@@ -35,16 +36,7 @@ export default function App() {
           <Route path="/" element={<Navigate to="/collections" replace />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/documents" element={<Documents />} />
-          <Route
-            path="/search"
-            element={
-              <Placeholder
-                title="자료 검색"
-                phase="P4a"
-                note="낱말로 찾기(AI 없이) → 뜻으로 찾기(임베딩 모델 필요) 순서로 만듭니다."
-              />
-            }
-          />
+          <Route path="/search" element={<Search />} />
           <Route
             path="/ask"
             element={<Placeholder title="규정 해석" phase="P5" note="근거를 읽고 답합니다. 답변 모델이 필요합니다." />}

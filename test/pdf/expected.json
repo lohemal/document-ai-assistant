@@ -80,6 +80,16 @@
     "sentence": "이 문장은 2쪽에만 있는 확인용 문장입니다. 확인코드 X2BB."
   },
   {
+    "file": "repeat-ko.pdf",
+    "page": 1,
+    "sentence": "이 문장은 1쪽에만 있는 확인용 문장입니다. 확인코드 R1AA."
+  },
+  {
+    "file": "repeat-ko.pdf",
+    "page": 2,
+    "sentence": "이 문장은 2쪽에만 있는 확인용 문장입니다. 확인코드 R2BB."
+  },
+  {
     "file": "mixed.pdf",
     "page": 1,
     "sentence": "MIXEDPAGE1"

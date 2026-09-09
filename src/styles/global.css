@@ -435,7 +435,7 @@ code {
 /* ── 자료 등록 ───────────────────────────────────────────────────── */
 
 .page-wide {
-  max-width: 1000px;
+  max-width: 1240px;
 }
 
 .field-label {
@@ -564,4 +564,186 @@ select.input {
 .pagetext-hint {
   margin-top: 8px;
   font-size: 13px;
+}
+
+/* ── 탭 ──────────────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  padding: 7px 14px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink-faint);
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab.is-on {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.btn-tiny {
+  padding: 3px 9px;
+  font-size: 12.5px;
+}
+
+.btn-tiny.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ── 청크 살펴보기 ───────────────────────────────────────────────── */
+
+.chunks-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.chunks-split {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.chunklist {
+  max-height: 620px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.chunklist li + li {
+  border-top: 1px solid var(--line);
+}
+
+.chunkitem {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  border: none;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chunkitem:hover {
+  background: #f4f7f9;
+}
+
+.chunkitem.is-on {
+  background: var(--accent-soft);
+}
+
+.chunkitem-head {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  font-size: 12.5px;
+}
+
+.chunkitem-path {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chunkitem-body {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.chunks-quote {
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: #fcfcfd;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  tab-size: 8;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+/* ── 원본 PDF 와 형광펜 ──────────────────────────────────────────── */
+
+.pdfview-bar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.pdfview-pages {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.pdfview-warn {
+  color: var(--danger);
+}
+
+.pdfview-scroll {
+  max-height: 620px;
+  overflow: auto;
+  background: #e9edf1;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.pdfview-stage {
+  position: relative;
+  margin: 0 auto;
+}
+
+.pdfview-canvas {
+  display: block;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.18);
+}
+
+.pdfview-mark {
+  position: absolute;
+  /* 글자를 가리지 않게 반투명하게 덮는다 */
+  background: rgba(255, 214, 0, 0.42);
+  outline: 1px solid rgba(203, 153, 0, 0.55);
+  border-radius: 2px;
+  pointer-events: none;
 }

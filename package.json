@@ -19,7 +19,8 @@
     "prebuild": "node scripts/copy-pdfjs-assets.mjs",
     "check:pdf": "node --experimental-strip-types --no-warnings scripts/check-pdf-extract.ts",
     "fixtures": "node scripts/fixtures/make-fixtures.mjs",
-    "app:build:nosign": "tauri build --config src-tauri/tauri.nosign.conf.json"
+    "app:build:nosign": "tauri build --config src-tauri/tauri.nosign.conf.json",
+    "check:chunk": "node --experimental-strip-types --no-warnings scripts/check-chunk.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.1.1",

@@ -12,6 +12,7 @@ import { registerPdf, type Progress } from '@/lib/pdf/register'
 import { statusMessage, type DocStatus } from '@/lib/pdf/extract'
 import { message } from '@/lib/err'
 import PageTextView from '@/components/PageTextView'
+import ChunkExplorer from '@/components/ChunkExplorer'
 
 const STATUS_LABEL: Record<string, string> = {
   ok: '정상',
@@ -33,6 +34,7 @@ export default function Documents() {
   const [openDoc, setOpenDoc] = useState<Document | null>(null)
   const [pages, setPages] = useState<PageOut[] | null>(null)
   const [pageNo, setPageNo] = useState(1)
+  const [tab, setTab] = useState<'chunks' | 'text'>('chunks')
 
   useEffect(() => {
     listCollections()
@@ -203,7 +205,7 @@ export default function Documents() {
               </div>
               <div className="list-actions">
                 <button className="btn" onClick={() => void onOpenText(d)}>
-                  글자 보기
+                  열기
                 </button>
                 <button className="btn btn-quiet" onClick={() => void onDelete(d)}>
                   지우기
@@ -217,38 +219,58 @@ export default function Documents() {
       {openDoc && (
         <section className="card viewer">
           <div className="viewer-head">
-            <h2 className="card-title">{openDoc.title} — 뽑은 글자</h2>
+            <h2 className="card-title">{openDoc.title}</h2>
             <button className="btn btn-quiet" onClick={() => setOpenDoc(null)}>
               닫기
             </button>
           </div>
 
-          {pages === null && <p className="muted">불러오는 중…</p>}
+          <div className="tabs">
+            <button
+              className={'tab' + (tab === 'chunks' ? ' is-on' : '')}
+              onClick={() => setTab('chunks')}
+            >
+              근거 위치
+            </button>
+            <button
+              className={'tab' + (tab === 'text' ? ' is-on' : '')}
+              onClick={() => setTab('text')}
+            >
+              뽑은 글자
+            </button>
+          </div>
 
-          {pages && pages.length > 0 && (
+          {tab === 'chunks' && <ChunkExplorer doc={openDoc} />}
+
+          {tab === 'text' && (
             <>
-              <div className="row-form">
-                <label className="field-label" htmlFor="pg">
-                  쪽
-                </label>
-                <select
-                  id="pg"
-                  className="input input-narrow"
-                  value={pageNo}
-                  onChange={(e) => setPageNo(Number(e.target.value))}
-                >
-                  {pages.map((p) => (
-                    <option key={p.page} value={p.page}>
-                      {p.page}쪽{p.isScanned ? ' (스캔)' : ''}
-                      {p.text.trim().length === 0 && !p.isScanned ? ' (빈 쪽)' : ''}
-                    </option>
-                  ))}
-                </select>
-                <span className="muted">
-                  {openDoc.extractor && `추출: ${openDoc.extractor}`}
-                </span>
-              </div>
-              {current && <PageTextView page={current} />}
+              {pages === null && <p className="muted">불러오는 중…</p>}
+              {pages && pages.length > 0 && (
+                <>
+                  <div className="row-form">
+                    <label className="field-label" htmlFor="pg">
+                      쪽
+                    </label>
+                    <select
+                      id="pg"
+                      className="input input-narrow"
+                      value={pageNo}
+                      onChange={(e) => setPageNo(Number(e.target.value))}
+                    >
+                      {pages.map((p) => (
+                        <option key={p.page} value={p.page}>
+                          {p.page}쪽{p.isScanned ? ' (스캔)' : ''}
+                          {p.text.trim().length === 0 && !p.isScanned ? ' (빈 쪽)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="muted">
+                      {openDoc.extractor && `추출: ${openDoc.extractor}`}
+                    </span>
+                  </div>
+                  {current && <PageTextView page={current} />}
+                </>
+              )}
             </>
           )}
         </section>

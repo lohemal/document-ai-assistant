@@ -40,6 +40,10 @@ pub fn run() {
             commands::document::document_pages,
             commands::document::document_page,
             commands::document::document_delete,
+            commands::chunk::chunk_save,
+            commands::chunk::chunk_list,
+            commands::chunk::chunk_get,
+            commands::chunk::chunk_count,
         ])
         .setup(|app| {
             // 자료를 여는 데 실패해도 앱은 뜬다. 화면에서 이유를 보여 준다.

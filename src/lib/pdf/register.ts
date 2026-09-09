@@ -6,6 +6,8 @@
  * `indexing` 인 채로 남고, 검색에 쓰이지 않는다.
  */
 import { documentStatus, type PageKind } from './extract'
+import { buildChunks } from '../chunk/build'
+import { saveChunks } from '@/ipc/chunks'
 import { EXTRACTOR, extractPage, openPdf, pageLabels } from './loader'
 import {
   documentBytes,
@@ -18,7 +20,7 @@ import {
 } from '@/ipc/documents'
 
 export type Progress = {
-  phase: '파일 읽는 중' | '글자 뽑는 중' | '갈무리하는 중'
+  phase: '파일 읽는 중' | '글자 뽑는 중' | '나누는 중' | '갈무리하는 중'
   page: number
   total: number
 }
@@ -52,6 +54,7 @@ export async function registerPdf(
     const total = pdf.numPages
 
     const kinds: PageKind[] = []
+    const texts: { page: number; text: string }[] = []
     let batch: PageIn[] = []
 
     for (let p = 1; p <= total; p++) {
@@ -68,6 +71,7 @@ export async function registerPdf(
       page.cleanup()
 
       kinds.push(ex.kind)
+      texts.push({ page: ex.page, text: ex.text })
       batch.push({
         page: ex.page,
         label: ex.label,
@@ -83,6 +87,12 @@ export async function registerPdf(
     }
 
     if (batch.length > 0) await saveDocumentPages(doc.id, batch)
+
+    // 글자를 다 뽑았으면 검색하기 좋은 크기로 나눈다.
+    // 나누기는 AI 모델이 필요 없다 — 여기까지가 P4a 의 밑바탕이다.
+    onProgress({ phase: '나누는 중', page: total, total })
+    const chunks = buildChunks(texts)
+    if (chunks.length > 0) await saveChunks(doc.id, chunks)
 
     onProgress({ phase: '갈무리하는 중', page: total, total })
     await task.destroy()

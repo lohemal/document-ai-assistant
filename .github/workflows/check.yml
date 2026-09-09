@@ -49,6 +49,10 @@ jobs:
       - name: PDF 추출 검사
         run: npm run check:pdf
 
+      # 청크가 가리키는 자리가 실제 pdf.js 항목으로 이어지는지 — 형광펜의 근거.
+      - name: 청크·위치 검사
+        run: npm run check:chunk
+
       - name: 타입 검사 · 화면 빌드
         run: npm run build
 

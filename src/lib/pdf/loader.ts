@@ -16,7 +16,7 @@ import {
   type ItemSpan,
   type PageKind,
   type TextItemLike,
-} from './extract'
+} from './extract.ts'
 
 // 워커도 앱 안에서 가져온다. CDN 을 쓰지 않는다.
 pdfjs.GlobalWorkerOptions.workerPort = new Worker(

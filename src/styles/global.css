@@ -145,6 +145,10 @@ li,
 
 .content {
   overflow-y: auto;
+  /* grid 의 1fr 칸은 기본이 min-width:auto 라, 안에 든 것이 넓으면 칸이
+     창보다 넓어진다. 그러면 오른쪽이 창 밖으로 잘려 버튼이 안 보인다.
+     (P4c 에서 버튼 셋이 붙는 줄을 만들며 드러났다) */
+  min-width: 0;
 }
 
 /* ── 페이지 ──────────────────────────────────────────────────────── */
@@ -400,6 +404,10 @@ code {
   display: flex;
   gap: 6px;
   align-items: center;
+  /* 고를 것이 셋까지 붙는 자리가 있다(모델 불일치). 창이 좁으면 접히게 한다 —
+     안 접히면 마지막 버튼이 잘려서 고를 수가 없다. */
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .confirm-ask {
@@ -1011,6 +1019,38 @@ select.input {
   font-size: 12px;
 }
 
+/* 색인 진행률은 담을 것이 많다 — 한 줄에 다 넣지 않고 접히게 한다.
+   (P4c: 문서명·청크 수·%·경과·남은 시간·모델·멈추기 버튼) */
+.progress {
+  flex-wrap: wrap;
+}
+
+.progress-line {
+  flex: 1 1 260px;
+}
+
+.progress-bar {
+  flex: 1 1 200px;
+}
+
+/* 경과·남은 시간·모델 줄은 아예 다음 줄로 내린다. 한 줄에 밀어 넣으면
+   창이 좁을 때 오른쪽이 잘려서, 정작 필요한 [멈추기] 가 안 보인다. */
+.progress .progress-line.muted {
+  flex: 1 1 100%;
+}
+
 .progress-line + .progress-line {
   margin-top: 2px;
+}
+
+/* 고를 것이 여럿인 안내 (모델 불일치·재색인) — 설명 바로 아래에 붙인다 */
+.choice {
+  margin-top: 6px;
+}
+
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
 }

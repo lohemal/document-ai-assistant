@@ -33,6 +33,8 @@ function tagKind(s: DocIndex['state']): string {
 
 type Props = {
   collectionId: number | null
+  /** 바깥에서 자료가 바뀌었을 때 올려 주는 수. 바뀌면 상태를 다시 읽는다 */
+  version?: number
   /** 색인이 끝나면 바깥 화면도 새로 그리게 */
   onChanged?: () => void
 }
@@ -44,7 +46,7 @@ type Props = {
  * 색인을 하지 않아도 낱말 검색은 그대로 되므로, 서두를 일이 아니라는 것을
  * 화면이 말해 준다.
  */
-export default function IndexPanel({ collectionId, onChanged }: Props) {
+export default function IndexPanel({ collectionId, version, onChanged }: Props) {
   const [view, setView] = useState<IndexOverview | null>(null)
   const [live, setLive] = useState<IndexEvent | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -62,9 +64,10 @@ export default function IndexPanel({ collectionId, onChanged }: Props) {
     }
   }, [collectionId])
 
+  // 자료집이 바뀌거나, 바깥에서 자료를 등록·삭제했을 때 다시 읽는다
   useEffect(() => {
     void reload()
-  }, [reload])
+  }, [reload, version])
 
   useEffect(() => {
     void onIndexProgress((e) => {
@@ -182,7 +185,13 @@ export default function IndexPanel({ collectionId, onChanged }: Props) {
       )}
 
       <ul className="list">
-        {view.documents.map((d) => {
+        {view.documents.map((raw) => {
+          // 도는 중인 문서는 목록에서도 살아 움직이게 한다. 목록은 판이 끝날
+          // 때만 다시 읽으므로, 그동안 0 / 255 로 멈춰 보이면 고장 같다.
+          const d =
+            live && live.documentId === raw.documentId
+              ? { ...raw, done: live.done, state: 'running' as const, label: '색인 중' }
+              : raw
           const action = indexAction(d.state)
           return (
             <li className="list-item" key={d.documentId}>
@@ -200,23 +209,57 @@ export default function IndexPanel({ collectionId, onChanged }: Props) {
                   )}
                 </div>
 
-                {d.state === 'model_mismatch' && (
-                  <div className="list-warn">
-                    이 자료는 이전 검색 모델로 색인되어 있습니다. 지금 모델(
-                    {view.model.name})로 의미 검색을 쓰려면 다시 색인해야 합니다.
-                  </div>
-                )}
-                {d.state === 'needs_reindex' && (
-                  <div className="list-warn">
-                    자료가 바뀌어 옛 벡터를 쓸 수 없습니다({d.stale}개). 다시 색인해야 의미
-                    검색이 맞습니다.
+                {(d.state === 'model_mismatch' || d.state === 'needs_reindex') && (
+                  <div className="choice">
+                    <p className="list-warn">
+                      {d.state === 'model_mismatch' ? (
+                        <>
+                          이 자료는 이전 검색 모델({d.indexedWith})로 색인되어 있습니다. 지금
+                          모델({view.model.name})로 의미 검색을 쓰려면 다시 색인해야 합니다.
+                        </>
+                      ) : (
+                        <>
+                          자료가 바뀌어 옛 벡터 {d.stale}개를 쓸 수 없습니다. 다시 색인해야 의미
+                          검색이 맞습니다.
+                        </>
+                      )}
+                    </p>
+                    {/* 고를 것을 설명 바로 아래에 둔다. 오른쪽 끝에 몰아 두면
+                        무엇에 대한 선택인지 읽히지 않는다. */}
+                    <div className="choice-row">
+                      <button
+                        className="btn"
+                        disabled={busy || live !== null}
+                        onClick={() => void start([d.documentId], true)}
+                      >
+                        현재 모델로 다시 색인
+                      </button>
+                      <button
+                        className="btn btn-quiet"
+                        disabled={busy}
+                        onClick={() =>
+                          setNotice(
+                            '기존 색인을 그대로 두었습니다. 이 자료는 낱말로 찾습니다. 검색 모델을 되돌리면 만들어 둔 벡터를 다시 쓸 수 있습니다.',
+                          )
+                        }
+                      >
+                        기존 색인 유지
+                      </button>
+                      <button
+                        className="btn btn-quiet"
+                        disabled={busy}
+                        onClick={() => void dropUnusable(d.documentId)}
+                      >
+                        낱말 검색만 쓰기
+                      </button>
+                    </div>
                   </div>
                 )}
                 {d.state === 'failed' && d.error && <div className="list-warn">⚠ {d.error}</div>}
               </div>
 
               <div className="list-actions">
-                {action && !live && (
+                {action && !live && !action.reindex && (
                   <button
                     className="btn"
                     disabled={busy}
@@ -224,20 +267,6 @@ export default function IndexPanel({ collectionId, onChanged }: Props) {
                   >
                     {action.label}
                   </button>
-                )}
-                {(d.state === 'model_mismatch' || d.state === 'needs_reindex') && !live && (
-                  <>
-                    <button className="btn btn-quiet" disabled={busy} onClick={() => setNotice('기존 색인을 그대로 두었습니다. 이 자료는 낱말로 찾습니다. 검색 모델을 되돌리면 다시 쓸 수 있습니다.')}>
-                      기존 색인 유지
-                    </button>
-                    <button
-                      className="btn btn-quiet"
-                      disabled={busy}
-                      onClick={() => void dropUnusable(d.documentId)}
-                    >
-                      낱말 검색만 쓰기
-                    </button>
-                  </>
                 )}
               </div>
             </li>

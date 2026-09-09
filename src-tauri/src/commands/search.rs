@@ -70,9 +70,25 @@ pub async fn search_query(
     })?;
     let ready: i64 = usable.iter().map(|d| d.done).sum();
     if ready == 0 {
-        return keyword_only(Some(
-            "의미 검색 색인이 아직 없어 낱말로만 찾았습니다.".into(),
-        ));
+        // 왜 없는지에 따라 사용자가 할 일이 다르다. 뭉뚱그리지 않는다.
+        let other: i64 = usable.iter().map(|d| d.other_model).sum();
+        let stale: i64 = usable.iter().map(|d| d.stale).sum();
+        let why = if other > 0 {
+            format!(
+                "이 자료는 다른 검색 모델로 색인되어 있어 낱말로만 찾았습니다. \
+                 지금 모델({})로 쓰려면 [자료 등록] 에서 다시 색인해 주세요.",
+                model.name
+            )
+        } else if stale > 0 {
+            "자료가 바뀌어 옛 색인을 쓸 수 없어 낱말로만 찾았습니다. \
+             [자료 등록] 에서 다시 색인해 주세요."
+                .to_string()
+        } else {
+            "의미 검색 색인이 아직 없어 낱말로만 찾았습니다. \
+             [자료 등록] 에서 색인하면 같은 뜻의 다른 말로도 찾습니다."
+                .to_string()
+        };
+        return keyword_only(Some(why));
     }
 
     // ③ 물음을 벡터로. AI 가 꺼져 있으면 여기서 걸린다 — 그때도 검색은 된다.

@@ -30,6 +30,8 @@ export default function Documents() {
   const [notice, setNotice] = useState<string | null>(null)
   const [progress, setProgress] = useState<Progress | null>(null)
   const cancelled = useRef(false)
+  /** 자료를 등록·삭제하면 올린다. 색인 판이 이 수를 보고 다시 읽는다 */
+  const [docsVersion, setDocsVersion] = useState(0)
 
   // 글자 보기
   const [openDoc, setOpenDoc] = useState<Document | null>(null)
@@ -49,6 +51,7 @@ export default function Documents() {
   const reload = useCallback(async (id: number) => {
     try {
       setDocs(await listDocuments(id))
+      setDocsVersion((v) => v + 1)
       setError(null)
     } catch (e) {
       setError(message(e))
@@ -217,7 +220,7 @@ export default function Documents() {
         </ul>
       )}
 
-      {docs.length > 0 && <IndexPanel collectionId={collectionId} />}
+      {docs.length > 0 && <IndexPanel collectionId={collectionId} version={docsVersion} />}
 
       {openDoc && (
         <section className="card viewer">

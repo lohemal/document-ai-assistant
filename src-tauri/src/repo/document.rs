@@ -56,7 +56,14 @@ pub struct PageOut {
 const SELECT: &str = "
 SELECT d.id, d.collection_id, d.title, d.filename, d.sha256, d.byte_size,
        d.page_count, d.status, d.embed_state, d.extractor,
-       (SELECT COUNT(*) FROM page p WHERE p.document_id = d.id AND LENGTH(TRIM(p.text)) < 50),
+       -- 글자 없는 쪽. 세는 규칙이 `pageKind`(src/lib/pdf/extract.ts) 와 **같아야**
+       -- 한다. TRIM 만 하면 표 사이의 탭과 줄바꿈이 글자로 세어져, 등록 때
+       -- '스캔본' 으로 판단한 쪽 수와 화면에 보이는 쪽 수가 어긋난다.
+       -- (실제로 368쪽 지침에서 15와 12로 갈렸다.)
+       (SELECT COUNT(*) FROM page p
+         WHERE p.document_id = d.id
+           AND LENGTH(REPLACE(REPLACE(REPLACE(REPLACE(p.text, ' ', ''),
+                              CHAR(9), ''), CHAR(10), ''), CHAR(13), '')) < 50),
        d.created_at
   FROM document d
 ";
@@ -379,10 +386,14 @@ mod tests {
                 page_in(1, &"가".repeat(80), "[]", "text"),
                 page_in(2, "", "[]", "scanned"),
                 page_in(3, "짧다", "[]", "empty"),
+                // 표 사이의 탭·줄바꿈은 글자가 아니다. 이 쪽은 '글자 없는 쪽'
+                // 으로 세어야 한다 — 등록 때의 판단과 화면의 숫자를 맞춘다.
+                // 글자는 40자뿐인데 탭·줄바꿈까지 세면 80자가 된다
+                page_in(4, &"칸\t칸\n".repeat(20), "[]", "empty"),
             ],
         )
         .unwrap();
-        assert_eq!(get(&c, id).unwrap().blank_pages, 2);
+        assert_eq!(get(&c, id).unwrap().blank_pages, 3);
     }
 
     #[test]

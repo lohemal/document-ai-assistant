@@ -1,0 +1,7 @@
+{
+  "questionId": "as-18",
+  "model": "gemma3:4b",
+  "promptHash": "9c10e6bc80dd08f4",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"검사완료한 후 계약상대자의 청구를 받은 날부터 5일 이내에 기성대가 지급\"\n}",
+  "llmMs": 12214
+}

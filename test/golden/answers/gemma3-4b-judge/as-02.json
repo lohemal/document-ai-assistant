@@ -1,0 +1,7 @@
+{
+  "questionId": "as-02",
+  "model": "gemma3:4b",
+  "promptHash": "3dac5fc5f6dd0668",
+  "raw": "{ \"answerable\": true, \"missing\": \"자유수강권\" }",
+  "llmMs": 24912
+}

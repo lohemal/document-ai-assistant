@@ -1,0 +1,7 @@
+{
+  "questionId": "et-10",
+  "model": "gemma3:4b",
+  "promptHash": "6c5a9e143ee7a519",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"초1(보호자), 초4, 중1, 고1\"\n}",
+  "llmMs": 14155
+}

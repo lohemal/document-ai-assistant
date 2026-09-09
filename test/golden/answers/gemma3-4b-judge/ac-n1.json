@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-n1",
+  "model": "gemma3:4b",
+  "promptHash": "10bcd8b4a1207a01",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"9,000원\"\n}",
+  "llmMs": 12239
+}

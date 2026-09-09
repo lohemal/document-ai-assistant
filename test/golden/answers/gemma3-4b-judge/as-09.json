@@ -1,0 +1,7 @@
+{
+  "questionId": "as-09",
+  "model": "gemma3:4b",
+  "promptHash": "e649435c20acd64f",
+  "raw": "{\n  \"answerable\": false,\n  \"missing\": \"5만 2천원\"\n}",
+  "llmMs": 8133
+}

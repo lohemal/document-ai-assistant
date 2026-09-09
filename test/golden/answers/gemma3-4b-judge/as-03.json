@@ -1,0 +1,7 @@
+{
+  "questionId": "as-03",
+  "model": "gemma3:4b",
+  "promptHash": "9b720815b47233cd",
+  "raw": "{\n  \"answerable\": false,\n  \"missing\": \"수익자부담 또는 재정 지원\"\n}",
+  "llmMs": 10264
+}

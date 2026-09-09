@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-18",
+  "model": "gemma3:4b",
+  "promptHash": "1c4bd0975101a9dc",
+  "raw": "{\n\"answerable\": false,\n\"missing\": \"일비는 일수에 따라 1일당 2만원 지급하되 차량을 임차하여 사용하거나 관용차량을 이용한 출장 시에는 2분의 1을 지급\"\n}",
+  "llmMs": 13969
+}

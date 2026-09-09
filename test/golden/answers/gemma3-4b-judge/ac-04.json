@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-04",
+  "model": "gemma3:4b",
+  "promptHash": "bb30553ae1d2940c",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"회계연도 종료 후 2월 이내\"\n}",
+  "llmMs": 12530
+}

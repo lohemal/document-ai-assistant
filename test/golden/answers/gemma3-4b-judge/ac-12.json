@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-12",
+  "model": "gemma3:4b",
+  "promptHash": "205f2164ddbb425d",
+  "raw": "{\"answerable\": true, \"missing\": \"1만원\"}",
+  "llmMs": 12427
+}

@@ -1,0 +1,7 @@
+{
+  "questionId": "as-06",
+  "model": "gemma3:4b",
+  "promptHash": "ec4b206800cc5944",
+  "raw": "{ \"answerable\": true, \"missing\": \"강사가 직접 수납할 수 없으며, 학교회계출납원이 수납하는 것을 원칙으로 함\" }",
+  "llmMs": 26119
+}

@@ -1,0 +1,7 @@
+{
+  "questionId": "as-13",
+  "model": "gemma3:4b",
+  "promptHash": "ca2e12753bb194d0",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"학생·학부모의 동의와 학교운영위원회 심의\"\n}",
+  "llmMs": 11527
+}

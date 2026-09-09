@@ -1,0 +1,7 @@
+{
+  "questionId": "as-08",
+  "model": "gemma3:4b",
+  "promptHash": "55b62fd4a93b2bee",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"5일\"\n}",
+  "llmMs": 10855
+}

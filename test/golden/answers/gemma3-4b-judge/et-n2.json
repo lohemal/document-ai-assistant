@@ -1,0 +1,7 @@
+{
+  "questionId": "et-n2",
+  "model": "gemma3:4b",
+  "promptHash": "b40ef0962209797d",
+  "raw": "{\"answerable\": true, \"missing\": \"6만원\"}",
+  "llmMs": 12058
+}

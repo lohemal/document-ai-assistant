@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-11",
+  "model": "gemma3:4b",
+  "promptHash": "4eead41d161167cf",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"생일시 소액(1인당 3만원 이하)의 상품권, 케익 등 지급 경비\"\n}",
+  "llmMs": 13727
+}

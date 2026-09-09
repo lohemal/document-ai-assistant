@@ -1,0 +1,7 @@
+{
+  "questionId": "et-02",
+  "model": "gemma3:4b",
+  "promptHash": "94a8a606729c2c4c",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"미디어 과의존 진단조사 실시\"\n}",
+  "llmMs": 36156
+}

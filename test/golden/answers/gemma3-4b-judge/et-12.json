@@ -1,0 +1,7 @@
+{
+  "questionId": "et-12",
+  "model": "gemma3:4b",
+  "promptHash": "af37de840b70998a",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"심층상담\"\n}",
+  "llmMs": 37556
+}

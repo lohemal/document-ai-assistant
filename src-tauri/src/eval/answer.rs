@@ -36,24 +36,24 @@ const MODEL: &str = "gemma3:4b";
 const COV: [f64; 5] = [0.001, 0.2, 0.26, 0.34, 0.4];
 
 #[derive(Debug, Deserialize)]
-struct Negative {
-    question_id: String,
+pub(super) struct Negative {
+    pub(super) question_id: String,
     #[allow(dead_code)]
-    document_id: i64,
-    collection_id: i64,
-    question: String,
+    pub(super) document_id: i64,
+    pub(super) collection_id: i64,
+    pub(super) question: String,
     /// 자료에 무엇이 없는지 (사람이 적어 둔 것)
-    absent: String,
+    pub(super) absent: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct GoldenAll {
-    questions: Vec<Question>,
+pub(super) struct GoldenAll {
+    pub(super) questions: Vec<Question>,
     #[serde(default)]
-    negatives: Vec<Negative>,
+    pub(super) negatives: Vec<Negative>,
 }
 
-fn load_all() -> GoldenAll {
+pub(super) fn load_all() -> GoldenAll {
     let path = format!("{ROOT}/golden.json");
     let raw = std::fs::read_to_string(&path)
         .unwrap_or_else(|e| panic!("{path} 를 읽지 못했습니다 ({e})"));
@@ -123,34 +123,36 @@ fn ask_model(qid: &str, user_prompt: &str) -> Result<(String, u64, bool), String
 
 // ── 한 물음 돌리기 ───────────────────────────────────────────────────
 
-struct Ran {
-    decision: refuse::Decision,
+pub(super) struct Ran {
+    pub(super) decision: refuse::Decision,
     /// 근거로 넘어간 청크 id
-    evidence_ids: Vec<i64>,
+    pub(super) evidence_ids: Vec<i64>,
+    /// LLM 에게 실제로 넘긴 근거의 원문 (핵심 개념 실험용 — `eval::concept`)
+    pub(super) evidence_texts: Vec<String>,
     /// 답변이 인용한 청크 id
-    cited_ids: Vec<i64>,
-    citations_ok: bool,
-    numbers_total: usize,
-    numbers_missing: usize,
-    llm_ms: u64,
-    fresh: bool,
+    pub(super) cited_ids: Vec<i64>,
+    pub(super) citations_ok: bool,
+    pub(super) numbers_total: usize,
+    pub(super) numbers_missing: usize,
+    pub(super) llm_ms: u64,
+    pub(super) fresh: bool,
     /// **주장 뒷받침 검사** 때문에 거부했는가.
     /// 이 신호를 빼면 어떻게 되는지 함께 재려고 담아 둔다.
-    refused_by_support: bool,
+    pub(super) refused_by_support: bool,
     /// 뒷받침되지 않은 주장 수
-    unsupported: usize,
+    pub(super) unsupported: usize,
     /// **아직 판단에 쓰지 않는 신호** — 물음의 핵심어를 인용 근거가 얼마나 덮는가.
     /// 넣을지 말지를 이 수치로 정한다 (`refuse::question_gap`).
-    gap: refuse::KeyWords,
+    pub(super) gap: refuse::KeyWords,
     /// 왜 그렇게 판단했는지 (첫 까닭)
-    reason: String,
+    pub(super) reason: String,
     /// 형식을 못 읽었으면 그 까닭
-    parse_error: Option<String>,
-    answer: String,
+    pub(super) parse_error: Option<String>,
+    pub(super) answer: String,
 }
 
 #[allow(clippy::too_many_arguments)]
-fn run_one(
+pub(super) fn run_one(
     conn: &Connection,
     vs: &Vectors,
     qid: &str,
@@ -183,6 +185,7 @@ fn run_one(
         return Some(Ran {
             decision: refuse::Decision::Refuse,
             evidence_ids,
+            evidence_texts: evidence.iter().map(|e| e.text.clone()).collect(),
             cited_ids: vec![],
             citations_ok: false,
             numbers_total: 0,
@@ -217,6 +220,7 @@ fn run_one(
             return Some(Ran {
                 decision: refuse::Decision::Refuse,
                 evidence_ids,
+                evidence_texts: evidence.iter().map(|e| e.text.clone()).collect(),
                 cited_ids: vec![],
                 citations_ok: false,
                 numbers_total: 0,
@@ -259,6 +263,7 @@ fn run_one(
         gap: refuse::question_gap(question, &cited_texts),
         decision: judgement.decision,
         evidence_ids,
+        evidence_texts: evidence.iter().map(|e| e.text.clone()).collect(),
         cited_ids,
         citations_ok: verdict.citations_ok,
         numbers_total: verdict.numbers.len(),

@@ -1,0 +1,7 @@
+{
+  "questionId": "et-n3",
+  "model": "gemma3:4b",
+  "promptHash": "ae88f3de68ca641f",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"반기별\"\n}",
+  "llmMs": 11944
+}

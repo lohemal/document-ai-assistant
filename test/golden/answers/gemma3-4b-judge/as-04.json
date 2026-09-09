@@ -1,0 +1,7 @@
+{
+  "questionId": "as-04",
+  "model": "gemma3:4b",
+  "promptHash": "3d1e677c74a4ccd1",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"강사료, 도서구입비, 재료구입비, 수용비\"\n}",
+  "llmMs": 8445
+}

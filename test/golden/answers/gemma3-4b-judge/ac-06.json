@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-06",
+  "model": "gemma3:4b",
+  "promptHash": "b78f15e1ba31a68e",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"1인당 50,000원 이내\"\n}",
+  "llmMs": 14373
+}

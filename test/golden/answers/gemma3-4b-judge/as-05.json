@@ -1,0 +1,7 @@
+{
+  "questionId": "as-05",
+  "model": "gemma3:4b",
+  "promptHash": "dded79ab243facff",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"강사료의 5%이내\"\n}",
+  "llmMs": 13917
+}

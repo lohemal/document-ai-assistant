@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-14",
+  "model": "gemma3:4b",
+  "promptHash": "b61de291338f9bfd",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"공무원여비규정상 현지교통비, 통신비, 세탁비, 음료수비 등 잡비에 사용되는 여비항목\"\n}",
+  "llmMs": 13408
+}

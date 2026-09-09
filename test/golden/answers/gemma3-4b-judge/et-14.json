@@ -1,0 +1,7 @@
+{
+  "questionId": "et-14",
+  "model": "gemma3:4b",
+  "promptHash": "aeb099f24d377a33",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"8500\"\n}",
+  "llmMs": 12424
+}

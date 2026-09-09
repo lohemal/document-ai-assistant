@@ -1,0 +1,7 @@
+{
+  "questionId": "et-09",
+  "model": "gemma3:4b",
+  "promptHash": "723f3bbdd925837b",
+  "raw": "{ \"answerable\": true, \"missing\": \"3월 신청, 4월~11월 운영\" }",
+  "llmMs": 19898
+}

@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-05",
+  "model": "gemma3:4b",
+  "promptHash": "b25bc080c1feff79",
+  "raw": "{\n\"answerable\": false,\n\"missing\": \"3월 31일까지\"\n}",
+  "llmMs": 9075
+}

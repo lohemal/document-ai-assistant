@@ -1,0 +1,7 @@
+{
+  "questionId": "as-11",
+  "model": "gemma3:4b",
+  "promptHash": "1ae699f776c3f17c",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"최소 7인 이상\"\n}",
+  "llmMs": 11196
+}

@@ -1,0 +1,7 @@
+{
+  "questionId": "as-16",
+  "model": "gemma3:4b",
+  "promptHash": "0f14f85081af7cd4",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"외부위탁업체와 계약 시에는 업체의 고의·과실의 경우, 보상청구가 가능하도록 민간보험(영업배상책임보험)의 가입 조항을 명시함\"\n}",
+  "llmMs": 13167
+}

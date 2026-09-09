@@ -1,0 +1,7 @@
+{
+  "questionId": "et-16",
+  "model": "gemma3:4b",
+  "promptHash": "27fbe6d437720e35",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"스마트쉼센터\"\n}",
+  "llmMs": 12682
+}

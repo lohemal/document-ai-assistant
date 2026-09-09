@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-08",
+  "model": "gemma3:4b",
+  "promptHash": "7c6dac9b8ec90d0d",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"해당 금액 기준은 명시되어 있지 않음\"\n}",
+  "llmMs": 11858
+}

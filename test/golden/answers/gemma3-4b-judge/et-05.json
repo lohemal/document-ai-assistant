@@ -1,0 +1,7 @@
+{
+  "questionId": "et-05",
+  "model": "gemma3:4b",
+  "promptHash": "24ccb303dfda732c",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"3·4·6학년\"\n}",
+  "llmMs": 12679
+}

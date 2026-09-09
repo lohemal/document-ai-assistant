@@ -1,0 +1,7 @@
+{
+  "questionId": "et-11",
+  "model": "gemma3:4b",
+  "promptHash": "b22419b09ef2b409",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"미디어 과의존 진단조사 및 사후 치유서비스(상담, 캠프 등), 상담 전문인력 양성\"\n}",
+  "llmMs": 13651
+}

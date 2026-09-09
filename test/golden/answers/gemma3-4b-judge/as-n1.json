@@ -1,0 +1,7 @@
+{
+  "questionId": "as-n1",
+  "model": "gemma3:4b",
+  "promptHash": "4540e97b2e6058da",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"1인당 연간 지원 금액 범위 내에서\"\n}",
+  "llmMs": 11903
+}

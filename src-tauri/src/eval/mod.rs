@@ -390,3 +390,11 @@ mod run;
 #[cfg(test)]
 #[path = "answer.rs"]
 mod answer;
+
+#[cfg(test)]
+#[path = "concept.rs"]
+mod concept;
+
+#[cfg(test)]
+#[path = "judge.rs"]
+mod judge;

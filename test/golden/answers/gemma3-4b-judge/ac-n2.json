@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-n2",
+  "model": "gemma3:4b",
+  "promptHash": "c19e07256227f8a9",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"20%\"\n}",
+  "llmMs": 36862
+}

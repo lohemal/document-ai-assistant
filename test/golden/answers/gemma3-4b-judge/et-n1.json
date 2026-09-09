@@ -1,0 +1,7 @@
+{
+  "questionId": "et-n1",
+  "model": "gemma3:4b",
+  "promptHash": "77086924fd003cf7",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"연 2회\"\n}",
+  "llmMs": 12449
+}

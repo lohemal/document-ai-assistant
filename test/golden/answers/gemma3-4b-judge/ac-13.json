@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-13",
+  "model": "gemma3:4b",
+  "promptHash": "3e40926215cd5734",
+  "raw": "{\n\"answerable\": false,\n\"missing\": \"4시간 미만\"\n}",
+  "llmMs": 12933
+}

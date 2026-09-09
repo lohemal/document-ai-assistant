@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-01",
+  "model": "gemma3:4b",
+  "promptHash": "0f25ca4b55d9fb34",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"10일 이내\"\n}",
+  "llmMs": 11742
+}

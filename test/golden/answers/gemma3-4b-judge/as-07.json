@@ -1,0 +1,7 @@
+{
+  "questionId": "as-07",
+  "model": "gemma3:4b",
+  "promptHash": "be7c8edfa45926ca",
+  "raw": "{ \"answerable\": true, \"missing\": \"수강료를 쓰고 남은 돈은 학교에 반환해야 합니다.\" }",
+  "llmMs": 34184
+}

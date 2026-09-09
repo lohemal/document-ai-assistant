@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-17",
+  "model": "gemma3:4b",
+  "promptHash": "26cafcc14c066fd4",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"사업부서 담당자\"\n}",
+  "llmMs": 12224
+}

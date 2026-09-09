@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-15",
+  "model": "gemma3:4b",
+  "promptHash": "f03d4a639d34eac5",
+  "raw": "{\n  \"answerable\": false,\n  \"missing\": \"각종 상품권 구입\"\n}",
+  "llmMs": 11992
+}

@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-07",
+  "model": "gemma3:4b",
+  "promptHash": "26008421e822a7a5",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"1인 1회당 40,000원까지\"\n}",
+  "llmMs": 14122
+}

@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-10",
+  "model": "gemma3:4b",
+  "promptHash": "1dcc20e731130276",
+  "raw": "{\"answerable\": false, \"missing\": \"교직원 9,000원(1인 1식) 이내\"}",
+  "llmMs": 12622
+}

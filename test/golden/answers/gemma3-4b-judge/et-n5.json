@@ -1,0 +1,7 @@
+{
+  "questionId": "et-n5",
+  "model": "gemma3:4b",
+  "promptHash": "170bfa5b34c690b9",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"1시간당 6만원\"\n}",
+  "llmMs": 12884
+}

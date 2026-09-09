@@ -1,0 +1,7 @@
+{
+  "questionId": "et-n4",
+  "model": "gemma3:4b",
+  "promptHash": "01532675962d5ecb",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"학급당\"\n}",
+  "llmMs": 12617
+}

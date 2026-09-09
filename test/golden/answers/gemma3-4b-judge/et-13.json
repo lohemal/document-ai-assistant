@@ -1,0 +1,7 @@
+{
+  "questionId": "et-13",
+  "model": "gemma3:4b",
+  "promptHash": "b431f1ce3909270b",
+  "raw": "{\"answerable\": true, \"missing\": \"한국 저작권 위원회\"}",
+  "llmMs": 11940
+}

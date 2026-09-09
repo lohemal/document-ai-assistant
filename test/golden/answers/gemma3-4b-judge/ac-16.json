@@ -1,0 +1,7 @@
+{
+  "questionId": "ac-16",
+  "model": "gemma3:4b",
+  "promptHash": "1cc5565a038881a3",
+  "raw": "{\n\"answerable\": true,\n\"missing\": \"일반수용비 등으로 업무추진비성 경비를 써도 돼?\"\n}",
+  "llmMs": 12969
+}

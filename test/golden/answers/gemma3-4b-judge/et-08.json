@@ -1,0 +1,7 @@
+{
+  "questionId": "et-08",
+  "model": "gemma3:4b",
+  "promptHash": "6876d7efe1e3d79f",
+  "raw": "{\n  \"answerable\": true,\n  \"missing\": \"1회기당 40,000원\"\n}",
+  "llmMs": 13332
+}

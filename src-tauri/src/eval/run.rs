@@ -335,3 +335,64 @@ fn 자료가_늘어도_버틴다() {
         assert!(m < 2000.0, "뜻 검색이 {m:.0}ms 나 걸립니다 — 색인 구조를 생각할 때입니다");
     }
 }
+
+/// 거부 임계값의 출발점을 실제 자료로 잰다 (설계안 2-7 · 위험 5번).
+///
+/// 답이 자료에 **있을 때** 정답 청크의 코사인이 얼마쯤인지, 같은 물음에서
+/// **틀린 1등**은 얼마쯤인지 본다. 두 분포가 겹치는 만큼이 "없다고 말해야
+/// 하는데 말하지 못하는" 구간이다.
+///
+/// 여기서 임계값을 정하지는 않는다 — 없는 것을 묻는 물음(negative)이 골든 셋에
+/// 아직 없기 때문이다. P5 에서 그것을 더해 정한다.
+#[test]
+fn 정답과_오답의_점수_차이를_본다() {
+    let Ok(vs) = load_vectors() else {
+        println!("\n[점수 분포] 벡터가 없어 재지 못했습니다.");
+        return;
+    };
+    let corpus = load_corpus();
+    let (conn, ids) = build(&corpus, Some(&vs));
+    let qs = load_golden();
+
+    let mut right: Vec<f64> = Vec::new();
+    let mut wrong_top: Vec<f64> = Vec::new();
+
+    for q in &qs {
+        let want = wanted(q, &ids);
+        let qv = &vs.questions[&q.question_id];
+        let (scored, _) = vector::nearest(&conn, qv, &[], 50).unwrap();
+
+        if let Some((_, s)) = scored.iter().find(|(id, _)| want.contains(id)) {
+            right.push(*s);
+        }
+        if let Some((_, s)) = scored.iter().find(|(id, _)| !want.contains(id)) {
+            wrong_top.push(*s);
+        }
+    }
+
+    let stat = |v: &mut Vec<f64>| {
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let mean = v.iter().sum::<f64>() / v.len() as f64;
+        (v[0], mean, v[v.len() - 1], v[v.len() / 10])
+    };
+    let (rmin, rmean, rmax, r10) = stat(&mut right);
+    let (wmin, wmean, wmax, _) = stat(&mut wrong_top);
+
+    println!("\n[코사인 점수 분포 · {} · 물음 {}개]", vs.model, qs.len());
+    println!("  정답 청크    최저 {rmin:.3} · 하위10% {r10:.3} · 평균 {rmean:.3} · 최고 {rmax:.3}");
+    println!("  틀린 1등     최저 {wmin:.3} · 평균 {wmean:.3} · 최고 {wmax:.3}");
+    println!(
+        "  정답이 50등 안에도 없는 물음 {}개",
+        qs.len() - right.len()
+    );
+    println!("  → 두 분포가 거의 그대로 겹칩니다. 코사인 하나로 '자료에 없다'를");
+    println!("    가를 수 없습니다. P5 의 거부 판단은 점수만 보지 말고 인용 대조를");
+    println!("    함께 봐야 합니다 (설계안 2-7 의 0.35/0.50 은 그대로 쓸 수 없습니다).");
+
+    // 절반도 못 걸리면 그건 벡터가 망가진 것이다
+    assert!(
+        right.len() * 2 > qs.len(),
+        "50등 안에 정답이 든 물음이 {}개뿐입니다",
+        right.len()
+    );
+}

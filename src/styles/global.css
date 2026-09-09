@@ -798,3 +798,195 @@ select.input {
   margin-bottom: 6px;
   font-size: 14px;
 }
+
+/* ── AI 설치 ─────────────────────────────────────────────────────── */
+
+.card-calm {
+  background: var(--accent-soft);
+  border-color: #bfe0e8;
+}
+
+.card-dim {
+  opacity: 0.62;
+}
+
+.step-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.step-head .card-title {
+  margin: 0;
+}
+
+.statuschip {
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chip-ok {
+  background: #e8f5ee;
+  border: 1px solid #bfe0cd;
+  color: #16794a;
+}
+
+.chip-off {
+  background: #f1f3f6;
+  border: 1px solid var(--line);
+  color: var(--ink-faint);
+}
+
+.pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 10px;
+  margin-right: 4px;
+  background: var(--panel);
+  border: 1px solid #bfe0e8;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+.installbox {
+  padding: 12px 14px;
+  margin-top: 10px;
+  background: #fbfcfd;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.installbox .row-form {
+  margin-bottom: 10px;
+}
+
+.cmd {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  background: #2b3240;
+  border-radius: 6px;
+  color: #e7edf5;
+  font-family: Consolas, monospace;
+  font-size: 13px;
+}
+
+.small {
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.modellist {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.modelitem {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--panel);
+}
+
+.modelitem + .modelitem {
+  border-top: 1px solid var(--line);
+}
+
+.modelitem.is-rec {
+  background: #fbfdfe;
+}
+
+.modelitem-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.modelitem-name {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.modelitem-note {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.modelitem-meta {
+  margin-top: 2px;
+  font-size: 12.5px;
+}
+
+.modelitem-test {
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--accent);
+}
+
+.tag-role {
+  background: #eef1f4;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+.tag-rec {
+  background: var(--accent-soft);
+  border: 1px solid #bfe0e8;
+  color: var(--accent);
+}
+
+/* ── AI 가 필요한 화면 앞의 안내 ─────────────────────────────────── */
+
+.aigate {
+  padding: 26px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.aigate-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.aigate-why {
+  margin: 6px 0 10px;
+  color: #8a5a00;
+}
+
+.aigate-actions {
+  display: flex;
+  gap: 8px;
+  margin: 16px 0 14px;
+}
+
+.aigate-actions .btn {
+  text-decoration: none;
+}
+
+.aigate-still {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--ink-faint);
+}

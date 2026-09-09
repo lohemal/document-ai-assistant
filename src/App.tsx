@@ -1,23 +1,49 @@
-import { useEffect, useState } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
 import Placeholder from '@/components/Placeholder'
+import AiGate from '@/components/AiGate'
 import Collections from '@/pages/Collections'
 import Documents from '@/pages/Documents'
 import Search from '@/pages/Search'
 import Settings from '@/pages/Settings'
+import AiSetup from '@/pages/AiSetup'
 import { getAppInfo, type AppInfo } from '@/ipc/app'
-import { AI_NONE, type AiStatus } from '@/lib/aiStatus'
+import { aiStatus, type AiStatus } from '@/ipc/ai'
 
 export default function App() {
-  // P4b 에서 Ollama 를 실제로 확인해 채운다. 그때까지는 "AI 없음" 상태로 둔다 —
-  // AI 가 없는 상태가 이 프로그램의 정상 상태 중 하나이기 때문이다 (설계안 2-12).
-  const [ai] = useState<AiStatus>(AI_NONE)
   const [info, setInfo] = useState<AppInfo | null>(null)
+  const [ai, setAi] = useState<AiStatus | null>(null)
+  const where = useLocation()
 
   useEffect(() => {
     getAppInfo().then(setInfo).catch(() => setInfo(null))
   }, [])
+
+  /**
+   * AI 상태를 알아본다.
+   *
+   * **여기서 실패해도 앱은 그대로 돈다.** Ollama 가 없거나 말썽이어도 화면이
+   * 하얗게 되면 안 된다 — 자료집·등록·낱말 검색은 AI 와 아무 상관이 없다.
+   */
+  const refreshAi = useCallback(() => {
+    aiStatus()
+      .then(setAi)
+      .catch(() => setAi(null))
+  }, [])
+
+  useEffect(refreshAi, [refreshAi])
+
+  // AI 화면을 들렀다 **나올 때만** 다시 본다.
+  //
+  // 화면을 옮길 때마다 확인하지 않는 까닭은, 실행환경이 없을 때 붙어 보는 데
+  // 2초쯤 걸리기 때문이다 (Windows 가 거부를 늦게 알려 준다 — ollama.rs 참고).
+  const wasOnAiPage = useRef(false)
+  useEffect(() => {
+    const onAi = where.pathname.startsWith('/settings/ai')
+    if (wasOnAiPage.current && !onAi) refreshAi()
+    wasOnAiPage.current = onAi
+  }, [where.pathname, refreshAi])
 
   return (
     <div className="app">
@@ -39,13 +65,28 @@ export default function App() {
           <Route path="/search" element={<Search />} />
           <Route
             path="/ask"
-            element={<Placeholder title="규정 해석" phase="P5" note="근거를 읽고 답합니다. 답변 모델이 필요합니다." />}
+            element={
+              <div className="page">
+                <h1 className="page-title">규정 해석</h1>
+                <AiGate status={ai} need="chat" what="AI 답변">
+                  <Placeholder title="규정 해석" phase="P5" note="근거를 읽고 답합니다." />
+                </AiGate>
+              </div>
+            }
           />
           <Route
             path="/draft"
-            element={<Placeholder title="문서 작성" phase="P7" note="가정통신문 · 문자메시지 초안." />}
+            element={
+              <div className="page">
+                <h1 className="page-title">문서 작성</h1>
+                <AiGate status={ai} need="chat" what="문서 초안">
+                  <Placeholder title="문서 작성" phase="P7" note="가정통신문 · 문자메시지 초안." />
+                </AiGate>
+              </div>
+            }
           />
           <Route path="/jobs" element={<Placeholder title="작업 기록" phase="P6" note="최근 작업과 중요 기록." />} />
+          <Route path="/settings/ai" element={<AiSetup />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/collections" replace />} />
         </Routes>

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import type { AiStatus } from '@/lib/aiStatus'
+import type { AiStatus } from '@/ipc/ai'
 
 type Group = { title: string; items: { to: string; label: string }[] }
 
@@ -25,20 +25,30 @@ const GROUPS: Group[] = [
   },
   {
     title: '⚙ 설정',
-    items: [{ to: '/settings', label: '설정' }],
+    items: [
+      { to: '/settings', label: '설정' },
+      { to: '/settings/ai', label: 'AI 기능 설치' },
+    ],
   },
 ]
 
-function statusLine(ai: AiStatus): { dot: string; text: string; tone: string } {
-  if (ai.pulling !== null) {
-    return { dot: '◐', text: `AI 모델 받는 중 ${ai.pulling}%`, tone: 'busy' }
+/**
+ * 아래 상태줄은 **늘 무엇이 되는지**를 말한다.
+ * AI 가 없어도 "낱말로 찾기는 됩니다" 를 붙여, 프로그램이 못 쓰는 상태가
+ * 아니라는 것을 알린다 (설계안 2-12).
+ */
+function statusLine(ai: AiStatus | null): { dot: string; text: string; tone: string } {
+  if (!ai) return { dot: '·', text: 'AI 상태 확인 중…', tone: 'off' }
+  if (ai.engine !== 'ready') {
+    return { dot: '○', text: 'AI 없음 — 낱말로 찾기는 됩니다', tone: 'off' }
   }
-  if (ai.llm) return { dot: '●', text: 'AI 준비됨', tone: 'ok' }
-  if (ai.embed) return { dot: '◑', text: '검색만 가능', tone: 'partial' }
-  return { dot: '○', text: 'AI 없음 — 낱말로 찾기는 됩니다', tone: 'off' }
+  if (ai.chatReady && ai.embedReady) return { dot: '●', text: 'AI 준비됨', tone: 'ok' }
+  if (ai.embedReady) return { dot: '◑', text: '검색 모델만 있음', tone: 'partial' }
+  if (ai.chatReady) return { dot: '◑', text: '답변 모델만 있음', tone: 'partial' }
+  return { dot: '○', text: '모델 없음 — 낱말로 찾기는 됩니다', tone: 'off' }
 }
 
-export default function Sidebar({ ai }: { ai: AiStatus }) {
+export default function Sidebar({ ai }: { ai: AiStatus | null }) {
   const s = statusLine(ai)
 
   return (
@@ -56,6 +66,7 @@ export default function Sidebar({ ai }: { ai: AiStatus }) {
               <NavLink
                 key={it.to}
                 to={it.to}
+                end={it.to === '/settings'}
                 className={({ isActive }) => 'sidebar-link' + (isActive ? ' is-active' : '')}
               >
                 {it.label}

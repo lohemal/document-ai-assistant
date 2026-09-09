@@ -18,15 +18,32 @@ $lines = New-Object System.Collections.Generic.List[string]
 $root = Get-Process -Name "DocAid" -ErrorAction SilentlyContinue
 if (-not $root) { Write-Error "no DocAid process"; exit 1 }
 
-# Walk the process tree
+# Walk the process tree.
+#
+# ParentProcessId alone is NOT enough. Windows reuses PIDs, so an unrelated
+# process can name a dead parent whose PID this app happens to hold now --
+# that pulled Outlook and a GPU service into an earlier run of this check and
+# made it look like the app was talking to the internet. A child must also
+# have started AFTER its parent.
 $all = Get-CimInstance Win32_Process
+$born = @{}
+foreach ($p in $all) { $born[[int]$p.ProcessId] = $p.CreationDate }
+
 $ids = New-Object System.Collections.Generic.HashSet[int]
 foreach ($p in $root) { [void]$ids.Add($p.Id) }
+
 for ($i = 0; $i -lt 6; $i++) {
   foreach ($p in $all) {
-    if ($p.ParentProcessId -and $ids.Contains([int]$p.ParentProcessId)) {
-      [void]$ids.Add([int]$p.ProcessId)
+    $pid_ = [int]$p.ProcessId
+    $parent = [int]$p.ParentProcessId
+    if ($ids.Contains($pid_)) { continue }
+    if (-not $ids.Contains($parent)) { continue }
+    $parentBorn = $born[$parent]
+    if ($parentBorn -and $p.CreationDate -and $p.CreationDate -lt $parentBorn) {
+      # Started before its "parent" -- the PID was reused. Not our child.
+      continue
     }
+    [void]$ids.Add($pid_)
   }
 }
 

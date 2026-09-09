@@ -45,9 +45,16 @@ export default function Settings() {
       </section>
 
       <section className="card">
+        <h2 className="card-title">AI 기능</h2>
+        <p>
+          AI 모델을 받거나 상태를 확인하려면 왼쪽의 <strong>AI 기능 설치</strong> 를 눌러 주세요.
+          AI 가 없어도 자료집 관리 · PDF 등록 · 원문 보기 · 낱말로 찾기는 그대로 됩니다.
+        </p>
+      </section>
+
+      <section className="card">
         <h2 className="card-title">아직 만들지 않은 설정</h2>
         <ul className="todo">
-          <li>AI 모델 선택 · 설치 — P4b</li>
           <li>기록 보존기간 — P6</li>
           <li>자료 폴더 열기 · 백업 · 복원 — P8</li>
           <li>프로그램 업데이트 — P8</li>

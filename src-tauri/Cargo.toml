@@ -24,6 +24,13 @@ log = "0.4"
 tauri-plugin-updater = "2.11.0"
 tauri-plugin-dialog = "2"
 sha2 = "0.10"
+# 127.0.0.1 의 Ollama 하고만 이야기한다. TLS 를 끄면 바깥으로 나갈 길 자체가 없다.
+ureq = { version = "2", default-features = false, features = ["json"] }
+tauri-plugin-opener = "2"
+
+[target.'cfg(windows)'.dependencies]
+# 메모리·저장공간을 재려고 쓴다. 필요한 것만 켠다.
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_System_SystemInformation", "Win32_Storage_FileSystem"] }
 
 [profile.release]
 codegen-units = 1

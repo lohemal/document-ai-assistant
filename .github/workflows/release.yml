@@ -1,0 +1,160 @@
+name: 릴리스 만들기
+
+# 버전 태그를 올리면 자동으로 설치 파일을 만들어 릴리스에 올린다.
+#
+#   npm run version:set 0.2.0
+#   npm run check:model
+#   git add . && git commit -m "v0.2.0"
+#   git tag v0.2.0 && git push origin main --tags
+#
+# 손으로 돌리고 싶으면 Actions 탭에서 [Run workflow]를 눌러도 된다.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # 이 프로그램은 Windows 전용이다
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Node 준비
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Rust 준비
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust 빌드 캐시
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: 의존성 설치
+        run: npm ci
+
+      # 배포가 조용히 깨지는 경우를 먼저 막는다 (이름 · 버전 · 업데이터 설정)
+      - name: 배포 이름·버전 검사
+        run: npm run check:model
+
+      - name: 타입 검사 · 화면 빌드
+        run: npm run build
+
+      - name: 서버 테스트
+        run: cargo test --lib
+        working-directory: src-tauri
+
+      - name: 설치 파일 만들기 · 서명
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          # 비밀번호 없는 키도 scrypt 로 감싸여 있어서, 변수가 아예 없으면
+          # tauri 가 비밀번호를 물어보며 멈춘다. GitHub 은 빈 값 시크릿을
+          # 저장할 수 없고 env: 에 "" 를 적으면 Windows 가 변수를 지우므로,
+          # bash 한 줄 대입으로 빈 문자열을 넘긴다. (방과후 앱에서 겪은 함정)
+        shell: bash
+        run: |
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" npm run tauri build
+
+      - name: 파일 확인 · latest.json 만들기
+        shell: pwsh
+        run: |
+          $ver = "${{ github.ref_name }}".TrimStart('v')
+          $dir = "src-tauri/target/release/bundle/nsis"
+          $exe = Get-ChildItem "$dir/*_x64-setup.exe" | Select-Object -First 1
+          if (-not $exe) { throw "설치 파일을 찾지 못했습니다: $dir" }
+
+          # 파일 이름에 ASCII 밖 문자가 있으면 GitHub 이 그것을 떼어 내어
+          # latest.json 의 url 과 실제 주소가 어긋난다. 여기서 먼저 막는다.
+          if ($exe.Name -notmatch '^[\x20-\x7E]+$') {
+            throw "설치 파일 이름에 ASCII 가 아닌 문자가 있습니다: $($exe.Name)"
+          }
+
+          $sigPath = "$($exe.FullName).sig"
+          if (-not (Test-Path $sigPath)) {
+            throw "서명 파일이 없습니다. TAURI_SIGNING_PRIVATE_KEY 시크릿을 확인하세요."
+          }
+          $sig = (Get-Content $sigPath -Raw).Trim()
+          if ([string]::IsNullOrWhiteSpace($sig)) { throw "서명이 비어 있습니다." }
+
+          $out = "release"
+          New-Item -ItemType Directory -Force $out | Out-Null
+          $name = $exe.Name
+          Copy-Item $exe.FullName "$out/$name"
+          Copy-Item $sigPath      "$out/$name.sig"
+
+          # 업데이터가 읽는 파일. 여기 url 이 실제 첨부 파일 주소와 같아야 한다.
+          $json = [ordered]@{
+            version   = $ver
+            notes     = "자세한 변경 내용은 릴리스 페이지를 확인해 주세요."
+            pub_date  = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            platforms = [ordered]@{
+              "windows-x86_64" = [ordered]@{
+                signature = $sig
+                url       = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/$name"
+              }
+            }
+          }
+          # BOM 이 있으면 업데이터가 읽지 못한다
+          $json | ConvertTo-Json -Depth 6 | Set-Content "$out/latest.json" -Encoding utf8NoBOM
+
+          # 직접 내려받은 파일이 온전한지 확인할 수 있도록 체크섬을 함께 올린다
+          $hash = (Get-FileHash "$out/$name" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $name" | Set-Content "$out/SHA256SUMS.txt" -Encoding utf8NoBOM
+
+          Write-Host "만들어진 파일:"
+          Get-ChildItem $out | ForEach-Object { Write-Host "  $($_.Name)  $($_.Length) bytes" }
+
+      - name: 릴리스 올리기
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $ver = $tag.TrimStart('v')
+          $notes = @"
+          ## 설치 방법
+
+          아래 ``DocAid_${ver}_x64-setup.exe`` 를 내려받아 실행하세요.
+          관리자 권한이 필요 없습니다.
+
+          > Windows가 "PC를 보호했습니다" 창을 띄우면 **추가 정보 → 실행** 을 누르세요.
+          > 코드 서명 인증서가 없는 프로그램은 모두 이렇게 나옵니다.
+
+          이미 쓰고 계신 분은 프로그램 안에서
+          **설정 → 프로그램 업데이트 → [업데이트 확인]** 을 누르면 바로 받을 수 있습니다.
+
+          ## AI 모델은 따로 받습니다
+
+          이 설치 파일에는 AI 모델이 들어 있지 않습니다. 설치 직후에도
+          자료집 관리 · PDF 등록 · 원문 보기 · 낱말로 찾기는 그대로 됩니다.
+          AI 답변을 쓰려면 프로그램 안에서 **[AI 모델 설치]** 를 눌러 주세요.
+
+          ## 자료는 그대로 남습니다
+
+          자료는 프로그램과 따로 ``%APPDATA%\kr.school.docaid`` 에 있습니다.
+          업데이트해도, 프로그램을 지웠다 다시 깔아도 그대로입니다.
+
+          ## 첨부 파일
+
+          | 파일 | 무엇인가요 |
+          |---|---|
+          | ``DocAid_….exe`` | 설치 파일. 이것만 받으면 됩니다 |
+          | ``DocAid_….exe.sig`` | 서명. 프로그램이 업데이트할 때 확인합니다 |
+          | ``latest.json`` | 업데이트 정보. 프로그램이 읽습니다 |
+          | ``SHA256SUMS.txt`` | 내려받은 파일이 온전한지 확인용 |
+          "@
+
+          # 같은 태그로 다시 돌릴 때를 대비해, 있으면 지우고 새로 만든다
+          gh release delete $tag --yes --cleanup-tag=false 2>$null
+          gh release create $tag (Get-ChildItem release | ForEach-Object { $_.FullName }) `
+            --title "업무자료 AI 도우미 $tag" `
+            --notes $notes

@@ -1,0 +1,33 @@
+{
+  "name": "docaid",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "app": "tauri dev",
+    "app:build": "tauri build",
+    "app:sandbox": "tauri dev --config src-tauri/tauri.sandbox.conf.json",
+    "check:model": "node --experimental-strip-types --no-warnings scripts/check-release-names.ts",
+    "version:set": "node scripts/set-version.mjs",
+    "icon": "node scripts/gen-icon.mjs && tauri icon scripts/appicon.png"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.1.1",
+    "@tauri-apps/plugin-updater": "^2.11.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.1.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  }
+}

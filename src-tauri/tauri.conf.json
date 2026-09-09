@@ -1,0 +1,78 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "DocAid",
+  "mainBinaryName": "DocAid",
+  "version": "0.1.0",
+  "identifier": "kr.school.docaid",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "업무자료 AI 도우미",
+        "width": 1360,
+        "height": 880,
+        "minWidth": 1120,
+        "minHeight": 720,
+        "resizable": true,
+        "center": true,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: asset: http://asset.localhost; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:11434 asset: http://asset.localhost; worker-src 'self' blob:; object-src 'none'",
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$APPDATA/kr.school.docaid/files/*"
+        ]
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "languages": [
+          "Korean"
+        ],
+        "displayLanguageSelector": false,
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico",
+        "uninstallerIcon": "icons/icon.ico"
+      }
+    },
+    "createUpdaterArtifacts": true,
+    "publisher": "lohemal",
+    "homepage": "https://github.com/lohemal/document-ai-assistant",
+    "copyright": "Copyright © 2026 lohemal",
+    "shortDescription": "학교 업무자료 로컬 AI 도우미",
+    "longDescription": "등록한 업무자료에서 근거를 찾아 답하고, 근거가 된 파일과 쪽을 함께 보여 줍니다. 자료와 AI 실행 모두 이 컴퓨터 안에서 이루어집니다.",
+    "category": "Education"
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/lohemal/document-ai-assistant/releases/latest/download/latest.json"
+      ],
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE4RDczQkVBQzA5MEVEMjUKUldRbDdaREE2anZYR081cnRNTDRaYnU0VXBmLzdKeVpSNlI1ZFN0dW0wYVl0QTg4dEIzeHRqaVYK",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

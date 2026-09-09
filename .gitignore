@@ -1,0 +1,8 @@
+node_modules
+dist
+src-tauri/target
+release
+
+# 서명 키는 절대 저장소에 들어가면 안 된다 (%USERPROFILE%\.docaid-release 에 둔다)
+*.key
+*.key.pub

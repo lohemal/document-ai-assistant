@@ -6,6 +6,18 @@
 use crate::error::{AppError, AppResult};
 use rusqlite::{params, Connection};
 use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
+
+/// 청크 글의 지문.
+///
+/// 벡터가 아직 이 글로 만든 것인지 가리는 데 쓴다. 온 글을 다 담을 필요는
+/// 없으므로 sha256 앞 16자만 쓴다 — 학교 자료 규모에서 부딪칠 일이 없다.
+///
+/// **색인용 정규화본(text_norm)을 해싱한다.** 검색과 임베딩이 같은 글을 보므로,
+/// 그 글이 달라졌을 때만 다시 만들면 된다.
+pub fn hash_of(text_norm: &str) -> String {
+    format!("{:x}", Sha256::digest(text_norm.as_bytes()))[..16].to_string()
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -62,8 +74,8 @@ pub fn replace_all(
     {
         let mut ins = tx.prepare(
             "INSERT INTO chunk(document_id, ord, heading_path, text, text_norm, kind,
-                               page_start, page_end)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                               page_start, page_end, hash)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
         )?;
         let mut ins_span = tx.prepare(
             "INSERT INTO chunk_span(chunk_id, page, char_start, char_end) VALUES (?1, ?2, ?3, ?4)",
@@ -88,6 +100,7 @@ pub fn replace_all(
                 c.kind,
                 c.page_start,
                 c.page_end,
+                hash_of(&c.text_norm),
             ])?;
             let chunk_id = tx.last_insert_rowid();
             for s in &c.spans {
@@ -307,4 +320,30 @@ mod tests {
             .unwrap();
         assert_eq!(n, 0);
     }
+}
+
+/// 지문이 비어 있는 청크에 지문을 채운다.
+///
+/// P4c 이전에 등록해 둔 자료는 지문이 없다. 비워 두면 "글이 바뀌었는가" 를
+/// 가릴 수 없으므로, 자료를 열 때 한 번 채운다. 이미 채워진 것은 건드리지
+/// 않으므로 여러 번 불러도 괜찮다.
+pub fn backfill_hashes(conn: &mut Connection) -> AppResult<usize> {
+    let mut st = conn.prepare("SELECT id, text_norm FROM chunk WHERE hash = ''")?;
+    let rows: Vec<(i64, String)> = st
+        .query_map([], |r| Ok((r.get(0)?, r.get(1)?)))?
+        .collect::<Result<Vec<_>, _>>()?;
+    drop(st);
+    if rows.is_empty() {
+        return Ok(0);
+    }
+    let tx = conn.transaction()?;
+    {
+        let mut up = tx.prepare("UPDATE chunk SET hash = ?2 WHERE id = ?1")?;
+        for (id, text) in &rows {
+            up.execute(params![id, hash_of(text)])?;
+        }
+    }
+    tx.commit()?;
+    log::info!("청크 {}개에 지문을 채웠습니다.", rows.len());
+    Ok(rows.len())
 }

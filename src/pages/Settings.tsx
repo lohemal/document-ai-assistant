@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getAppInfo, type AppInfo } from '@/ipc/app'
+import EmbedModelPick from '@/components/EmbedModelPick'
 
 export default function Settings() {
   const [info, setInfo] = useState<AppInfo | null>(null)
@@ -51,6 +52,8 @@ export default function Settings() {
           AI 가 없어도 자료집 관리 · PDF 등록 · 원문 보기 · 낱말로 찾기는 그대로 됩니다.
         </p>
       </section>
+
+      <EmbedModelPick />
 
       <section className="card">
         <h2 className="card-title">아직 만들지 않은 설정</h2>

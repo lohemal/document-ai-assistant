@@ -990,3 +990,27 @@ select.input {
   font-size: 13px;
   color: var(--ink-faint);
 }
+
+/* ── 색인 상태 표 (P4c) ─────────────────────────────────────────── */
+
+/* 아직 하지 않은 일 — 눈에 덜 띄게 */
+.tag-quiet {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+/* 지금 도는 중 */
+.tag-busy {
+  background: #eaf1fb;
+  border: 1px solid #c3d7f2;
+  color: #1c4e93;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.progress-line + .progress-line {
+  margin-top: 2px;
+}

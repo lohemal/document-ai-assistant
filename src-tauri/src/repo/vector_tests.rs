@@ -5,6 +5,20 @@
 
 use super::*;
 use crate::db::schema::MIGRATIONS;
+use crate::repo::chunk::hash_of;
+
+const MODEL: &str = "테스트";
+
+/// 그 청크의 지금 지문
+fn hash(conn: &Connection, chunk_id: i64) -> String {
+    conn.query_row("SELECT hash FROM chunk WHERE id = ?1", [chunk_id], |r| r.get(0))
+        .unwrap()
+}
+
+/// 지금 글·지금 모델로 벡터를 담는다
+fn put(conn: &Connection, chunk_id: i64, v: &[f32]) {
+    save(conn, chunk_id, MODEL, &hash(conn, chunk_id), v).unwrap();
+}
 
 fn db() -> Connection {
     let conn = Connection::open_in_memory().unwrap();
@@ -27,9 +41,9 @@ fn db() -> Connection {
     for ord in 0..3 {
         conn.execute(
             "INSERT INTO chunk(id, document_id, ord, heading_path, text, text_norm, kind,
-                               page_start, page_end)
-             VALUES (?1, 1, ?1, '', ?2, ?2, 'text', 1, 1)",
-            rusqlite::params![ord + 1, format!("청크 {ord}")],
+                               page_start, page_end, hash)
+             VALUES (?1, 1, ?1, '', ?2, ?2, 'text', 1, 1, ?3)",
+            rusqlite::params![ord + 1, format!("청크 {ord}"), hash_of(&format!("청크 {ord}"))],
         )
         .unwrap();
     }
@@ -60,11 +74,11 @@ fn 같은_방향이면_1_이_나온다() {
 #[test]
 fn 가까운_것부터_돌려준다() {
     let conn = db();
-    save(&conn, 1, "테스트", &[1.0, 0.0]).unwrap();
-    save(&conn, 2, "테스트", &[0.7, 0.7]).unwrap();
-    save(&conn, 3, "테스트", &[0.0, 1.0]).unwrap();
+    put(&conn, 1, &[1.0, 0.0]);
+    put(&conn, 2, &[0.7, 0.7]);
+    put(&conn, 3, &[0.0, 1.0]);
 
-    let (out, looked) = nearest(&conn, &[1.0, 0.05], &[], 3).unwrap();
+    let (out, looked) = nearest(&conn, &[1.0, 0.05], MODEL, &[], 3).unwrap();
     assert_eq!(looked, 3, "훑어본 청크 수");
     assert_eq!(out.iter().map(|(id, _)| *id).collect::<Vec<_>>(), vec![1, 2, 3]);
 }
@@ -72,22 +86,14 @@ fn 가까운_것부터_돌려준다() {
 #[test]
 fn 두_번_저장하면_덮어쓴다() {
     let conn = db();
-    save(&conn, 1, "테스트", &[1.0, 0.0]).unwrap();
-    save(&conn, 1, "테스트", &[0.0, 1.0]).unwrap();
+    put(&conn, 1, &[1.0, 0.0]);
+    put(&conn, 1, &[0.0, 1.0]);
     let n: i64 = conn
         .query_row("SELECT COUNT(*) FROM embedding", [], |r| r.get(0))
         .unwrap();
     assert_eq!(n, 1);
-    let (out, _) = nearest(&conn, &[0.0, 1.0], &[], 1).unwrap();
+    let (out, _) = nearest(&conn, &[0.0, 1.0], MODEL, &[], 1).unwrap();
     assert!(out[0].1 > 0.99, "{out:?}");
-}
-
-#[test]
-fn 색인할_거리를_찾아_준다() {
-    let conn = db();
-    save(&conn, 2, "테스트", &[1.0, 0.0]).unwrap();
-    let todo = missing(&conn, 1).unwrap();
-    assert_eq!(todo.iter().map(|(id, _)| *id).collect::<Vec<_>>(), vec![1, 3]);
 }
 
 #[test]
@@ -107,22 +113,22 @@ fn 자료집을_고르면_그_안에서만_찾는다() {
     .unwrap();
     conn.execute(
         "INSERT INTO chunk(id, document_id, ord, heading_path, text, text_norm, kind,
-                           page_start, page_end)
-         VALUES (9, 2, 0, '', '다른 청크', '다른 청크', 'text', 1, 1)",
+                           page_start, page_end, hash)
+         VALUES (9, 2, 0, '', '다른 청크', '다른 청크', 'text', 1, 1, '')",
         [],
     )
     .unwrap();
-    save(&conn, 1, "테스트", &[1.0, 0.0]).unwrap();
-    save(&conn, 9, "테스트", &[1.0, 0.0]).unwrap();
+    put(&conn, 1, &[1.0, 0.0]);
+    put(&conn, 9, &[1.0, 0.0]);
 
-    let (out, _) = nearest(&conn, &[1.0, 0.0], &[2], 10).unwrap();
+    let (out, _) = nearest(&conn, &[1.0, 0.0], MODEL, &[2], 10).unwrap();
     assert_eq!(out.iter().map(|(id, _)| *id).collect::<Vec<_>>(), vec![9]);
 }
 
 #[test]
 fn 대체된_문서는_근거로_나오지_않는다() {
     let conn = db();
-    save(&conn, 1, "테스트", &[1.0, 0.0]).unwrap();
+    put(&conn, 1, &[1.0, 0.0]);
     conn.execute(
         "INSERT INTO document(id, collection_id, title, filename, sha256, byte_size, page_count,
                               status, created_at)
@@ -132,7 +138,7 @@ fn 대체된_문서는_근거로_나오지_않는다() {
     .unwrap();
     conn.execute("UPDATE document SET superseded_by = 2 WHERE id = 1", [])
         .unwrap();
-    let (out, _) = nearest(&conn, &[1.0, 0.0], &[], 10).unwrap();
+    let (out, _) = nearest(&conn, &[1.0, 0.0], MODEL, &[], 10).unwrap();
     assert!(out.is_empty(), "지난 문서가 나왔습니다: {out:?}");
 }
 
@@ -144,11 +150,12 @@ fn 뜻으로_찾은_결과에도_원문_위치가_붙는다() {
         [],
     )
     .unwrap();
-    save(&conn, 1, "테스트", &[1.0, 0.0]).unwrap();
+    put(&conn, 1, &[1.0, 0.0]);
 
     let res = semantic_search(
         &conn,
         &[1.0, 0.0],
+        MODEL,
         &Request { text: String::new(), collection_ids: vec![], limit: 5 },
     )
     .unwrap();

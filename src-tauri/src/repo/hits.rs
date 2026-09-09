@@ -12,11 +12,38 @@ use super::search::{spans_of, Hit};
 use crate::error::AppResult;
 use rusqlite::{Connection, ToSql};
 
-/// `scored` 는 (청크 id, 점수). 앞에 있는 것이 위에 온다 — 여기서 다시
-/// 정렬하지 않는다. 순위를 정하는 일은 부르는 쪽 몫이다.
+/// 어느 청크가 몇 점이고, 각 방법에서 몇 등이었는가.
+#[derive(Debug, Clone, Copy)]
+pub struct Scored {
+    pub chunk_id: i64,
+    pub score: f64,
+    pub keyword_rank: Option<i64>,
+    pub semantic_rank: Option<i64>,
+}
+
+impl Scored {
+    pub fn new(chunk_id: i64, score: f64) -> Self {
+        Scored { chunk_id, score, keyword_rank: None, semantic_rank: None }
+    }
+
+    /// 두 방법이 다 찾았으면 `높음`, 한쪽만 찾았으면 `보통`.
+    ///
+    /// 이렇게 하는 까닭은 **설명할 수 있기 때문**이다. "낱말로도 걸리고 뜻으로도
+    /// 가깝다" 는 사용자에게 말이 되지만, "RRF 0.032" 는 아무 말도 아니다.
+    fn relevance(&self) -> String {
+        if self.keyword_rank.is_some() && self.semantic_rank.is_some() {
+            "높음".to_string()
+        } else {
+            "보통".to_string()
+        }
+    }
+}
+
+/// `scored` 는 앞에 있는 것이 위에 온다 — 여기서 다시 정렬하지 않는다.
+/// 순위를 정하는 일은 부르는 쪽 몫이다.
 pub fn fill(
     conn: &Connection,
-    scored: &[(i64, f64)],
+    scored: &[Scored],
     collections: &[i64],
     limit: i64,
 ) -> AppResult<Vec<Hit>> {
@@ -39,8 +66,8 @@ pub fn fill(
     );
 
     let mut params: Vec<Box<dyn ToSql>> = Vec::new();
-    for (id, _) in scored {
-        params.push(Box::new(*id));
+    for s in scored {
+        params.push(Box::new(s.chunk_id));
     }
     for id in collections {
         params.push(Box::new(*id));
@@ -81,8 +108,8 @@ pub fn fill(
         .collect::<Result<Vec<_>, _>>()?;
 
     let mut hits = Vec::new();
-    for (id, score) in scored {
-        let Some(row) = loaded.iter().find(|l| l.chunk_id == *id) else {
+    for sc in scored {
+        let Some(row) = loaded.iter().find(|l| l.chunk_id == sc.chunk_id) else {
             continue; // 걸러진 청크
         };
         hits.push(Hit {
@@ -101,7 +128,10 @@ pub fn fill(
             matched: 0,
             matched_terms: vec![],
             bm25: 0.0,
-            score: *score,
+            score: sc.score,
+            keyword_rank: sc.keyword_rank,
+            semantic_rank: sc.semantic_rank,
+            relevance: sc.relevance(),
         });
         if hits.len() as i64 >= limit.max(1) {
             break;

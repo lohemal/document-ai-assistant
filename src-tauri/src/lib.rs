@@ -84,12 +84,20 @@ pub fn run() {
             commands::chunk::chunk_get,
             commands::chunk::chunk_count,
             commands::search::search_keyword,
+            commands::search::search_query,
             commands::search::search_neighbors,
             commands::ai::ai_status,
             commands::ai::ai_install_help,
             commands::ai::ai_pull_model,
             commands::ai::ai_cancel_pull,
             commands::ai::ai_test_model,
+            commands::index::index_status,
+            commands::index::index_collection_summary,
+            commands::index::index_models,
+            commands::index::index_set_model,
+            commands::index::index_start,
+            commands::index::index_stop,
+            commands::index::index_drop_unusable,
         ])
         .setup(|app| {
             // 자료를 여는 데 실패해도 앱은 뜬다. 화면에서 이유를 보여 준다.
@@ -100,6 +108,8 @@ pub fn run() {
             app.manage(AppState::new(dir));
             // 모델 받기를 멈출 수 있게 들고 있는다
             app.manage(commands::ai::PullControl::default());
+            // 색인을 멈출 수 있게 들고 있는다
+            app.manage(commands::index::IndexControl::default());
             Ok(())
         })
         .run(tauri::generate_context!())

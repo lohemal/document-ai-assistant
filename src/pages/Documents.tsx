@@ -13,6 +13,7 @@ import { statusMessage, type DocStatus } from '@/lib/pdf/extract'
 import { message } from '@/lib/err'
 import PageTextView from '@/components/PageTextView'
 import ChunkExplorer from '@/components/ChunkExplorer'
+import IndexPanel from '@/components/IndexPanel'
 
 const STATUS_LABEL: Record<string, string> = {
   ok: '정상',
@@ -215,6 +216,8 @@ export default function Documents() {
           ))}
         </ul>
       )}
+
+      {docs.length > 0 && <IndexPanel collectionId={collectionId} />}
 
       {openDoc && (
         <section className="card viewer">

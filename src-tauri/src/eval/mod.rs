@@ -235,11 +235,12 @@ fn build(corpus: &Corpus, vectors: Option<&Vectors>) -> (Connection, HashMap<(i6
         for ch in &d.chunks {
             conn.execute(
                 "INSERT INTO chunk(document_id, ord, heading_path, text, text_norm, kind,
-                                   page_start, page_end)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                                   page_start, page_end, hash)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                 rusqlite::params![
                     d.id, ch.ord, ch.heading_path, ch.text, ch.text_norm, ch.kind,
-                    ch.page_start, ch.page_end
+                    ch.page_start, ch.page_end,
+                    crate::repo::chunk::hash_of(&ch.text_norm)
                 ],
             )
             .unwrap();
@@ -255,7 +256,8 @@ fn build(corpus: &Corpus, vectors: Option<&Vectors>) -> (Connection, HashMap<(i6
             }
             if let Some(vs) = vectors {
                 if let Some(v) = vs.chunks.get(&(d.id, ch.ord)) {
-                    vector::save(&conn, cid, &vs.model, v).unwrap();
+                    let hash = crate::repo::chunk::hash_of(&ch.text_norm);
+                    vector::save(&conn, cid, &vs.model, &hash, v).unwrap();
                 }
             }
         }
@@ -335,22 +337,23 @@ fn run_keyword(conn: &Connection, q: &Question, collections: Vec<i64>) -> Run {
     }
 }
 
-fn run_semantic(conn: &Connection, v: &[f32], collections: Vec<i64>) -> Run {
+fn run_semantic(conn: &Connection, v: &[f32], model: &str, collections: Vec<i64>) -> Run {
     let t = std::time::Instant::now();
-    let (scored, _) = vector::nearest(conn, v, &collections, TOP as usize).unwrap();
+    let (scored, _) = vector::nearest(conn, v, model, &collections, TOP as usize).unwrap();
     Run {
         order: scored.iter().map(|(id, _)| *id).collect(),
         ms: t.elapsed().as_secs_f64() * 1000.0,
     }
 }
 
-fn run_hybrid(conn: &Connection, q: &Question, v: &[f32], collections: Vec<i64>, depth: i64) -> Run {
+fn run_hybrid(conn: &Connection, q: &Question, v: &[f32], model: &str, collections: Vec<i64>, depth: i64) -> Run {
     let t = std::time::Instant::now();
     let res = hybrid::hybrid_search(
         conn,
         &hybrid::Hybrid {
             text: &q.question,
             query_vec: v,
+            model,
             collection_ids: collections,
             limit: TOP,
             depth,

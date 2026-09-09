@@ -33,6 +33,17 @@ pub struct ModelSpec {
     /// 내려받을 크기 어림 (GB)
     pub download_gb: f64,
     pub note: &'static str,
+    /// 검색 모델이 돌려주는 벡터 길이. 답변 모델은 0.
+    ///
+    /// **이 값이 실제와 다르면 색인이 조용히 어긋난다.** 그래서 모델을 받은 뒤
+    /// `test_embed` 로 실제 길이를 확인하고, 다르면 화면에서 알린다.
+    pub dim: i64,
+    /// 색인이 얼마나 걸리는지 어림 — 청크 하나당 밀리초.
+    ///
+    /// P4b 에서 이 PC(100% CPU)로 잰 값이다. GPU 를 쓰면 훨씬 빠르지만,
+    /// 학교 PC 는 대개 CPU 로 돈다. 남은 시간을 처음 보여 줄 때만 쓰고,
+    /// 그 뒤에는 실제 속도로 고친다.
+    pub ms_per_chunk: i64,
 }
 
 pub const MODELS: &[ModelSpec] = &[
@@ -45,6 +56,8 @@ pub const MODELS: &[ModelSpec] = &[
         min_ram_gb: 8,
         download_gb: 3.3,
         note: "메모리가 넉넉하지 않은 PC 에서도 돕니다. 요약과 자료 검색 답변에 쓸 만합니다.",
+        dim: 0,
+        ms_per_chunk: 0,
     },
     ModelSpec {
         id: "chat-standard",
@@ -54,6 +67,8 @@ pub const MODELS: &[ModelSpec] = &[
         min_ram_gb: 16,
         download_gb: 5.2,
         note: "규정 해석처럼 길게 따져야 하는 일에서 가벼운 모델보다 낫습니다.",
+        dim: 0,
+        ms_per_chunk: 0,
     },
     // ── 검색용 모델 ──────────────────────────────────────────────────
     ModelSpec {
@@ -64,6 +79,8 @@ pub const MODELS: &[ModelSpec] = &[
         min_ram_gb: 8,
         download_gb: 1.2,
         note: "한국어를 포함해 여러 말을 다룹니다. 긴 문서에 강합니다.",
+        dim: 1024,
+        ms_per_chunk: 770,
     },
     ModelSpec {
         id: "embed-light",
@@ -73,6 +90,8 @@ pub const MODELS: &[ModelSpec] = &[
         min_ram_gb: 4,
         download_gb: 0.6,
         note: "메모리가 아주 적은 PC 용입니다. 찾는 솜씨는 기본 모델보다 떨어집니다.",
+        dim: 768,
+        ms_per_chunk: 90,
     },
 ];
 
@@ -142,6 +161,20 @@ mod tests {
         for (i, a) in MODELS.iter().enumerate() {
             for b in &MODELS[i + 1..] {
                 assert_ne!(a.id, b.id, "id 가 겹칩니다: {}", a.id);
+            }
+        }
+    }
+
+    #[test]
+    fn 검색_모델은_벡터_길이를_적어_둔다() {
+        // 이 값으로 "쓸 수 있는 벡터" 를 가린다. 비어 있으면 색인이 조용히 어긋난다.
+        for m in MODELS {
+            match m.role {
+                Role::Embed => {
+                    assert!(m.dim > 0, "{} 에 벡터 길이가 없습니다", m.id);
+                    assert!(m.ms_per_chunk > 0, "{} 에 색인 속도 어림이 없습니다", m.id);
+                }
+                Role::Chat => assert_eq!(m.dim, 0),
             }
         }
     }

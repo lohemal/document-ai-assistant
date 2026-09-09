@@ -60,6 +60,8 @@ pub fn open(data_dir: &Path) -> AppResult<Db> {
     conn.pragma_update(None, "foreign_keys", "ON")?;
 
     migrate(&mut conn, data_dir)?;
+    // 옛 자료에는 청크 지문이 없다. 한 번 채워 둔다 (P4c).
+    crate::repo::chunk::backfill_hashes(&mut conn)?;
     Ok(Db(Mutex::new(conn)))
 }
 

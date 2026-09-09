@@ -5,7 +5,7 @@
 //! 만들어져 있기 때문이다.
 
 /// (버전, 이 버전으로 올리는 SQL)
-pub const MIGRATIONS: &[(i64, &str)] = &[(1, V1), (2, V2)];
+pub const MIGRATIONS: &[(i64, &str)] = &[(1, V1), (2, V2), (3, V3)];
 
 const V1: &str = r#"
 -- 자료집 -----------------------------------------------------------------
@@ -162,4 +162,35 @@ INSERT INTO setting(key, value) VALUES
 const V2: &str = r#"
 ALTER TABLE page ADD COLUMN item_map TEXT NOT NULL DEFAULT '[]';
 ALTER TABLE document ADD COLUMN extractor TEXT;
+"#;
+
+/// P4c 에서 더한 것 — 의미 색인이 살아 있는지 가릴 수 있게 하는 값들.
+///
+/// 벡터를 **조용히 다시 쓰지 않는 것**이 이 판의 목적이다. 청크 글이 바뀌었거나
+/// 다른 모델로 만든 벡터가 검색에 섞이면, 사용자는 그것을 알 길이 없다.
+/// 그래서 벡터마다 "어느 글로, 어느 모델로, 언제 만들었는가" 를 함께 담는다.
+///
+/// **파생할 수 있는 것은 담지 않는다.** `색인 완료`·`모델 불일치`·`재색인 필요`
+/// 는 embedding 행을 세어 그때그때 정한다. 담아 두면 모델을 바꾼 순간 거짓이
+/// 된다. `document.embed_state` 에는 파생할 수 없는 것만 남긴다 —
+/// `idle | queued | running | paused | failed`.
+const V3: &str = r#"
+-- 청크 글의 지문. 글이 달라지면 이 값이 달라지고, 그 벡터는 죽은 것이 된다.
+ALTER TABLE chunk ADD COLUMN hash TEXT NOT NULL DEFAULT '';
+
+-- 벡터를 만들 때 본 청크 지문. chunk.hash 와 다르면 쓰지 않는다.
+ALTER TABLE embedding ADD COLUMN chunk_hash TEXT NOT NULL DEFAULT '';
+ALTER TABLE embedding ADD COLUMN created_at TEXT NOT NULL DEFAULT '';
+CREATE INDEX idx_embedding_model ON embedding(model);
+
+-- 마지막 색인이 실패한 까닭 (사람에게 보여 줄 말)
+ALTER TABLE document ADD COLUMN index_error TEXT;
+-- 청크를 나눈 규칙의 판. 규칙이 바뀐 것을 사람 말로 설명하려고 적어 둔다.
+ALTER TABLE document ADD COLUMN split_version INTEGER NOT NULL DEFAULT 0;
+
+-- 옛 값(none/partial/done)은 이제 파생해서 쓴다. 일의 상태만 남긴다.
+UPDATE document SET embed_state = 'idle';
+
+-- 검색에 쓸 모델. 카탈로그의 id 를 담는다 (태그가 아니라 id — 태그는 바뀔 수 있다).
+INSERT OR IGNORE INTO setting(key, value) VALUES ('embed_model', 'embed-standard');
 "#;

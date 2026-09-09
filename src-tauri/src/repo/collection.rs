@@ -24,8 +24,16 @@ const SELECT: &str = "
 SELECT c.id,
        c.name,
        (SELECT COUNT(*) FROM document d WHERE d.collection_id = c.id),
+       -- 벡터가 청크 수만큼 있지 않은 문서 수.
+       --
+       -- 어느 모델로 만든 벡터인지는 여기서 보지 않는다. 그건 지금 고른
+       -- 모델을 알아야 하는 일이라 repo::embed_index 가 맡는다. 여기 값은
+       -- 채울 것이 남았는지만 거칠게 말한다.
        (SELECT COUNT(*) FROM document d
-         WHERE d.collection_id = c.id AND d.embed_state <> 'done'),
+         WHERE d.collection_id = c.id
+           AND (SELECT COUNT(*) FROM chunk ch WHERE ch.document_id = d.id)
+               > (SELECT COUNT(*) FROM chunk ch JOIN embedding e ON e.chunk_id = ch.id
+                   WHERE ch.document_id = d.id)),
        c.embed_model,
        c.created_at
   FROM collection c
@@ -204,19 +212,31 @@ mod tests {
     }
 
     #[test]
-    fn 임베딩이_없는_문서_수를_센다() {
+    fn 벡터가_덜_만들어진_문서_수를_센다() {
+        // P4c 부터는 문서에 적힌 상태가 아니라 **실제 벡터 수**로 센다.
+        // 상태는 모델을 바꾼 순간 거짓이 되기 때문이다.
         let c = db();
         let cid = create(&c, "늘봄").unwrap();
+        for (id, name) in [(1, "a"), (2, "b")] {
+            c.execute(
+                "INSERT INTO document(id, collection_id, title, filename, sha256, byte_size, created_at)
+                 VALUES (?1, ?2, ?3, ?3, ?3, 1, '2026-09-09')",
+                params![id, cid, name],
+            )
+            .unwrap();
+            c.execute(
+                "INSERT INTO chunk(id, document_id, ord, text, text_norm, kind,
+                                   page_start, page_end, hash)
+                 VALUES (?1, ?1, 0, '글', '글', 'text', 1, 1, 'h')",
+                params![id],
+            )
+            .unwrap();
+        }
+        // 첫 문서만 벡터가 있다
         c.execute(
-            "INSERT INTO document(id, collection_id, title, filename, sha256, byte_size, embed_state, created_at)
-             VALUES (1, ?1, 'a', 'a.pdf', 'x', 1, 'done', '2026-09-09')",
-            params![cid],
-        )
-        .unwrap();
-        c.execute(
-            "INSERT INTO document(id, collection_id, title, filename, sha256, byte_size, embed_state, created_at)
-             VALUES (2, ?1, 'b', 'b.pdf', 'y', 1, 'none', '2026-09-09')",
-            params![cid],
+            "INSERT INTO embedding(chunk_id, model, dim, vec, chunk_hash, created_at)
+             VALUES (1, 'bge-m3', 2, X'0000', 'h', '2026-09-09')",
+            [],
         )
         .unwrap();
 

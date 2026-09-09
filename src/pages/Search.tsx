@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 import { listCollections, type Collection } from '@/ipc/collections'
-import { searchKeyword, type Hit, type SearchResult } from '@/ipc/search'
+import { modeLabel, searchQuery, type Hit, type SearchResult } from '@/ipc/search'
 import { message } from '@/lib/err'
 import PdfHighlight from '@/components/PdfHighlight'
 
 /**
- * 낱말로 찾기. **AI 모델이 없어도 된다** (설계안 2-12).
+ * 찾기. **사용자는 방식을 고르지 않는다.**
+ *
+ * 의미 색인이 있고 AI 가 돌면 섞어 찾기(Hybrid), 아니면 낱말로 찾기.
+ * 어느 쪽이었는지는 결과 위에 작게 적어 준다 — 품질이 갑자기 달라졌을 때
+ * 까닭을 알 수 있어야 한다.
+ *
+ * **AI 모델이 없어도 된다** (설계안 2-12).
  *
  * 결과를 누르면 P3 의 형광펜으로 이어진다 —
  * 검색 → 청크 → 문서·쪽 → 원문 → 그 자리 형광펜.
@@ -34,7 +40,7 @@ export default function Search() {
     setBusy(true)
     setPicked(null)
     try {
-      const r = await searchKeyword(text, collectionId === 'all' ? [] : [collectionId])
+      const r = await searchQuery(text, collectionId === 'all' ? [] : [collectionId])
       setResult(r)
       setPicked(r.hits[0] ?? null)
       setError(null)
@@ -51,7 +57,7 @@ export default function Search() {
     <div className="page page-wide">
       <h1 className="page-title">자료 검색</h1>
       <p className="page-lead">
-        등록한 자료에서 <strong>낱말로</strong> 찾습니다. AI 모델이 없어도 됩니다.
+        등록한 자료에서 근거를 찾습니다. <strong>AI 모델이 없어도</strong> 낱말로 찾습니다.
       </p>
 
       <form className="searchbar" onSubmit={run}>
@@ -74,7 +80,7 @@ export default function Search() {
           onChange={(e) => setText(e.target.value)}
         />
         <button className="btn btn-primary" disabled={busy || !text.trim()}>
-          {busy ? '찾는 중…' : '낱말로 찾기'}
+          {busy ? '찾는 중…' : '찾기'}
         </button>
       </form>
 
@@ -86,6 +92,9 @@ export default function Search() {
             {result.hits.length > 0
               ? `${result.hits.length}건 · ${result.elapsedMs}ms`
               : `찾지 못했습니다 · ${result.elapsedMs}ms`}
+          </span>
+          <span className={'tag tag-' + (result.mode === 'hybrid' ? 'ok' : 'quiet')}>
+            검색 방식: {modeLabel(result.mode)}
           </span>
           {result.terms.length > 0 && (
             <span className="muted">찾아 본 말: {result.terms.join(', ')}</span>
@@ -106,6 +115,8 @@ export default function Search() {
           </label>
         </div>
       )}
+
+      {result?.modeNote && <p className="banner banner-info small">{result.modeNote}</p>}
 
       {empty && (
         <div className="empty">
@@ -139,11 +150,21 @@ export default function Search() {
                   {h.headingPath && <span className="chunkitem-path">{h.headingPath}</span>}
                   <span className="chunkitem-body">{h.text.slice(0, 100).replace(/\n/g, ' ')}</span>
                   <span className="hit-why">
-                    {h.matchedTerms.length > 0 && <>걸린 말: {h.matchedTerms.join(', ')}</>}
+                    <span className={'tag tag-' + (h.relevance === '높음' ? 'ok' : 'quiet')}>
+                      관련도 {h.relevance}
+                    </span>
+                    {h.matchedTerms.length > 0 && <> 걸린 말: {h.matchedTerms.join(', ')}</>}
                     {showScore && (
                       <span className="muted">
-                        {' '}
-                        · 낱말 {h.matched}개 · BM25 {h.bm25.toFixed(2)}
+                        {' '}· 낱말 {h.keywordRank ?? '—'}등 · 뜻 {h.semanticRank ?? '—'}등
+                        {result.mode === 'hybrid' ? (
+                          <> · RRF {h.score.toFixed(4)}</>
+                        ) : (
+                          <>
+                            {' '}
+                            · 든 낱말 {h.matched}개 · BM25 {h.bm25.toFixed(2)}
+                          </>
+                        )}
                       </span>
                     )}
                   </span>

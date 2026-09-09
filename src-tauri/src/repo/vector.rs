@@ -32,27 +32,25 @@ pub fn from_blob(b: &[u8]) -> AppResult<Vec<f32>> {
 }
 
 /// 청크 하나의 벡터를 저장한다. 이미 있으면 덮어쓴다.
-pub fn save(conn: &Connection, chunk_id: i64, model: &str, vec: &[f32]) -> AppResult<()> {
+///
+/// `chunk_hash` 를 함께 담는 것이 핵심이다 — 나중에 청크 글이 바뀌면 이 값이
+/// 어긋나고, 그 벡터는 검색에서 조용히 제외된다 (`repo::embed_index`).
+pub fn save(
+    conn: &Connection,
+    chunk_id: i64,
+    model: &str,
+    chunk_hash: &str,
+    vec: &[f32],
+) -> AppResult<()> {
+    let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
     conn.execute(
-        "INSERT INTO embedding(chunk_id, model, dim, vec) VALUES (?1, ?2, ?3, ?4)
-         ON CONFLICT(chunk_id) DO UPDATE SET model = ?2, dim = ?3, vec = ?4",
-        rusqlite::params![chunk_id, model, vec.len() as i64, to_blob(vec)],
+        "INSERT INTO embedding(chunk_id, model, dim, vec, chunk_hash, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+         ON CONFLICT(chunk_id) DO UPDATE SET
+           model = ?2, dim = ?3, vec = ?4, chunk_hash = ?5, created_at = ?6",
+        rusqlite::params![chunk_id, model, vec.len() as i64, to_blob(vec), chunk_hash, now],
     )?;
     Ok(())
-}
-
-/// 벡터가 아직 없는 청크 (색인할 거리)
-pub fn missing(conn: &Connection, document_id: i64) -> AppResult<Vec<(i64, String)>> {
-    let mut st = conn.prepare(
-        "SELECT c.id, c.text_norm FROM chunk c
-           LEFT JOIN embedding e ON e.chunk_id = c.id
-          WHERE c.document_id = ?1 AND e.chunk_id IS NULL
-          ORDER BY c.ord",
-    )?;
-    let rows = st
-        .query_map([document_id], |r| Ok((r.get(0)?, r.get(1)?)))?
-        .collect::<Result<Vec<_>, _>>()?;
-    Ok(rows)
 }
 
 /// 코사인 닮음. 둘 다 길이가 0 이 아니라고 보고 셈한다.
@@ -76,10 +74,15 @@ pub fn cosine(a: &[f32], b: &[f32]) -> f32 {
 
 /// 물음 벡터에 가까운 청크를 점수와 함께 돌려준다. 순위는 점수 내림차순.
 ///
+/// **지금 모델·지금 글로 만든 벡터만 본다.** 이 조건이 여기 있는 것이 중요하다 —
+/// 부르는 쪽에서 잊어도 옛 벡터가 검색에 섞이지 않는다. 어긋난 벡터는 조용히
+/// 빠지고, 그 사실은 화면이 `repo::embed_index` 로 따로 알린다.
+///
 /// 화면에 보여 줄 꼴로 채우는 일은 `hits::fill` 이 한다.
 pub fn nearest(
     conn: &Connection,
     query: &[f32],
+    model: &str,
     collections: &[i64],
     take: usize,
 ) -> AppResult<(Vec<(i64, f64)>, i64)> {
@@ -93,10 +96,12 @@ pub fn nearest(
         "SELECT e.chunk_id, e.vec FROM embedding e
            JOIN chunk c ON c.id = e.chunk_id
            JOIN document d ON d.id = c.document_id
-          WHERE d.superseded_by IS NULL{coll}"
+          WHERE d.superseded_by IS NULL
+            AND e.model = ?1 AND e.dim = ?2 AND e.chunk_hash = c.hash{coll}"
     );
 
-    let mut params: Vec<Box<dyn ToSql>> = Vec::new();
+    let mut params: Vec<Box<dyn ToSql>> =
+        vec![Box::new(model.to_string()), Box::new(query.len() as i64)];
     for id in collections {
         params.push(Box::new(*id));
     }
@@ -123,10 +128,22 @@ pub fn nearest(
 pub fn semantic_search(
     conn: &Connection,
     query: &[f32],
+    model: &str,
     req: &Request,
 ) -> AppResult<SearchResult> {
     let started = std::time::Instant::now();
-    let (scored, looked) = nearest(conn, query, &req.collection_ids, req.limit.max(1) as usize)?;
+    let (scored, looked) =
+        nearest(conn, query, model, &req.collection_ids, req.limit.max(1) as usize)?;
+    let scored: Vec<super::hits::Scored> = scored
+        .iter()
+        .enumerate()
+        .map(|(i, (id, score))| super::hits::Scored {
+            chunk_id: *id,
+            score: *score,
+            keyword_rank: None,
+            semantic_rank: Some(i as i64 + 1),
+        })
+        .collect();
     let hits = super::hits::fill(conn, &scored, &req.collection_ids, req.limit)?;
     Ok(SearchResult {
         hits,
@@ -136,6 +153,10 @@ pub fn semantic_search(
         candidates: looked,
         elapsed_ms: started.elapsed().as_millis() as i64,
         note: None,
+        // 뜻만 쓰는 검색은 화면에 내놓지 않는다 — 시험과 평가에서만 쓴다.
+        // (섞기가 낱말을 늘 함께 보므로, 사용자에게는 두 가지 방식만 보인다)
+        mode: "semantic".to_string(),
+        mode_note: None,
     })
 }
 

@@ -7,6 +7,7 @@ import {
   type Collection,
 } from '@/ipc/collections'
 import { message } from '@/lib/err'
+import { indexCollectionSummary, type CollectionIndex } from '@/ipc/index'
 
 export default function Collections() {
   const [items, setItems] = useState<Collection[] | null>(null)
@@ -18,6 +19,8 @@ export default function Collections() {
   const [editing, setEditing] = useState<{ id: number; name: string } | null>(null)
   /** 지울지 다시 묻는 중인 자료집 */
   const [confirming, setConfirming] = useState<number | null>(null)
+  /** 자료집마다 의미 검색이 얼마나 준비됐는가 */
+  const [ready, setReady] = useState<Record<number, CollectionIndex>>({})
 
   const reload = useCallback(async () => {
     try {
@@ -31,6 +34,18 @@ export default function Collections() {
   useEffect(() => {
     void reload()
   }, [reload])
+
+  // 자료집마다 의미 검색 준비 상태를 읽는다. 실패해도 화면은 그대로 돈다 —
+  // 이건 곁들이는 정보라, 없으면 안 보이면 된다.
+  useEffect(() => {
+    if (!items) return
+    for (const c of items) {
+      if (c.docCount === 0) continue
+      indexCollectionSummary(c.id)
+        .then((r) => setReady((prev) => ({ ...prev, [c.id]: r })))
+        .catch(() => {})
+    }
+  }, [items])
 
   /** 한 가지 일을 하고 목록을 다시 읽는다. 실패하면 이유를 남긴다. */
   async function run(work: () => Promise<unknown>) {
@@ -131,11 +146,22 @@ export default function Collections() {
                       ) : (
                         <>
                           <span>자료 {c.docCount}개</span>
-                          {c.embedPending > 0 && (
-                            <span className="tag tag-warn" title="AI 모델을 설치하면 채울 수 있습니다">
-                              뜻으로 찾기 준비 안 됨 {c.embedPending}개
+                          {ready[c.id] && (
+                            <span
+                              className={
+                                'tag tag-' +
+                                (ready[c.id].ready === ready[c.id].documents ? 'ok' : 'quiet')
+                              }
+                              title="의미 검색은 색인해야 쓸 수 있습니다. 색인하지 않아도 낱말 검색은 됩니다."
+                            >
+                              {ready[c.id].summary}
                             </span>
                           )}
+                          {ready[c.id]?.needsAction ? (
+                            <span className="tag tag-warn">
+                              손볼 자료 {ready[c.id].needsAction}개
+                            </span>
+                          ) : null}
                         </>
                       )}
                     </div>

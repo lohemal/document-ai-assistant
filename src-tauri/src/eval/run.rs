@@ -93,8 +93,8 @@ fn 세_방법을_같은_조건으로_견준다() {
             .unwrap_or_else(|| panic!("{} 의 물음 벡터가 없습니다", q.question_id));
 
         let a = run_keyword(&conn, q, vec![]);
-        let b = run_semantic(&conn, qv, vec![]);
-        let c = run_hybrid(&conn, q, qv, vec![], hybrid::DEFAULT_DEPTH);
+        let b = run_semantic(&conn, qv, &vs.model, vec![]);
+        let c = run_hybrid(&conn, q, qv, &vs.model, vec![], hybrid::DEFAULT_DEPTH);
 
         let (ra, rb, rc) = (
             first_rank(&a.order, &want),
@@ -166,12 +166,18 @@ fn 못_찾은_물음을_들여다본다() {
     for q in &qs {
         let want = wanted(q, &ids);
         let kwr = first_rank(&run_keyword(&conn, q, vec![]).order, &want);
-        let (semr, hybr) = match (&vs, vs.as_ref().and_then(|v| v.questions.get(&q.question_id))) {
-            (Some(_), Some(qv)) => (
-                first_rank(&run_semantic(&conn, qv, vec![]).order, &want),
-                first_rank(&run_hybrid(&conn, q, qv, vec![], hybrid::DEFAULT_DEPTH).order, &want),
+        let (semr, hybr) = match vs
+            .as_ref()
+            .and_then(|v| v.questions.get(&q.question_id).map(|qv| (v, qv)))
+        {
+            Some((v, qv)) => (
+                first_rank(&run_semantic(&conn, qv, &v.model, vec![]).order, &want),
+                first_rank(
+                    &run_hybrid(&conn, q, qv, &v.model, vec![], hybrid::DEFAULT_DEPTH).order,
+                    &want,
+                ),
             ),
-            _ => (None, None),
+            None => (None, None),
         };
 
         // 벡터가 없으면 낱말만 보고 판단한다 (없는 것을 실패로 세면 전부 나온다)
@@ -215,7 +221,7 @@ fn 섞는_깊이와_k_가_많이_흔들리지_않는다() {
         for q in &qs {
             let want = wanted(q, &ids);
             let qv = &vs.questions[&q.question_id];
-            let r = run_hybrid(&conn, q, qv, vec![], depth);
+            let r = run_hybrid(&conn, q, qv, &vs.model, vec![], depth);
             s.add(first_rank(&r.order, &want), r.ms);
         }
         println!("  {}", s.line(&format!("depth {depth}")));
@@ -233,7 +239,7 @@ fn 섞는_깊이와_k_가_많이_흔들리지_않는다() {
                 &Request { text: q.question.clone(), collection_ids: vec![], limit: hybrid::DEFAULT_DEPTH },
             )
             .unwrap();
-            let (sem, _) = vector::nearest(&conn, qv, &[], hybrid::DEFAULT_DEPTH as usize).unwrap();
+            let (sem, _) = vector::nearest(&conn, qv, &vs.model, &[], hybrid::DEFAULT_DEPTH as usize).unwrap();
             let lists = vec![
                 kw.hits.iter().map(|h| h.chunk_id).collect::<Vec<_>>(),
                 sem.iter().map(|(id, _)| *id).collect::<Vec<_>>(),
@@ -318,7 +324,7 @@ fn 자료가_늘어도_버틴다() {
             let qv = v.questions.values().next().unwrap().clone();
             let t = std::time::Instant::now();
             for _ in 0..questions.len() {
-                vector::nearest(&conn, &qv, &[], 10).unwrap();
+                vector::nearest(&conn, &qv, &v.model, &[], 10).unwrap();
             }
             Some(t.elapsed().as_secs_f64() * 1000.0 / questions.len() as f64)
         }
@@ -360,7 +366,7 @@ fn 정답과_오답의_점수_차이를_본다() {
     for q in &qs {
         let want = wanted(q, &ids);
         let qv = &vs.questions[&q.question_id];
-        let (scored, _) = vector::nearest(&conn, qv, &[], 50).unwrap();
+        let (scored, _) = vector::nearest(&conn, qv, &vs.model, &[], 50).unwrap();
 
         if let Some((_, s)) = scored.iter().find(|(id, _)| want.contains(id)) {
             right.push(*s);

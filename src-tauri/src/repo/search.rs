@@ -48,6 +48,16 @@ pub struct Hit {
     /// 그 방법이 쓴 점수. 낱말=든 낱말 수, 의미=코사인, 섞기=RRF 합.
     /// **방법이 다르면 단위가 다르다.** 서로 견주면 안 된다. 개발용이다.
     pub score: f64,
+    /// 낱말 검색에서 몇 등이었나. 섞기에서만 채운다 — 개발용이다.
+    pub keyword_rank: Option<i64>,
+    /// 뜻 검색에서 몇 등이었나. 개발용이다.
+    pub semantic_rank: Option<i64>,
+    /// 사용자에게 보여 줄 말: `높음` | `보통`.
+    ///
+    /// 점수를 그대로 보여 주지 않는다. 척도가 방법마다 다르고, 0.68 이 무슨
+    /// 뜻인지 사용자가 알 수 없다. 대신 **왜 높은지 설명할 수 있는** 값을 쓴다 —
+    /// 두 방법이 다 찾았으면 높음, 한쪽만 찾았으면 보통이다.
+    pub relevance: String,
 }
 
 #[derive(Debug, Serialize)]
@@ -65,6 +75,19 @@ pub struct SearchResult {
     pub elapsed_ms: i64,
     /// 찾을 낱말이 하나도 없었으면 왜 그런지
     pub note: Option<String>,
+    /// `hybrid` | `keyword`. 화면에 "검색 방식: 혼합 검색" 으로 보여 준다.
+    pub mode: String,
+    /// 왜 그 방식이 되었는지. 섞기를 쓸 수 없었으면 그 까닭을 담는다.
+    pub mode_note: Option<String>,
+}
+
+/// 낱말 검색만 썼을 때의 표시. 찾는 말을 다 담은 청크를 `높음` 으로 본다.
+pub fn keyword_relevance(matched: i64, terms: usize) -> String {
+    if terms > 0 && matched as usize >= terms {
+        "높음".to_string()
+    } else {
+        "보통".to_string()
+    }
 }
 
 pub struct Request {
@@ -276,6 +299,9 @@ pub fn keyword_search(conn: &Connection, req: &Request) -> AppResult<SearchResul
             matched_terms: rk.matched_terms.clone(),
             bm25: rk.bm25,
             score: rk.matched as f64,
+            keyword_rank: Some(i as i64 + 1),
+            semantic_rank: None,
+            relevance: keyword_relevance(rk.matched as i64, terms.len()),
         });
     }
 
@@ -291,6 +317,8 @@ pub fn keyword_search(conn: &Connection, req: &Request) -> AppResult<SearchResul
         candidates,
         elapsed_ms: started.elapsed().as_millis() as i64,
         note,
+        mode: "keyword".to_string(),
+        mode_note: None,
     })
 }
 

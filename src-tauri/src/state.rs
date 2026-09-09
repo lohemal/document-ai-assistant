@@ -15,11 +15,19 @@ pub struct AppState {
 impl AppState {
     pub fn new(data_dir: PathBuf) -> Self {
         match crate::db::open(&data_dir) {
-            Ok(db) => Self {
-                data_dir,
-                db: Some(db),
-                open_error: None,
-            },
+            Ok(db) => {
+                // 지난번에 색인을 하다 앱이 꺼졌으면 '도는 중' 이 그대로 남아
+                // 있다. 그대로 두면 문서가 영원히 "색인 중" 으로 보이고
+                // 사용자는 기다린다. 켤 때 '멈춤' 으로 돌린다.
+                if let Err(e) = db.with(|c| crate::repo::embed_index::reset_running(c)) {
+                    log::warn!("색인 상태를 되돌리지 못했습니다: {e}");
+                }
+                Self {
+                    data_dir,
+                    db: Some(db),
+                    open_error: None,
+                }
+            }
             Err(e) => {
                 log::error!("자료를 열지 못했습니다: {e}");
                 Self {

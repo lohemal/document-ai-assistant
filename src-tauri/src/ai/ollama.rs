@@ -400,6 +400,48 @@ pub fn test_embed(tag: &str) -> Result<usize, String> {
     }
 }
 
+/// 글 여러 개를 한꺼번에 벡터로 바꾼다.
+///
+/// 자료 하나에 청크가 수백 개다. 한 번에 하나씩 보내면 왕복 비용만 쌓이므로
+/// 묶음으로 보낸다. 다만 너무 크게 보내면 Ollama 가 오래 붙들고 있어서
+/// 진행률을 보여 줄 수 없다 — 부르는 쪽에서 묶음 크기를 정한다.
+pub fn embed(tag: &str, texts: &[String]) -> Result<Vec<Vec<f32>>, String> {
+    guard().map_err(|_| "루프백이 아닌 주소는 쓰지 않습니다.".to_string())?;
+    if texts.is_empty() {
+        return Ok(vec![]);
+    }
+    let resp = agent(GENERATE_TIMEOUT)
+        .post(&endpoint("/api/embed"))
+        .send_json(ureq::json!({ "model": tag, "input": texts }))
+        .map_err(describe)?;
+    let json: serde_json::Value = resp.into_json().map_err(|e| e.to_string())?;
+    let rows = json
+        .get("embeddings")
+        .and_then(|e| e.as_array())
+        .ok_or_else(|| "모델이 벡터를 돌려주지 않았습니다.".to_string())?;
+    if rows.len() != texts.len() {
+        return Err(format!(
+            "보낸 글은 {}개인데 벡터는 {}개가 왔습니다.",
+            texts.len(),
+            rows.len()
+        ));
+    }
+    let mut out = Vec::with_capacity(rows.len());
+    for r in rows {
+        let v: Vec<f32> = r
+            .as_array()
+            .ok_or_else(|| "벡터 모양이 아닙니다.".to_string())?
+            .iter()
+            .map(|n| n.as_f64().unwrap_or(0.0) as f32)
+            .collect();
+        if v.is_empty() {
+            return Err("빈 벡터가 왔습니다.".into());
+        }
+        out.push(v);
+    }
+    Ok(out)
+}
+
 #[cfg(test)]
 #[path = "ollama_tests.rs"]
 mod server_tests;

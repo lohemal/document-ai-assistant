@@ -1,0 +1,1197 @@
+{
+ "questions": [
+  {
+   "question_id": "as-01",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 자유수강권 지원 대상은?",
+   "question_type": "A",
+   "expected_pages": [
+    124,
+    125
+   ],
+   "expected_chunk_ids": [
+    187,
+    188
+   ],
+   "evidence": [
+    "소득을 기준으로 저소득층 학생을"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "지원 대상 기준이 적힌 조항"
+  },
+  {
+   "question_id": "as-02",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "자유수강권을 받을 수 있는 학생은 누구야?",
+   "question_type": "B",
+   "expected_pages": [
+    124,
+    125
+   ],
+   "expected_chunk_ids": [
+    187,
+    188
+   ],
+   "evidence": [
+    "소득을 기준으로 저소득층 학생을"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "as-01 과 같은 자리를 조사·어미를 바꿔 묻는다"
+  },
+  {
+   "question_id": "as-03",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "형편이 어려운 아이들 방과후 수업비를 대신 내주는 제도는 어떻게 운영해?",
+   "question_type": "C",
+   "expected_pages": [
+    124,
+    125
+   ],
+   "expected_chunk_ids": [
+    187,
+    188
+   ],
+   "evidence": [
+    "소득을 기준으로 저소득층 학생을"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "'자유수강권' 이라는 낱말을 쓰지 않고 뜻으로만 묻는다"
+  },
+  {
+   "question_id": "as-04",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 수강료는 무엇으로 구성되는가?",
+   "question_type": "A",
+   "expected_pages": [
+    126
+   ],
+   "expected_chunk_ids": [
+    189
+   ],
+   "evidence": [
+    "강사료와 도서구입비, 재료구입비, 수용비로 구성되어 있음"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "수강료 구성 항목"
+  },
+  {
+   "question_id": "as-05",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "수용비는 강사료의 5퍼센트까지 쓸 수 있나요?",
+   "question_type": "D",
+   "expected_pages": [
+    124,
+    125
+   ],
+   "expected_chunk_ids": [
+    186,
+    187
+   ],
+   "evidence": [
+    "수용비는 학교운영위원회 심의를 통해 강사료의 5%이내로"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "원문은 '5%', 질문은 '5퍼센트'"
+  },
+  {
+   "question_id": "as-06",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "강사가 학생한테 수강료를 직접 받아도 돼?",
+   "question_type": "E",
+   "expected_pages": [
+    122,
+    124,
+    126,
+    127
+   ],
+   "expected_chunk_ids": [
+    185,
+    189,
+    190
+   ],
+   "evidence": [
+    "수강료는 강사가 직접 수납할 수 없으며"
+   ],
+   "kinds": [
+    "text",
+    "table",
+    "text"
+   ],
+   "note": "금지 조항"
+  },
+  {
+   "question_id": "as-07",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "수강료를 쓰고 남은 돈은 어떻게 처리해야 해?",
+   "question_type": "E",
+   "expected_pages": [
+    124,
+    125
+   ],
+   "expected_chunk_ids": [
+    187
+   ],
+   "evidence": [
+    "집행 잔액은 수강생에게 반환하는 것을 원칙"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "정산 원칙"
+  },
+  {
+   "question_id": "as-08",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "개인위탁 외부강사 모집 공고기간은 며칠이야?",
+   "question_type": "A",
+   "expected_pages": [
+    54
+   ],
+   "expected_chunk_ids": [
+    66
+   ],
+   "evidence": [
+    "접수마감일까지 최소 5일"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "공고 개요"
+  },
+  {
+   "question_id": "as-09",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "영어회화 프로그램의 학생 1인당 강사료는 5만 2천원인가요?",
+   "question_type": "D",
+   "expected_pages": [
+    78,
+    79
+   ],
+   "expected_chunk_ids": [
+    112
+   ],
+   "evidence": [
+    "영어회화 52,000원"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "원문 표는 '52,000원', 질문은 '5만 2천원' — 표 안의 값을 찾아야 한다"
+  },
+  {
+   "question_id": "as-10",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "3개 프로그램을 위탁하는 학교의 기초금액은 1억 1775만원이야?",
+   "question_type": "D",
+   "expected_pages": [
+    78,
+    79
+   ],
+   "expected_chunk_ids": [
+    112
+   ],
+   "evidence": [
+    "기초금액은 117,750,000원"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "원문 '117,750,000원' 을 '1억 1775만원' 으로 물었다"
+  },
+  {
+   "question_id": "as-11",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "제안서 평가위원회의 평가위원 수는?",
+   "question_type": "A",
+   "expected_pages": [
+    80,
+    81
+   ],
+   "expected_chunk_ids": [
+    115,
+    116
+   ],
+   "evidence": [
+    "평가위원 수 - 7인"
+   ],
+   "kinds": [
+    "text",
+    "table"
+   ],
+   "note": "평가위원 구성 예시"
+  },
+  {
+   "question_id": "as-12",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "성범죄 경력 때문에 강사 계약을 해지하면 어디에 보고해야 해?",
+   "question_type": "E",
+   "expected_pages": [
+    67
+   ],
+   "expected_chunk_ids": [
+    92,
+    93
+   ],
+   "evidence": [
+    "아동학대관련범죄 등으로 계약을 해지한 경우 교육(지원)청에 서면으로 보고"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "해지 후 절차"
+  },
+  {
+   "question_id": "as-13",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "종교와 관련된 방과후 프로그램을 열려면 무엇이 필요해?",
+   "question_type": "E",
+   "expected_pages": [
+    9,
+    10,
+    11
+   ],
+   "expected_chunk_ids": [
+    5,
+    6
+   ],
+   "evidence": [
+    "학생·학부모의 동의와 학교운영위원회 심의를 거쳐야 한다"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "조건 조항"
+  },
+  {
+   "question_id": "as-14",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "학교운영위원회는 방과후학교에서 무엇을 심의해?",
+   "question_type": "F",
+   "expected_pages": [
+    34,
+    35,
+    44
+   ],
+   "expected_chunk_ids": [
+    30,
+    46
+   ],
+   "evidence": [
+    "방과후학교 프로그램 운영과 수익자부담경비에 관한 사항을 심의"
+   ],
+   "kinds": [
+    "text",
+    "table"
+   ],
+   "note": "역할 정리"
+  },
+  {
+   "question_id": "as-15",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "초등학교 저학년한테 영어 방과후 수업을 해도 선행학습 금지에 안 걸려?",
+   "question_type": "C",
+   "expected_pages": [
+    23
+   ],
+   "expected_chunk_ids": [
+    19
+   ],
+   "evidence": [
+    "초등학교 1학년과 2학년의 영어 방과후학교 과정"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "'선행교육 규제 예외' 를 다른 말로 물었다"
+  },
+  {
+   "question_id": "as-16",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 수업 중에 사고가 나면 보상을 받을 수 있어?",
+   "question_type": "E",
+   "expected_pages": [
+    43
+   ],
+   "expected_chunk_ids": [
+    44
+   ],
+   "evidence": [
+    "학교안전공제회로부터 보상을 받을 수 있도록"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "안전사고 처리"
+  },
+  {
+   "question_id": "as-17",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "전년도 강사료 30,000원에서 3천원을 올리면 원가는 얼마가 돼?",
+   "question_type": "D",
+   "expected_pages": [
+    75
+   ],
+   "expected_chunk_ids": [
+    106,
+    107
+   ],
+   "evidence": [
+    "원가는 33,000원으로 산정"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "원문 '3,000원 인상', 질문 '3천원'"
+  },
+  {
+   "question_id": "as-18",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "강사료는 언제 주나요?",
+   "question_type": "B",
+   "expected_pages": [
+    124,
+    125
+   ],
+   "expected_chunk_ids": [
+    186,
+    187
+   ],
+   "evidence": [
+    "강사료는 월별지급을 원칙으로 한다"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "'월별지급을 원칙으로 한다' 를 '언제 주나요' 로"
+  },
+  {
+   "question_id": "ac-01",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "학부모가 직접 부담하는 비용은 언제까지 공개해야 해?",
+   "question_type": "C",
+   "expected_pages": [
+    25,
+    26
+   ],
+   "expected_chunk_ids": [
+    26
+   ],
+   "evidence": [
+    "당해 사업 종료 후 10일 이내에"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "'수익자부담경비' 라는 낱말을 쓰지 않고 물었다"
+  },
+  {
+   "question_id": "ac-02",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "순세계잉여금이 세입결산액의 몇 % 이상이면 감액되나요?",
+   "question_type": "A",
+   "expected_pages": [
+    13,
+    14
+   ],
+   "expected_chunk_ids": [
+    15,
+    16
+   ],
+   "evidence": [
+    "순세계잉여금이 세입결산액의 1.5% 이상"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "재정운용 방향의 수치 기준"
+  },
+  {
+   "question_id": "ac-03",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "업무추진비를 다른 목에서 끌어와 쓸 수 있어?",
+   "question_type": "E",
+   "expected_pages": [
+    39,
+    40
+   ],
+   "expected_chunk_ids": [
+    43,
+    44
+   ],
+   "evidence": [
+    "인건비, 시설비는 다른 목으로 이·전용 불가"
+   ],
+   "kinds": [
+    "text",
+    "table"
+   ],
+   "note": "이·전용 제한"
+  },
+  {
+   "question_id": "ac-04",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "결산서는 언제까지 학교운영위원회에 제출해야 하나요?",
+   "question_type": "A",
+   "expected_pages": [
+    41,
+    42
+   ],
+   "expected_chunk_ids": [
+    46,
+    47
+   ],
+   "evidence": [
+    "회계연도 종료 후 2월 이내에 학교운영위원회에 제출"
+   ],
+   "kinds": [
+    "table",
+    "table"
+   ],
+   "note": "예·결산 일정"
+  },
+  {
+   "question_id": "ac-05",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "출납폐쇄정리는 언제까지 해야 해?",
+   "question_type": "E",
+   "expected_pages": [
+    42
+   ],
+   "expected_chunk_ids": [
+    47
+   ],
+   "evidence": [
+    "회계연도 종료 후 20일까지"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "규칙 제4조"
+  },
+  {
+   "question_id": "ac-06",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "경조사비는 1인당 5만원까지 집행할 수 있어?",
+   "question_type": "D",
+   "expected_pages": [
+    99,
+    100
+   ],
+   "expected_chunk_ids": [
+    122
+   ],
+   "evidence": [
+    "경조사비는 1인당 50,000원 이내"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "원문 '50,000원', 질문 '5만원' ← P4a 가 못 찾던 모양"
+  },
+  {
+   "question_id": "ac-07",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "간담회 경비는 1인 1회당 40,000원까지인가요?",
+   "question_type": "D",
+   "expected_pages": [
+    99,
+    100
+   ],
+   "expected_chunk_ids": [
+    122
+   ],
+   "evidence": [
+    "1인 1회당 4만원 이하"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "원문 '4만원', 질문 '40,000원' ← 반대 방향"
+  },
+  {
+   "question_id": "ac-08",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "업무추진비를 쓸 때 상대방 소속과 이름을 적어야 하는 금액 기준은?",
+   "question_type": "D",
+   "expected_pages": [
+    99,
+    100
+   ],
+   "expected_chunk_ids": [
+    122
+   ],
+   "evidence": [
+    "건당 50만원 이상"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "원문 '50만원'"
+  },
+  {
+   "question_id": "ac-09",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "업무추진비를 밤늦게 써도 되나요?",
+   "question_type": "E",
+   "expected_pages": [
+    99,
+    100
+   ],
+   "expected_chunk_ids": [
+    122
+   ],
+   "evidence": [
+    "심야(23시 이후)와 사용자의 자택근처"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "사용 제한 시간·장소"
+  },
+  {
+   "question_id": "ac-10",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "특근매식비 단가는 얼마인가요?",
+   "question_type": "B",
+   "expected_pages": [
+    75,
+    76
+   ],
+   "expected_chunk_ids": [
+    89
+   ],
+   "evidence": [
+    "교직원 9,000원(1인 1식) 이내"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "직접 표현에 가깝지만 어미가 다르다"
+  },
+  {
+   "question_id": "ac-11",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "교직원 생일에 30,000원짜리 상품권을 줄 수 있어?",
+   "question_type": "D",
+   "expected_pages": [
+    75,
+    76,
+    271,
+    272
+   ],
+   "expected_chunk_ids": [
+    88,
+    89,
+    322
+   ],
+   "evidence": [
+    "1인당 3만원이하"
+   ],
+   "kinds": [
+    "text",
+    "text",
+    "text"
+   ],
+   "note": "원문 '3만원이하', 질문 '30,000원'"
+  },
+  {
+   "question_id": "ac-12",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "근무지내 국내출장이 4시간 이상이면 실비 상한액은 얼마인가요?",
+   "question_type": "A",
+   "expected_pages": [
+    81,
+    82
+   ],
+   "expected_chunk_ids": [
+    97
+   ],
+   "evidence": [
+    "4시간 이상 2만원"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "표 안의 값"
+  },
+  {
+   "question_id": "ac-13",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "왕복 2km 이내 가까운 출장에도 여비를 줄 수 있어?",
+   "question_type": "E",
+   "expected_pages": [
+    81,
+    82,
+    96
+   ],
+   "expected_chunk_ids": [
+    97,
+    116,
+    117
+   ],
+   "evidence": [
+    "왕복 2km이내"
+   ],
+   "kinds": [
+    "table",
+    "text",
+    "text"
+   ],
+   "note": "근거리 출장 기준"
+  },
+  {
+   "question_id": "ac-14",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "일비는 어떤 데 쓰는 돈이야?",
+   "question_type": "F",
+   "expected_pages": [
+    85,
+    86
+   ],
+   "expected_chunk_ids": [
+    102,
+    103
+   ],
+   "evidence": [
+    "현지교통비, 통신비, 세탁비, 음료수비 등"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "항목 설명"
+  },
+  {
+   "question_id": "ac-15",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "학급운영비로 상품권을 사도 되나요?",
+   "question_type": "E",
+   "expected_pages": [
+    77,
+    78
+   ],
+   "expected_chunk_ids": [
+    91,
+    92
+   ],
+   "evidence": [
+    "학급운영비 집행 제한 항목"
+   ],
+   "kinds": [
+    "table",
+    "text"
+   ],
+   "note": "제한 항목 목록"
+  },
+  {
+   "question_id": "ac-16",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "일반수용비로 업무추진비성 경비를 써도 돼?",
+   "question_type": "E",
+   "expected_pages": [
+    63
+   ],
+   "expected_chunk_ids": [
+    71
+   ],
+   "evidence": [
+    "다른 비목에 해당하는 경비를 일반수용비에서 집행하지 않아야 함"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "비목 구분"
+  },
+  {
+   "question_id": "ac-17",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "물품 검사와 검수는 누가 하나요?",
+   "question_type": "F",
+   "expected_pages": [
+    25,
+    26
+   ],
+   "expected_chunk_ids": [
+    26,
+    27
+   ],
+   "evidence": [
+    "검사와 검수는 사업부서 담당자가 실시"
+   ],
+   "kinds": [
+    "text",
+    "text"
+   ],
+   "note": "역할 구분"
+  },
+  {
+   "question_id": "ac-18",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "일비는 하루에 20,000원인가요?",
+   "question_type": "D",
+   "expected_pages": [
+    25,
+    26
+   ],
+   "expected_chunk_ids": [
+    26
+   ],
+   "evidence": [
+    "1일당 2만원 지급하되"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "원문 '2만원', 질문 '20,000원'"
+  },
+  {
+   "question_id": "et-01",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "정보통신윤리교육의 추진 근거는?",
+   "question_type": "A",
+   "expected_pages": [
+    1,
+    2
+   ],
+   "expected_chunk_ids": [
+    0
+   ],
+   "evidence": [
+    "「지능정보화기본법」 제44조"
+   ],
+   "kinds": [
+    "text"
+   ],
+   "note": "추진 근거 법령"
+  },
+  {
+   "question_id": "et-02",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "정보통신윤리교육에서 학교가 해야 할 주요 활동은?",
+   "question_type": "F",
+   "expected_pages": [
+    2,
+    4
+   ],
+   "expected_chunk_ids": [
+    1
+   ],
+   "evidence": [
+    "자체 정보통신윤리교육 운영계획 수립 및 법적 의무사항 교육시수"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "기관별 역할 중 학교"
+  },
+  {
+   "question_id": "et-03",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "초·중·고등학교의 의무 교육시수는?",
+   "question_type": "A",
+   "expected_pages": [
+    2,
+    4
+   ],
+   "expected_chunk_ids": [
+    1
+   ],
+   "evidence": [
+    "초·중·고등학교: 반기별 1회(연 2회)"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "법적 의무 시수"
+  },
+  {
+   "question_id": "et-04",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "유치원은 몇 번 교육해야 하나요?",
+   "question_type": "B",
+   "expected_pages": [
+    2,
+    4
+   ],
+   "expected_chunk_ids": [
+    1
+   ],
+   "evidence": [
+    "유치원: 연 1회"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "같은 자리를 학교급만 바꿔 묻는다"
+  },
+  {
+   "question_id": "et-05",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "2026년도 과의존 예방교육 대상 학년은?",
+   "question_type": "A",
+   "expected_pages": [
+    4,
+    5
+   ],
+   "expected_chunk_ids": [
+    2
+   ],
+   "evidence": [
+    "초 3·4·6학년, 중 1·3학년"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "대상 표"
+  },
+  {
+   "question_id": "et-06",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "작년과 비교해서 예방교육 대상이 어떻게 바뀌었어?",
+   "question_type": "E",
+   "expected_pages": [
+    4,
+    5
+   ],
+   "expected_chunk_ids": [
+    2
+   ],
+   "evidence": [
+    "전년 대비"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "표 안의 비고"
+  },
+  {
+   "question_id": "et-07",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "과의존 예방교육 강사 수당은 1시간에 60,000원인가요?",
+   "question_type": "D",
+   "expected_pages": [
+    4,
+    5
+   ],
+   "expected_chunk_ids": [
+    2
+   ],
+   "evidence": [
+    "1시간당 6만원"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "원문 '6만원', 질문 '60,000원'"
+  },
+  {
+   "question_id": "et-08",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "심층상담 수당은 1회기당 40,000원이야?",
+   "question_type": "D",
+   "expected_pages": [
+    4,
+    5
+   ],
+   "expected_chunk_ids": [
+    2
+   ],
+   "evidence": [
+    "1회기당 4만원"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "원문 '4만원', 질문 '40,000원'"
+  },
+  {
+   "question_id": "et-09",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "예방교육은 언제 신청하고 언제 운영해?",
+   "question_type": "F",
+   "expected_pages": [
+    4,
+    5
+   ],
+   "expected_chunk_ids": [
+    2
+   ],
+   "evidence": [
+    "3월 신청, 4월~11월 운영"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "추진 일정"
+  },
+  {
+   "question_id": "et-10",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "청소년 미디어 이용습관 진단조사 대상은?",
+   "question_type": "A",
+   "expected_pages": [
+    5,
+    6
+   ],
+   "expected_chunk_ids": [
+    3
+   ],
+   "evidence": [
+    "초1(보호자), 초4, 중1, 고1"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "대상 학년"
+  },
+  {
+   "question_id": "et-11",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "진단조사부터 치유서비스까지 업무 흐름이 어떻게 돼?",
+   "question_type": "F",
+   "expected_pages": [
+    4,
+    5,
+    6
+   ],
+   "expected_chunk_ids": [
+    2,
+    3
+   ],
+   "evidence": [
+    "치유서비스 연계 지원"
+   ],
+   "kinds": [
+    "table",
+    "table"
+   ],
+   "note": "단계 표 — 표 구조를 읽어야 한다"
+  },
+  {
+   "question_id": "et-12",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "스마트폰을 너무 많이 쓰는 학생을 상담이나 치료로 이어 주는 지원이 있어?",
+   "question_type": "C",
+   "expected_pages": [
+    5,
+    6
+   ],
+   "expected_chunk_ids": [
+    3
+   ],
+   "evidence": [
+    "미디어 과의존 진단 결과 주의/위험군"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "'치유서비스' 라는 낱말 없이 물었다"
+  },
+  {
+   "question_id": "et-13",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "찾아가는 저작권 교육은 누가 주관해?",
+   "question_type": "A",
+   "expected_pages": [
+    6,
+    7
+   ],
+   "expected_chunk_ids": [
+    4
+   ],
+   "evidence": [
+    "주관: 한국 저작권 위원회"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "연계 지원 사업"
+  },
+  {
+   "question_id": "et-14",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "정보통신윤리교육 사업 예산 총액은 8500만원이야?",
+   "question_type": "D",
+   "expected_pages": [
+    6,
+    7
+   ],
+   "expected_chunk_ids": [
+    4
+   ],
+   "evidence": [
+    "총액 85,000"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "원문은 천원 단위 '85,000', 질문은 '8500만원'"
+  },
+  {
+   "question_id": "et-15",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "이 계획의 기대효과는?",
+   "question_type": "F",
+   "expected_pages": [
+    6,
+    7
+   ],
+   "expected_chunk_ids": [
+    4
+   ],
+   "evidence": [
+    "건강하고 안전한 디지털 환경 조성"
+   ],
+   "kinds": [
+    "table"
+   ],
+   "note": "마지막 절"
+  },
+  {
+   "question_id": "et-16",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "과의존 예방교육을 맡는 전담 기관은 어디야?",
+   "question_type": "E",
+   "expected_pages": [
+    2,
+    4,
+    5
+   ],
+   "expected_chunk_ids": [
+    1,
+    2
+   ],
+   "evidence": [
+    "(전담 기관) 스마트쉼센터"
+   ],
+   "kinds": [
+    "table",
+    "table"
+   ],
+   "note": "전담 기관"
+  }
+ ]
+}

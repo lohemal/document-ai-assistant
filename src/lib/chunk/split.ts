@@ -29,6 +29,8 @@ export type SplitOptions = {
   overlap: number
   /** 이보다 작은 조각은 앞 조각에 붙인다 */
   min: number
+  /** 이 깊이까지의 제목에서만 "반드시" 끊는다. 더 작은 제목은 끊기 좋은 자리로만 쓴다 */
+  topicLevel: number
 }
 
 export const DEFAULT_SPLIT: SplitOptions = {
@@ -36,6 +38,7 @@ export const DEFAULT_SPLIT: SplitOptions = {
   max: 900,
   overlap: 150,
   min: 120,
+  topicLevel: 1,
 }
 
 // ── 제목 찾기 ────────────────────────────────────────────────────────────
@@ -61,9 +64,6 @@ const HEADING_RULES: { re: RegExp; level: number }[] = [
   { re: /^[①-⑳]/, level: 4 },
   { re: /^\(\s*\d{1,2}\s*\)\s+\S/, level: 4 },
 ]
-
-/** 이 깊이까지가 "다른 이야기가 시작된다"고 볼 만한 제목이다 */
-const TOPIC_LEVEL = 2
 
 function findHeadings(text: string): Heading[] {
   const out: Heading[] = []
@@ -224,7 +224,7 @@ export function splitDocument(text: string, opts: SplitOptions = DEFAULT_SPLIT):
   // 그렇게 하면 "제1장 총칙" 여섯 글자짜리 조각이 나온다. 그런 조각은
   // 검색에 아무 쓸모가 없다. 그래서 조각이 어느 정도 자란 뒤에만 끊는다.
   const topicStops = headings
-    .filter((h) => h.level <= TOPIC_LEVEL && !inTable(h.start))
+    .filter((h) => h.level <= opts.topicLevel && !inTable(h.start))
     .map((h) => h.start)
     .sort((a, b) => a - b)
 

@@ -3,6 +3,8 @@ pub mod commands;
 pub mod domain;
 pub mod db;
 pub mod error;
+#[cfg(test)]
+mod eval;
 pub mod repo;
 pub mod state;
 

@@ -21,7 +21,12 @@
     "fixtures": "node scripts/fixtures/make-fixtures.mjs",
     "app:build:nosign": "tauri build --config src-tauri/tauri.nosign.conf.json",
     "check:chunk": "node --experimental-strip-types --no-warnings scripts/check-chunk.ts",
-    "fixtures:chunks": "node --experimental-strip-types --no-warnings scripts/export-chunks.ts"
+    "fixtures:chunks": "node --experimental-strip-types --no-warnings scripts/export-chunks.ts",
+    "golden:analyze": "node --experimental-strip-types --no-warnings scripts/analyze-golden.ts",
+    "golden:build": "node --experimental-strip-types --no-warnings scripts/build-golden.ts",
+    "golden:embed": "node scripts/embed-golden.mjs",
+    "golden:eval": "cd src-tauri && cargo test --lib eval -- --nocapture",
+    "check:golden": "node --experimental-strip-types --no-warnings scripts/check-golden-position.ts"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.1.1",

@@ -45,6 +45,9 @@ pub struct Hit {
     pub matched_terms: Vec<String>,
     /// SQLite BM25. 작을수록 잘 맞는다. 개발용으로만 보여 준다
     pub bm25: f64,
+    /// 그 방법이 쓴 점수. 낱말=든 낱말 수, 의미=코사인, 섞기=RRF 합.
+    /// **방법이 다르면 단위가 다르다.** 서로 견주면 안 된다. 개발용이다.
+    pub score: f64,
 }
 
 #[derive(Debug, Serialize)]
@@ -186,7 +189,7 @@ fn by_scan(conn: &Connection, needles: &[String], collections: &[i64]) -> AppRes
     Ok(rows)
 }
 
-fn spans_of(conn: &Connection, chunk_id: i64) -> AppResult<Vec<Span>> {
+pub(crate) fn spans_of(conn: &Connection, chunk_id: i64) -> AppResult<Vec<Span>> {
     let mut st = conn.prepare(
         "SELECT page, char_start, char_end FROM chunk_span
           WHERE chunk_id = ?1 ORDER BY page, char_start",
@@ -272,6 +275,7 @@ pub fn keyword_search(conn: &Connection, req: &Request) -> AppResult<SearchResul
             matched: rk.matched as i64,
             matched_terms: rk.matched_terms.clone(),
             bm25: rk.bm25,
+            score: rk.matched as f64,
         });
     }
 

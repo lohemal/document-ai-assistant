@@ -63,6 +63,20 @@ jobs:
           git diff --exit-code -- test/search/chunks.json \
             || { echo "::error::test/search/chunks.json 이 낡았습니다. npm run fixtures:chunks 를 돌리고 커밋하세요."; exit 1; }
 
+      # 실제 업무자료(골든 셋)도 같은 검사를 받는다. 청크가 낡으면 검색 품질
+      # 시험이 옛 청크를 보면서 통과한다.
+      - name: 골든 셋 청크가 최신인지
+        shell: bash
+        run: |
+          npm run golden:analyze
+          npm run golden:build
+          git diff --exit-code -- test/golden/chunks.json test/golden/golden.json \
+            || { echo "::error::test/golden 의 청크가 낡았습니다. npm run golden:analyze 와 npm run golden:build 를 돌리고 커밋하세요."; exit 1; }
+
+      # 정답 문장이 실제 PDF 의 그 자리에 있는지 — 근거 표시가 거짓이 아닌지 본다
+      - name: 골든 셋 근거 위치 검사
+        run: npm run check:golden
+
       - name: 타입 검사 · 화면 빌드
         run: npm run build
 

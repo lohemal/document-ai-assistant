@@ -265,27 +265,28 @@ fn 자료가_늘어도_버틴다() {
             rusqlite::params![doc_id, format!("불린 자료 {copy}")],
         )
         .unwrap();
+        // 청크 id 를 정해진 만큼 밀어 베낀다. 그래야 벡터를 같은 규칙으로
+        // 이어 붙일 수 있다 (ord 로 짝지으면 세 자료의 ord 가 겹쳐 어긋난다).
+        let offset = copy * 1_000_000;
         conn.execute(
-            "INSERT INTO chunk(document_id, ord, heading_path, text, text_norm, kind,
+            "INSERT INTO chunk(id, document_id, ord, heading_path, text, text_norm, kind,
                                page_start, page_end)
-             SELECT ?1, ord, heading_path, text, text_norm, kind, page_start, page_end
+             SELECT id + ?2, ?1, ord, heading_path, text, text_norm, kind, page_start, page_end
                FROM chunk WHERE document_id <= 3",
-            [doc_id],
+            rusqlite::params![doc_id, offset],
         )
         .unwrap();
-        if let Some(v) = &vs {
+        if vs.is_some() {
             // 벡터도 함께 불린다 — 뜻 검색이 훑을 거리를 실제와 비슷하게
             conn.execute(
                 "INSERT INTO embedding(chunk_id, model, dim, vec)
-                 SELECT c2.id, e.model, e.dim, e.vec
-                   FROM chunk c1
-                   JOIN embedding e ON e.chunk_id = c1.id
-                   JOIN chunk c2 ON c2.document_id = ?1 AND c2.ord = c1.ord
-                  WHERE c1.document_id <= 3",
-                [doc_id],
+                 SELECT e.chunk_id + ?1, e.model, e.dim, e.vec
+                   FROM embedding e
+                   JOIN chunk c ON c.id = e.chunk_id
+                  WHERE c.document_id <= 3",
+                [offset],
             )
-            .ok();
-            let _ = v;
+            .unwrap();
         }
     }
 

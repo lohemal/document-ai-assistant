@@ -10,3 +10,4 @@
 *.ttf   binary
 *.pfb   binary
 *.wasm  binary
+*.bin   binary

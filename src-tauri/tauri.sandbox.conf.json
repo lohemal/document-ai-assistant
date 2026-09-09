@@ -14,12 +14,6 @@
         "center": true,
         "decorations": true
       }
-    ],
-    "security": {
-      "assetProtocol": {
-        "enable": true,
-        "scope": ["$APPDATA/kr.school.docaid.sandbox/files/*"]
-      }
-    }
+    ]
   }
 }

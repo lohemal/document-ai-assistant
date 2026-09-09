@@ -13,11 +13,19 @@
     "app:sandbox": "tauri dev --config src-tauri/tauri.sandbox.conf.json",
     "check:model": "node --experimental-strip-types --no-warnings scripts/check-release-names.ts",
     "version:set": "node scripts/set-version.mjs",
-    "icon": "node scripts/gen-icon.mjs && tauri icon scripts/appicon.png"
+    "icon": "node scripts/gen-icon.mjs && tauri icon scripts/appicon.png",
+    "pdfjs:assets": "node scripts/copy-pdfjs-assets.mjs",
+    "predev": "node scripts/copy-pdfjs-assets.mjs",
+    "prebuild": "node scripts/copy-pdfjs-assets.mjs",
+    "check:pdf": "node --experimental-strip-types --no-warnings scripts/check-pdf-extract.ts",
+    "fixtures": "node scripts/fixtures/make-fixtures.mjs",
+    "app:build:nosign": "tauri build --config src-tauri/tauri.nosign.conf.json"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.1.1",
+    "@tauri-apps/plugin-dialog": "^2.7.3",
     "@tauri-apps/plugin-updater": "^2.11.0",
+    "pdfjs-dist": "^6.3.289",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"

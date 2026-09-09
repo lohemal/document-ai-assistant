@@ -89,12 +89,44 @@ npm run app:sandbox
 
 ```bash
 npm run check:model   # 배포 이름 · 버전 · 업데이터 설정
+npm run check:pdf     # PDF 추출 · 쪽 번호 · 문자 위치 지도
 npm run build         # 타입 검사 + 화면 빌드
+cd src-tauri && cargo test --lib
 ```
 
 `check:model` 은 **배포가 조용히 깨지는 경우**를 먼저 막습니다 — 세 파일의 버전이
 어긋나거나, 빌드 산출물 이름에 한글이 섞이거나, 업데이터 설정이 저장소와 어긋나는
 경우입니다. 셋 다 빌드는 성공하고 릴리스 뒤에야 드러나는 사고입니다.
+
+`check:pdf` 는 이 프로그램에서 **가장 중요한 검사**입니다. `test/pdf/` 의 시험용
+PDF 로 아래 네 가지가 서로 맞는지 봅니다.
+
+```
+원문 문장  ->  추출 텍스트  ->  쪽 번호  ->  저장된 문자 위치
+```
+
+앱이 쓰는 것과 똑같은 `src/lib/pdf/extract.ts` 를 부르므로, 검사만 통과하고
+앱에서는 다르게 도는 일이 없습니다. 시험용 PDF 를 다시 만들려면
+`npm run fixtures` (Windows + Edge 필요).
+
+### pdf.js 자료를 앱 안에 담는 것
+
+`npm run dev` · `npm run build` 앞에 `scripts/copy-pdfjs-assets.mjs` 가 자동으로
+돌아 `public/pdfjs/` 로 3.4MB 를 복사합니다. **이걸 빠뜨리면 옛 한글 공문 PDF 가
+글자 0자로 추출됩니다** — pdf.js 가 cMap 을 인터넷에서 받으려 하고, CSP 가 그걸
+막기 때문입니다. 오류도 나지 않고 조용히 빈 결과가 나옵니다.
+
+### 서명 키 없이 로컬에서 빌드하기
+
+`npm run app:build` 는 마지막 서명 단계에서 멈춥니다(설치 파일은 나오지만
+`A public key has been found, but no private key` 오류로 끝납니다). 키 없이
+설치 파일만 만들어 보려면:
+
+```bash
+npm run app:build:nosign
+```
+
+`npm run app` · `npm run app:sandbox` (개발 실행)는 키와 무관합니다.
 
 ### 이름 규칙
 

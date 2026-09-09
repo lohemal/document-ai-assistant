@@ -7,7 +7,10 @@ use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
 /// 지금 프로그램이 아는 자료구조 번호.
-pub const SCHEMA_VERSION: i64 = 1;
+///
+/// 손으로 적지 않고 마이그레이션 목록의 마지막에서 끌어온다. 손으로 맞추게
+/// 두면 언젠가 어긋나고, 어긋나면 자료가 반만 올라간 채로 열린다.
+pub const SCHEMA_VERSION: i64 = schema::MIGRATIONS[schema::MIGRATIONS.len() - 1].0;
 
 /// 앱이 들고 다니는 연결 하나. rusqlite 연결은 여러 갈래에서 동시에 쓸 수
 /// 없으므로 자물쇠로 감싼다. 이 프로그램에서 무거운 일은 임베딩과 LLM 이지
@@ -207,6 +210,87 @@ mod tests {
             Ok(())
         })
         .unwrap();
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn 옛_자료를_올려도_담긴_것이_그대로_남는다() {
+        // 설계안 10-5. 업데이트로 자료가 상하지 않는다는 것을 실제로 확인한다.
+        let dir = temp_dir("migrate");
+
+        // v1 만 적용한 옛 자료를 만든다
+        {
+            let conn = Connection::open(db_path(&dir)).unwrap();
+            conn.pragma_update(None, "foreign_keys", "ON").unwrap();
+            let (v, sql) = schema::MIGRATIONS[0];
+            conn.execute_batch(sql).unwrap();
+            conn.execute_batch(&format!("PRAGMA user_version = {v}")).unwrap();
+            conn.execute(
+                "INSERT INTO collection(id, name, embed_model, embed_dim, created_at)
+                 VALUES (1, '늘봄학교', 'bge-m3', 1024, '2026-09-01')",
+                [],
+            )
+            .unwrap();
+            conn.execute(
+                "INSERT INTO document(id, collection_id, title, filename, sha256, byte_size, status, created_at)
+                 VALUES (1, 1, '운영지침', 'a.pdf', 'abc', 100, 'ok', '2026-09-01')",
+                [],
+            )
+            .unwrap();
+            conn.execute(
+                "INSERT INTO chunk(id, document_id, ord, text, text_norm, page_start, page_end)
+                 VALUES (1, 1, 0, '교재비로 쓸 수 있다', '교재비로 쓸 수 있다', 3, 3)",
+                [],
+            )
+            .unwrap();
+            // 임베딩은 다시 만드는 값이 비싸다. 절대 잃으면 안 된다.
+            conn.execute(
+                "INSERT INTO embedding(chunk_id, model, dim, vec) VALUES (1, 'bge-m3', 2, ?1)",
+                [&[0u8, 1, 2, 3, 4, 5, 6, 7][..]],
+            )
+            .unwrap();
+        }
+
+        // 지금 프로그램으로 연다 -> v2 로 올라간다
+        let db = open(&dir).unwrap();
+        assert_eq!(db.with(|c| user_version(c)).unwrap(), SCHEMA_VERSION);
+
+        db.with(|c| {
+            let name: String =
+                c.query_row("SELECT name FROM collection WHERE id = 1", [], |r| r.get(0))?;
+            assert_eq!(name, "늘봄학교");
+
+            let vec: Vec<u8> =
+                c.query_row("SELECT vec FROM embedding WHERE chunk_id = 1", [], |r| r.get(0))?;
+            assert_eq!(vec, vec![0u8, 1, 2, 3, 4, 5, 6, 7], "임베딩이 그대로 있어야 한다");
+
+            // v2 에서 더한 칸은 기본값으로 채워져 있다
+            let map: String = c.query_row(
+                "SELECT COALESCE((SELECT item_map FROM page LIMIT 1), '[]')",
+                [],
+                |r| r.get(0),
+            )?;
+            assert_eq!(map, "[]");
+
+            // 낱말 색인도 살아 있다
+            let hit: i64 = c.query_row(
+                "SELECT COUNT(*) FROM chunk_fts WHERE chunk_fts MATCH '교재비'",
+                [],
+                |r| r.get(0),
+            )?;
+            assert_eq!(hit, 1);
+            Ok(())
+        })
+        .unwrap();
+
+        // 손대기 전에 백업을 떠 두었는가
+        let backups: Vec<_> = std::fs::read_dir(dir.join("backups"))
+            .unwrap()
+            .filter_map(|e| e.ok())
+            .collect();
+        assert_eq!(backups.len(), 1, "올리기 전에 백업이 하나 있어야 한다");
+        assert!(backups[0].file_name().to_string_lossy().starts_with("pre-migration-v1-"));
+
         std::fs::remove_dir_all(&dir).ok();
     }
 

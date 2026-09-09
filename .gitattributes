@@ -1,0 +1,12 @@
+# 이진 파일은 절대 줄바꿈을 건드리지 않는다.
+#
+# 손으로 만든 시험용 PDF 는 대부분이 ASCII 라서 git 이 텍스트로 잘못 보고
+# CRLF 변환을 걸려 한다. 그러면 압축 스트림이 깨져 PDF 가 열리지 않는다.
+*.pdf   binary
+*.png   binary
+*.ico   binary
+*.icns  binary
+*.bcmap binary
+*.ttf   binary
+*.pfb   binary
+*.wasm  binary

@@ -31,3 +31,4 @@ exports/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+public/pdfjs/

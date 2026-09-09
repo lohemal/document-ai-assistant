@@ -24,12 +24,22 @@ pub fn data_dir(app: &tauri::AppHandle) -> AppResult<PathBuf> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![
             commands::system::app_info,
             commands::collection::collection_list,
             commands::collection::collection_create,
             commands::collection::collection_rename,
             commands::collection::collection_delete,
+            commands::document::document_register,
+            commands::document::document_bytes,
+            commands::document::document_save_pages,
+            commands::document::document_finish,
+            commands::document::document_list,
+            commands::document::document_get,
+            commands::document::document_pages,
+            commands::document::document_page,
+            commands::document::document_delete,
         ])
         .setup(|app| {
             // 자료를 여는 데 실패해도 앱은 뜬다. 화면에서 이유를 보여 준다.

@@ -5,7 +5,7 @@
 //! 만들어져 있기 때문이다.
 
 /// (버전, 이 버전으로 올리는 SQL)
-pub const MIGRATIONS: &[(i64, &str)] = &[(1, V1)];
+pub const MIGRATIONS: &[(i64, &str)] = &[(1, V1), (2, V2)];
 
 const V1: &str = r#"
 -- 자료집 -----------------------------------------------------------------
@@ -151,4 +151,15 @@ CREATE TABLE setting (
 
 INSERT INTO setting(key, value) VALUES
   ('retention_days', '30');
+"#;
+
+/// P2 에서 더한 것 — 문자 위치 지도.
+///
+/// 쪽마다 `[문자시작, 문자끝, 항목번호]` 를 담는다. 이게 나중에 "근거가 이 쪽
+/// 이 자리에 있다"는 형광펜의 근거가 된다. 자세한 내용은 설계안 2-1.
+///
+/// 항목 번호는 pdf.js 가 준 차례이므로, 어느 판으로 뽑았는지 함께 적어 둔다.
+const V2: &str = r#"
+ALTER TABLE page ADD COLUMN item_map TEXT NOT NULL DEFAULT '[]';
+ALTER TABLE document ADD COLUMN extractor TEXT;
 "#;

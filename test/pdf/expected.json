@@ -1,0 +1,97 @@
+[
+  {
+    "file": "plain-ko.pdf",
+    "page": 1,
+    "sentence": "이 문장은 1쪽에만 있는 확인용 문장입니다. 확인코드 A3F7."
+  },
+  {
+    "file": "plain-ko.pdf",
+    "page": 2,
+    "sentence": "이 문장은 2쪽에만 있는 확인용 문장입니다. 확인코드 B8K2."
+  },
+  {
+    "file": "plain-ko.pdf",
+    "page": 3,
+    "sentence": "이 문장은 3쪽에만 있는 확인용 문장입니다. 확인코드 C1M9."
+  },
+  {
+    "file": "plain-ko.pdf",
+    "page": 4,
+    "sentence": "이 문장은 4쪽에만 있는 확인용 문장입니다. 확인코드 D6P4."
+  },
+  {
+    "file": "plain-ko.pdf",
+    "page": 3,
+    "sentence": "이용권을 사용한 경우에는"
+  },
+  {
+    "file": "plain-ko.pdf",
+    "page": 4,
+    "sentence": "2026. 3. 1. 부터 시행한다"
+  },
+  {
+    "file": "table-ko.pdf",
+    "page": 1,
+    "sentence": "이 문장은 1쪽에만 있는 확인용 문장입니다. 확인코드 T100."
+  },
+  {
+    "file": "table-ko.pdf",
+    "page": 2,
+    "sentence": "이 문장은 2쪽에만 있는 확인용 문장입니다. 확인코드 T200."
+  },
+  {
+    "file": "table-ko.pdf",
+    "page": 3,
+    "sentence": "이 문장은 3쪽에만 있는 확인용 문장입니다. 확인코드 T300."
+  },
+  {
+    "file": "table-ko.pdf",
+    "page": 1,
+    "sentence": "500,000원"
+  },
+  {
+    "file": "table-ko.pdf",
+    "page": 2,
+    "sentence": "중위소득 100% 이하"
+  },
+  {
+    "file": "manual-ko.pdf",
+    "page": 1,
+    "sentence": "이 문장은 1쪽에만 있는 확인용 문장입니다. 확인코드 M001."
+  },
+  {
+    "file": "manual-ko.pdf",
+    "page": 30,
+    "sentence": "이 문장은 30쪽에만 있는 확인용 문장입니다. 확인코드 M030."
+  },
+  {
+    "file": "manual-ko.pdf",
+    "page": 60,
+    "sentence": "이 문장은 60쪽에만 있는 확인용 문장입니다. 확인코드 M060."
+  },
+  {
+    "file": "odd-layer.pdf",
+    "page": 1,
+    "sentence": "이 문장은 1쪽에만 있는 확인용 문장입니다. 확인코드 X1AA."
+  },
+  {
+    "file": "odd-layer.pdf",
+    "page": 2,
+    "sentence": "이 문장은 2쪽에만 있는 확인용 문장입니다. 확인코드 X2BB."
+  },
+  {
+    "file": "mixed.pdf",
+    "page": 1,
+    "sentence": "MIXEDPAGE1"
+  },
+  {
+    "file": "cid-ko.pdf",
+    "page": 1,
+    "sentence": "자유수강권 운영지침을 붙임과 같이 알려 드립니다."
+  },
+  {
+    "file": "cid-ko.pdf",
+    "page": 2,
+    "sentence": "1인당 100,000원 이내로 지원한다."
+  }
+]

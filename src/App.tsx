@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
 import Placeholder from '@/components/Placeholder'
 import Collections from '@/pages/Collections'
+import Documents from '@/pages/Documents'
 import Settings from '@/pages/Settings'
 import { getAppInfo, type AppInfo } from '@/ipc/app'
 import { AI_NONE, type AiStatus } from '@/lib/aiStatus'
@@ -33,16 +34,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/collections" replace />} />
           <Route path="/collections" element={<Collections />} />
-          <Route
-            path="/documents"
-            element={
-              <Placeholder
-                title="자료 등록"
-                phase="P2"
-                note="PDF 를 등록하고 텍스트를 뽑습니다. AI 모델 없이도 됩니다."
-              />
-            }
-          />
+          <Route path="/documents" element={<Documents />} />
           <Route
             path="/search"
             element={

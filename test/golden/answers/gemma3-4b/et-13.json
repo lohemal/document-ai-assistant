@@ -1,0 +1,8 @@
+{
+  "questionId": "et-13",
+  "model": "gemma3:4b",
+  "promptHash": "968d6f53b699bc2e",
+  "raw": "{\n  \"answer\": \"한국 저작권 위원회\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거5\"\n      ],\n      \"text\": \"찾아가는 저작권 교육은 주관: 한국 저작권 위원회\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 50044,
+  "tokens": 95
+}

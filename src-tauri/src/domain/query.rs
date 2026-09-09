@@ -55,6 +55,18 @@ fn is_asking(s: &str) -> bool {
     ASKING.iter().any(|a| *a == s)
 }
 
+/// 물어보는 말인가. **조사를 떼고도 본다** — `얼마까지` 는 `얼마` 다.
+///
+/// `parse` 는 조사를 뗀 꼴이 물음말이면 그 꼴만 버리고 원래 낱말은 남긴다
+/// (`얼마까지` 로 찾을 수는 있으므로). 물음의 핵심어를 고를 때는 그렇게
+/// 남은 것도 버려야 한다 — `얼마까지` 가 근거에 없다고 답을 거부하면 안 된다.
+pub fn is_question_word(s: &str) -> bool {
+    if is_asking(s) {
+        return true;
+    }
+    matches!(strip_particle(s), Some(stem) if is_asking(&stem))
+}
+
 /// 뒤에 붙은 조사를 뗀다. 떼고 남는 것이 두 글자보다 짧으면 그냥 둔다 —
 /// `종이` 에서 `이` 를 떼면 `종` 이 되어 엉뚱한 것이 걸린다.
 pub fn strip_particle(term: &str) -> Option<String> {

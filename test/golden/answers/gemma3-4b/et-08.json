@@ -1,0 +1,8 @@
+{
+  "questionId": "et-08",
+  "model": "gemma3:4b",
+  "promptHash": "b192840c4c15db26",
+  "raw": "{\n  \"answer\": \"아니요. 심층상담 수당은 1회기당 40,000원입니다. [근거3]\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거3\"\n      ],\n      \"text\": \"심층상담 수당은 세출예산 집행기준 강사수당-3 기준이며, 1회기당 4만 원\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 51380,
+  "tokens": 132
+}

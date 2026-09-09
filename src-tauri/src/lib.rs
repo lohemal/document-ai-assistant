@@ -1,4 +1,5 @@
 pub mod ai;
+pub mod answer;
 pub mod commands;
 pub mod domain;
 pub mod db;
@@ -98,6 +99,8 @@ pub fn run() {
             commands::index::index_start,
             commands::index::index_stop,
             commands::index::index_drop_unusable,
+            commands::answer::answer_ask,
+            commands::answer::answer_cancel,
         ])
         .setup(|app| {
             // 자료를 여는 데 실패해도 앱은 뜬다. 화면에서 이유를 보여 준다.
@@ -110,6 +113,8 @@ pub fn run() {
             app.manage(commands::ai::PullControl::default());
             // 색인을 멈출 수 있게 들고 있는다
             app.manage(commands::index::IndexControl::default());
+            // 답변 만들기를 멈출 수 있게 들고 있는다
+            app.manage(commands::answer::AskControl::default());
             Ok(())
         })
         .run(tauri::generate_context!())

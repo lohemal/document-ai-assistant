@@ -1,0 +1,8 @@
+{
+  "questionId": "et-03",
+  "model": "gemma3:4b",
+  "promptHash": "e953e438f2312a2b",
+  "raw": "{\n  \"answer\": \"반기별 1회(연 2회)\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"유치원: 연 1회, 초·중·고등학교: 반기별 1회(연 2회)\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 49095,
+  "tokens": 102
+}

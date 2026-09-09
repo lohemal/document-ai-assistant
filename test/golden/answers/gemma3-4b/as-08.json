@@ -1,0 +1,8 @@
+{
+  "questionId": "as-08",
+  "model": "gemma3:4b",
+  "promptHash": "ce116cbe0838491c",
+  "raw": "{\n  \"answer\": \"공고기간은 최소 5일(등록일 제외)이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거1\"\n      ],\"text\": \"○ 공고기간) 접수마감일까지 최소 5일(등록일 제외) 이상의 기간\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 66024,
+  "tokens": 102
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-06",
+  "model": "gemma3:4b",
+  "promptHash": "86ba238c3540b35b",
+  "raw": "{\n  \"answer\": \"경조사비는 1인당 5천원 이내 집행 가능\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"경조사비는 1인당 50,000원 이내 집행 가능\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 73289,
+  "tokens": 104
+}

@@ -442,6 +442,124 @@ pub fn embed(tag: &str, texts: &[String]) -> Result<Vec<Vec<f32>>, String> {
     Ok(out)
 }
 
+/// 답변 한 판. 끝났을 때의 살림살이도 함께 담는다.
+#[derive(Debug, Clone)]
+pub struct ChatOut {
+    pub text: String,
+    /// 사용자가 멈춰서 끝났는가
+    pub cancelled: bool,
+    /// 모델이 내놓은 토큰 수 (속도를 재는 데 쓴다)
+    pub tokens: u64,
+    pub elapsed_ms: u64,
+}
+
+/// 답변을 받는다. **토큰이 오는 대로 흘려 준다.**
+///
+/// 흘려 받는 까닭이 두 가지다.
+///   ① 이 PC 는 CPU 로 돌아서 한 판에 20초가 넘는다. 아무것도 안 보이면
+///      사용자는 멈춘 줄 안다.
+///   ② **멈출 수 있어야 한다.** 한 번에 받아 오는 방식이면 다 올 때까지
+///      기다려야 하지만, 흘려 받으면 읽기를 그만두면 끝난다.
+///
+/// `format` 에 스키마를 주면 Ollama 가 그 꼴로만 내놓는다. 작은 모델이 형식을
+/// 어기는 것을 크게 줄여 준다.
+pub fn chat_stream(
+    tag: &str,
+    system: &str,
+    prompt: &str,
+    format: Option<serde_json::Value>,
+    cancel: Arc<AtomicBool>,
+    mut on_token: impl FnMut(&str),
+) -> Result<ChatOut, String> {
+    guard().map_err(|_| "루프백이 아닌 주소는 쓰지 않습니다.".to_string())?;
+    let started = std::time::Instant::now();
+
+    let mut body = ureq::json!({
+        "model": tag,
+        "system": system,
+        "prompt": prompt,
+        "stream": true,
+        "options": {
+            // ⚠ **문맥 창을 반드시 정해 줘야 한다.**
+            //
+            // Ollama 는 기본을 4,096 토큰으로 잡는다. 우리가 넘기는 근거는
+            // 6,000자쯤이고 한국어는 1토큰이 1.5자쯤이라 4,000토큰을 넘는다.
+            // 그러면 **앞쪽 근거가 조용히 잘려 나간다.** 실제로 그 때문에
+            // 모델이 뒤쪽 근거만 인용하고 정작 답이 있는 앞쪽 근거를 놓쳤다.
+            // 잘렸다는 말은 어디에도 나오지 않아서 알아채기 어렵다.
+            "num_ctx": 8192,
+            // 업무자료를 다루므로 되도록 흔들리지 않게 한다.
+            // 같은 물음에 같은 답이 나와야 검증도 뜻이 있다.
+            "temperature": 0,
+            "top_p": 0.9,
+            // 짧게 쓰라고 시켰으므로 이만큼이면 넉넉하다. CPU 에서는 토큰 수가
+            // 그대로 기다리는 시간이다 — 4B 모델이 초당 4토큰쯤 낸다.
+            "num_predict": 900
+        }
+    });
+    if let Some(f) = format {
+        body["format"] = f;
+    }
+
+    let resp = ureq::AgentBuilder::new()
+        .timeout_connect(CONNECT_TIMEOUT)
+        // 답변은 오래 걸린다. 읽기 시간 제한을 두지 않는다 —
+        // 멈추는 일은 사용자가 한다.
+        .build()
+        .post(&endpoint("/api/generate"))
+        .send_json(body)
+        .map_err(describe)?;
+
+    let reader = BufReader::new(resp.into_reader());
+    let mut text = String::new();
+    let mut tokens = 0u64;
+
+    for line in reader.lines() {
+        if cancel.load(Ordering::Relaxed) {
+            return Ok(ChatOut {
+                text,
+                cancelled: true,
+                tokens,
+                elapsed_ms: started.elapsed().as_millis() as u64,
+            });
+        }
+        let line = match line {
+            Ok(l) => l,
+            Err(e) => return Err(format!("답변을 받는 도중 끊겼습니다: {e}")),
+        };
+        if line.trim().is_empty() {
+            continue;
+        }
+        let v: serde_json::Value = match serde_json::from_str(&line) {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        if let Some(err) = v.get("error").and_then(|e| e.as_str()) {
+            return Err(err.to_string());
+        }
+        if let Some(part) = v.get("response").and_then(|r| r.as_str()) {
+            if !part.is_empty() {
+                text.push_str(part);
+                on_token(part);
+            }
+        }
+        if v.get("done").and_then(|d| d.as_bool()).unwrap_or(false) {
+            tokens = v.get("eval_count").and_then(|c| c.as_u64()).unwrap_or(0);
+            break;
+        }
+    }
+
+    if text.trim().is_empty() {
+        return Err("모델이 아무 답도 하지 않았습니다.".into());
+    }
+    Ok(ChatOut {
+        text,
+        cancelled: false,
+        tokens,
+        elapsed_ms: started.elapsed().as_millis() as u64,
+    })
+}
+
 #[cfg(test)]
 #[path = "ollama_tests.rs"]
 mod server_tests;

@@ -1054,3 +1054,128 @@ select.input {
   gap: 6px;
   margin-top: 6px;
 }
+
+/* ── 답변 화면 (P5) ─────────────────────────────────────────────── */
+
+.answer-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.75;
+  white-space: pre-wrap;
+}
+
+.answer-refusal {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--muted);
+}
+
+.answer-limited {
+  border-color: var(--warn-line);
+}
+
+/* 답이 아직 오는 중임을 보이는 띠 */
+.progress-idle {
+  width: 30%;
+  animation: idle 1.4s ease-in-out infinite;
+}
+
+@keyframes idle {
+  0% { margin-left: 0; }
+  50% { margin-left: 70%; }
+  100% { margin-left: 0; }
+}
+
+.evlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.evitem {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+/* 답변이 실제로 인용한 근거를 눈에 띄게 — 나머지는 곁들인 문맥이다 */
+.evitem.is-cited .evname {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.evhead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.evname {
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.checks {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  line-height: 1.8;
+}
+
+.checks .ok::marker {
+  content: '✓ ';
+}
+
+.checks .bad::marker,
+.checks .warn::marker {
+  content: '⚠ ';
+}
+
+.checks .bad {
+  color: #8a5a00;
+}
+
+.numtable {
+  width: 100%;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.numtable td {
+  padding: 4px 8px;
+  border-top: 1px solid var(--line);
+}
+
+.notes {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.raw {
+  max-height: 260px;
+  margin: 0;
+  padding: 10px;
+  overflow: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: pre-wrap;
+}

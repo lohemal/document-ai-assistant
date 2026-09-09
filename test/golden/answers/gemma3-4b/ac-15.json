@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-15",
+  "model": "gemma3:4b",
+  "promptHash": "f9ab6d76ed3758cd",
+  "raw": "{\n  \"answer\": \"no\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"학급운영비는 단위학교 학급운영의 자율성‧특색적인 교육활동 필요경비로 생활교육, 학급행사, 자료발간 등으로 집행\"\n    }\n  ],\n  \"insufficientEvidence\": true,\n  \"confidence\": \"high\"\n}",
+  "llmMs": 71474,
+  "tokens": 118
+}

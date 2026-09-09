@@ -1,0 +1,8 @@
+{
+  "questionId": "et-14",
+  "model": "gemma3:4b",
+  "promptHash": "290a609fab565e3d",
+  "raw": "{\n  \"answer\": \"예\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거1\"\n      ],\n      \"text\": \"정보통신윤리교육 사업 예산 총액은 8500천원이다.\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 49412,
+  "tokens": 91
+}

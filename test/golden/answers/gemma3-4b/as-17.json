@@ -1,0 +1,8 @@
+{
+  "questionId": "as-17",
+  "model": "gemma3:4b",
+  "promptHash": "ff7d376397fc01ad",
+  "raw": "{\n  \"answer\": \"33,000원\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"전년도 강사료 원가가 30,000원이고 금년도 강사료 원가 산정 시 3,000원 인상을 적용할 경우, 금년도 강사료 원가는 33,000원으로 산정\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 70078,
+  "tokens": 130
+}

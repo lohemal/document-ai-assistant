@@ -1,0 +1,8 @@
+{
+  "questionId": "as-16",
+  "model": "gemma3:4b",
+  "promptHash": "9fc9ee810a0d98d3",
+  "raw": "{\n  \"answer\": \"개인위탁의 경우, 학교장과의 실질 고용 계약인 경우 학교안전공제회로부터 보상을 받을 수 있다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"개인위탁의 경우, 학교장과의 실질 고용 계약인 경우 학교안전공제회로부터 보상을 받을 수 있도록 조치를 취할 수 있음\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 62966,
+  "tokens": 128
+}

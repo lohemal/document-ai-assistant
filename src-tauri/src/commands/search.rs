@@ -37,8 +37,21 @@ pub async fn search_query(
     collection_ids: Vec<i64>,
     limit: Option<i64>,
 ) -> AppResult<repo::SearchResult> {
-    let limit = limit.unwrap_or(20);
-    let db = state.db()?;
+    best_search(state.db()?, &text, &collection_ids, limit.unwrap_or(20)).await
+}
+
+/// 찾기의 몸통. 화면 명령과 **답변 파이프라인이 같은 길을 쓰게** 하려고 따로 뺐다.
+///
+/// 검색과 답변이 다른 길로 찾으면, 화면에서 본 근거와 답변이 쓴 근거가
+/// 어긋난다. 그런 어긋남은 사용자가 알아챌 수 없다.
+pub async fn best_search(
+    db: &crate::db::Db,
+    text: &str,
+    collection_ids: &[i64],
+    limit: i64,
+) -> AppResult<repo::SearchResult> {
+    let text = text.to_string();
+    let collection_ids = collection_ids.to_vec();
 
     let keyword_only = |note: Option<String>| -> AppResult<repo::SearchResult> {
         let mut r = db.with(|c| {

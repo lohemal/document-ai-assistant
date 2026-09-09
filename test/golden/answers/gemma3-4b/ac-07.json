@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-07",
+  "model": "gemma3:4b",
+  "promptHash": "d1248218880a6d4d",
+  "raw": "{\n\"answer\": \"아니오. 간담회 경비는 1인 1회당 4만원 이하 범위에서 집행합니다.\",\n\"claims\": [\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거4\"],\n    \"text\": \"경조사비는 1인당 50,000원 이내 집행 가능\"\n  }\n],\n\"insufficientEvidence\": true,\n\"confidence\": \"high\"\n}",
+  "llmMs": 75283,
+  "tokens": 117
+}

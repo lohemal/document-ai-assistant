@@ -1,0 +1,8 @@
+{
+  "questionId": "as-n5",
+  "model": "gemma3:4b",
+  "promptHash": "3b9548ee72a54e07",
+  "raw": "{ \"answer\": \"수강료(강사료+수용비) 47,000원\", \"claims\": [], \"insufficientEvidence\": true }",
+  "llmMs": 73575,
+  "tokens": 45
+}

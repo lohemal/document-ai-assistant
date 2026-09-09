@@ -1,0 +1,8 @@
+{
+  "questionId": "as-09",
+  "model": "gemma3:4b",
+  "promptHash": "cd600c251300e7e5",
+  "raw": "{\n  \"answer\": \"예\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거1\"\n      ],\n      \"text\": \"수강료는 강사료, 도서구입비, 재료구입비, 수용비로 구분하되, 강사료는 전년도 원가계산 금액을 기준으로 참여 인원 수 등을 고려하여 산출\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 83153,
+  "tokens": 121
+}

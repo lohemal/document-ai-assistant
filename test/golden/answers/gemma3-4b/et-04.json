@@ -1,0 +1,8 @@
+{
+  "questionId": "et-04",
+  "model": "gemma3:4b",
+  "promptHash": "56191ac9af9e97fb",
+  "raw": "{\n  \"answer\": \"유치원은 연 1회 교육해야 합니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"유치원: 연 1회\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 47681,
+  "tokens": 82
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "et-15",
+  "model": "gemma3:4b",
+  "promptHash": "d726f410ed30a7ab",
+  "raw": "{\n  \"answer\": \"건강하고 안전한 디지털 환경 조성 및 주체적인 지능정보서비스 이용 습관 형성\",\n  \"claims\": [\n    {\n      \"kind\": \"interpretation\",\n      \"sources\": [\n        \"□ 사업 항목: 정보통신윤리교육\"\n      ],\n      \"text\": \"건강하고 안전한 디지털 환경 조성 및 주체적인 지능정보서비스 이용 습관 형성\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 50212,
+  "tokens": 117
+}

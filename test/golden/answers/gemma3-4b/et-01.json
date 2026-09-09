@@ -1,0 +1,8 @@
+{
+  "questionId": "et-01",
+  "model": "gemma3:4b",
+  "promptHash": "fbabdf166d40bf6d",
+  "raw": "{\"answer\": \"「지능정보화기본법」 제44조 제1항 제2조 및 5조, 「세종특별자치시교육청 인터넷중독 예방교육에 관한 조례」 제4조\",\"claims\": [],\"insufficientEvidence\": true}",
+  "llmMs": 46392,
+  "tokens": 65
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "et-10",
+  "model": "gemma3:4b",
+  "promptHash": "8226c52308a20dae",
+  "raw": "{\n  \"answer\": \"초1(보호자), 초4, 중1, 고1\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"학령전환기 청소년의 미디어 이용습관 진단을 통해 인터넷·스마트폰(게임) 과의존에 대한 경각심 제고 및 개선 유도, 과다 사용 문제의 조기 발견 및 맞춤형 조치(상담·치료) 지원\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 52032,
+  "tokens": 140
+}

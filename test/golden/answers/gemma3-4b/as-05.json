@@ -1,0 +1,8 @@
+{
+  "questionId": "as-05",
+  "model": "gemma3:4b",
+  "promptHash": "377eed325d98550f",
+  "raw": "{\n  \"answer\": \"수용비는 강사료의 5% 이내에서 학교운영위원회 심의를 거쳐 결정할 수 있다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"수강료는 강사료, 도서구입비, 재료구입비, 수용비로 구분하되, 강사료는 전년도 원가계산 금액을 기준으로 참여 인원 수 등을 고려하여 산출한다.\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"수용비는 강사료의 5% 이내로 정할 수 있다.\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 78356,
+  "tokens": 193
+}

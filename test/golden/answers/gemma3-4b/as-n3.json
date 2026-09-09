@@ -1,0 +1,8 @@
+{
+  "questionId": "as-n3",
+  "model": "gemma3:4b",
+  "promptHash": "748a15f43eadac49",
+  "raw": "{\n\"answer\": \"insufficientEvidence\",\n\"claims\": [\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거1\"],\n    \"text\": \"단위학교는 방과후학교 단위 프로그램별 수강 학생 수는 공간, 내용 등을 고려하여 달리 정할 수 있다.\"\n  }\n],\n\"insufficientEvidence\": true\n}",
+  "llmMs": 68000,
+  "tokens": 89
+}

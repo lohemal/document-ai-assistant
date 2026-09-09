@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n1",
+  "model": "gemma3:4b",
+  "promptHash": "99da9d6748d79bb0",
+  "raw": "{\n  \"answer\": \"유치원은 연 1회, 초·중·고등학교는 반기별 1회(연 2회) 운영\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"유치원: 연 1회, 초·중·고등학교: 반기별 1회(연 2회)\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 52680,
+  "tokens": 119
+}

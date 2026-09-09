@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-05",
+  "model": "gemma3:4b",
+  "promptHash": "c9409f7cfcd77444",
+  "raw": "{\n  \"answer\": \"세입․세출에 관한 사무는 3월 20일을 기준으로 폐쇄\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"세입․세출에 관한 사무는 3월 20일을 기준으로 폐쇄\"\n    }\n  ],\n  \"insufficientEvidence\": true,\n  \"confidence\": \"high\"\n}",
+  "llmMs": 72159,
+  "tokens": 115
+}

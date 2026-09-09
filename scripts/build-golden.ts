@@ -19,6 +19,15 @@ const dir = join(root, 'test', 'golden')
 
 type Chunk = { ord: number; text: string; pageStart: number; pageEnd: number; kind: string }
 type Doc = { id: number; collectionId: number; title: string; chunks: Chunk[] }
+type Negative = {
+  id: string
+  doc: number
+  q: string
+  /** 자료에 무엇이 없는지 — 나중에 자료가 바뀌면 이 물음을 다시 봐야 한다 */
+  absent: string
+  why?: string
+}
+
 type Question = {
   id: string
   doc: number
@@ -31,9 +40,9 @@ type Question = {
 const corpus = JSON.parse(readFileSync(join(dir, 'chunks.json'), 'utf8')) as {
   documents: Doc[]
 }
-const { questions } = JSON.parse(readFileSync(join(dir, 'questions.json'), 'utf8')) as {
-  questions: Question[]
-}
+const { questions, negatives } = JSON.parse(
+  readFileSync(join(dir, 'questions.json'), 'utf8'),
+) as { questions: Question[]; negatives: Negative[] }
 
 const bare = (s: string) => s.replace(/\s+/g, '')
 
@@ -114,12 +123,31 @@ const multi = (out as { expected_chunk_ids: number[] }[]).filter((r) => r.expect
 console.log(`  정답 청크가 둘 이상인 질문 ${multi.length}개`)
 const tables = (out as { kinds: string[] }[]).filter((r) => r.kinds.includes('table'))
 console.log(`  정답이 표 청크인 질문 ${tables.length}개`)
+console.log(`  자료에 답이 없는 물음 ${(negatives ?? []).length}개`)
 
 if (problems.length > 0) {
   console.log(`\n손볼 곳 ${problems.length}건`)
   for (const p of problems) console.log(`  - ${p}`)
 }
 
-writeFileSync(join(dir, 'golden.json'), JSON.stringify({ questions: out }, null, 1) + '\n')
+/** 자료에 답이 없는 물음. 정답 청크가 없으므로 따로 담는다. */
+const negativeOut = (negatives ?? []).map((n) => {
+  const doc = corpus.documents.find((d) => d.id === n.doc)
+  return {
+    question_id: n.id,
+    document_id: n.doc,
+    collection_id: doc?.collectionId ?? 0,
+    document: doc?.title ?? '',
+    question: n.q,
+    question_type: 'N',
+    absent: n.absent,
+    note: n.why ?? '',
+  }
+})
+
+writeFileSync(
+  join(dir, 'golden.json'),
+  JSON.stringify({ questions: out, negatives: negativeOut }, null, 1) + '\n',
+)
 console.log(`\ntest/golden/golden.json 을 만들었습니다.`)
 if (problems.some((p) => p.includes('못 찾은') || p.includes('없습니다'))) process.exit(1)

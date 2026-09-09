@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n4",
+  "model": "gemma3:4b",
+  "promptHash": "f53a151a6fd5d457",
+  "raw": "{\n  \"answer\": \"3개\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"초 3·4·6학년, 중 1·3학년 (전년 대비 고１학년 제외)의 인터넷·스마트폰 과의존 예방교육 학급당 1차시 과의존 예방 교육(레몬 교실) 시행\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 50892,
+  "tokens": 122
+}

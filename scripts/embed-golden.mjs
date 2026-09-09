@@ -12,7 +12,8 @@
 //
 // 이 스크립트는 **개발 도구**다. 앱이 도는 길과는 별개다 — 앱은 Rust 쪽
 // `ai::ollama::embed` 로 이 PC 안(127.0.0.1)에만 말을 건다.
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { join, resolve } from 'node:path'
 
 const root = resolve(import.meta.dirname, '..')
@@ -42,8 +43,10 @@ for (const d of corpus.documents) {
     chunkTexts.push(c.textNorm)
   }
 }
-const questionIds = golden.questions.map((q) => q.question_id)
-const questionTexts = golden.questions.map((q) => q.question)
+// 답이 있는 물음과 없는 물음을 모두 벡터로 만든다 — 거부 성능도 재야 한다
+const allQuestions = [...golden.questions, ...(golden.negatives ?? [])]
+const questionIds = allQuestions.map((q) => q.question_id)
+const questionTexts = allQuestions.map((q) => q.question)
 
 async function embed(texts) {
   const res = await fetch(`${host}/api/embed`, {
@@ -76,22 +79,71 @@ try {
 }
 
 const all = [...chunkTexts, ...questionTexts]
-console.log(`${model} 로 ${chunkTexts.length}개 청크 + ${questionTexts.length}개 물음 = ${all.length}개`)
+const keys = [...chunkKeys.map((k) => 'c:' + k.join(':')), ...questionIds.map((id) => 'q:' + id)]
+const hashes = all.map((t) => createHash('sha256').update(t).digest('hex').slice(0, 16))
 
-const vectors = []
+const stem = model.replace(/[^A-Za-z0-9._-]/g, '-')
+const manifestPath = join(outDir, `${stem}.json`)
+const binPath = join(outDir, `${stem}.bin`)
+
+// 이미 만들어 둔 벡터를 다시 쓴다.
+//
+// 청크 701개를 다 만드는 데 10분이 걸린다. 물음 하나를 고쳤을 뿐인데 10분을
+// 다시 기다리면, 골든 셋을 손보는 일 자체를 미루게 된다. 그러면 잘못된 물음이
+// 그대로 남는다. 글의 지문이 같으면 그 벡터를 그대로 쓴다 — 같은 글에서 같은
+// 벡터가 나오기 때문이다. `--all` 을 주면 처음부터 다시 만든다.
+const reuse = new Map()
+if (!process.argv.includes('--all') && existsSync(manifestPath) && existsSync(binPath)) {
+  try {
+    const old = JSON.parse(readFileSync(manifestPath, 'utf8'))
+    const bin = readFileSync(binPath)
+    if (old.model === model && Array.isArray(old.hashes)) {
+      const oldKeys = [
+        ...old.chunks.map((k) => 'c:' + k.join(':')),
+        ...old.questions.map((id) => 'q:' + id),
+      ]
+      for (let i = 0; i < oldKeys.length && i < old.hashes.length; i++) {
+        const off = i * old.dim * 4
+        if (off + old.dim * 4 > bin.length) break
+        const v = new Array(old.dim)
+        for (let k = 0; k < old.dim; k++) v[k] = bin.readFloatLE(off + k * 4)
+        reuse.set(oldKeys[i] + '|' + old.hashes[i], v)
+      }
+      console.log(`이미 만들어 둔 벡터 ${reuse.size}개를 읽었습니다.`)
+    }
+  } catch (e) {
+    console.log(`옛 벡터를 읽지 못해 처음부터 만듭니다: ${e.message}`)
+  }
+}
+
+const vectors = new Array(all.length)
+const todo = []
+for (let i = 0; i < all.length; i++) {
+  const got = reuse.get(keys[i] + '|' + hashes[i])
+  if (got) vectors[i] = got
+  else todo.push(i)
+}
+
+console.log(
+  `${model} 로 청크 ${chunkTexts.length}개 + 물음 ${questionTexts.length}개 가운데 ` +
+    `${todo.length}개를 새로 만듭니다.`,
+)
+
 const started = Date.now()
-for (let i = 0; i < all.length; i += batch) {
-  const part = all.slice(i, i + batch)
-  const got = await embed(part)
-  vectors.push(...got)
-  const done = Math.min(i + batch, all.length)
+for (let n = 0; n < todo.length; n += batch) {
+  const idx = todo.slice(n, n + batch)
+  const got = await embed(idx.map((i) => all[i]))
+  idx.forEach((i, k) => (vectors[i] = got[k]))
+  const done = Math.min(n + batch, todo.length)
   const per = (Date.now() - started) / done
   process.stdout.write(
-    `\r  ${done}/${all.length}  (${(per).toFixed(0)}ms/개, 남은 시간 ${(((all.length - done) * per) / 1000).toFixed(0)}초)   `,
+    `\r  ${done}/${todo.length}  (${per.toFixed(0)}ms/개, 남은 시간 ${(((todo.length - done) * per) / 1000).toFixed(0)}초)   `,
   )
 }
-const elapsed = (Date.now() - started) / 1000
-console.log(`\n  ${elapsed.toFixed(1)}초 걸렸습니다 (${(elapsed / all.length * 1000).toFixed(0)}ms/개)`)
+if (todo.length > 0) {
+  const elapsed = (Date.now() - started) / 1000
+  console.log(`\n  ${elapsed.toFixed(1)}초 걸렸습니다 (${((elapsed / todo.length) * 1000).toFixed(0)}ms/개)`)
+}
 
 const dim = vectors[0].length
 if (vectors.some((v) => v.length !== dim)) throw new Error('벡터 길이가 서로 다릅니다')
@@ -106,12 +158,12 @@ for (const v of vectors) {
 }
 
 mkdirSync(outDir, { recursive: true })
-const stem = model.replace(/[^A-Za-z0-9._-]/g, '-')
 writeFileSync(
-  join(outDir, `${stem}.json`),
-  JSON.stringify({ model, dim, chunks: chunkKeys, questions: questionIds }, null, 1) + '\n',
+  manifestPath,
+  // `hashes` 는 다음에 다시 쓸 수 있는지 가리는 데 쓴다 (위 reuse 참고)
+  JSON.stringify({ model, dim, chunks: chunkKeys, questions: questionIds, hashes }, null, 1) + '\n',
 )
-writeFileSync(join(outDir, `${stem}.bin`), buf)
+writeFileSync(binPath, buf)
 
 console.log(
   `test/golden/vectors/${stem}.{json,bin} 을 만들었습니다 — ${dim}차원 · ${(buf.length / 1024 / 1024).toFixed(1)}MB`,

@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-10",
+  "model": "gemma3:4b",
+  "promptHash": "803058224274dfbe",
+  "raw": "{\n  \"answer\": \"9,000원\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"교직원 특근매식비의 집행은 불가피한 경우를 제외하고는 기관카드, 기관현금영수증카드 중 선택하여 사용하는 것을 원칙으로 함\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 77374,
+  "tokens": 109
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n2",
+  "model": "gemma3:4b",
+  "promptHash": "002c78e8c8a1d9bf",
+  "raw": "{\n  \"answer\": \"정보통신윤리교육 담당 교사에게 주는 수당은 6만원이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"interpretation\",\n      \"sources\": [\n        \"근거3\"\n      ],\n      \"text\": \"인터넷·스마트폰과의존 예방교육 (세출예산 집행기준 강사수당-3 기준) 1회기당 4만원\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 51480,
+  "tokens": 128
+}

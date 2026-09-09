@@ -75,7 +75,7 @@ struct Golden {
     questions: Vec<Question>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 struct Question {
     question_id: String,
     document_id: i64,
@@ -386,3 +386,7 @@ const TYPE_NAME: [(&str, &str); 6] = [
 #[cfg(test)]
 #[path = "run.rs"]
 mod run;
+
+#[cfg(test)]
+#[path = "answer.rs"]
+mod answer;

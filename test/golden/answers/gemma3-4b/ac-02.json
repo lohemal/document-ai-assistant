@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-02",
+  "model": "gemma3:4b",
+  "promptHash": "cab6f1107fa667ed",
+  "raw": "{\n  \"answer\": \"1.5%\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"순세계잉여금이 세입결산액의 1.5% 이상 발생학교는 1.5%를 초과하는 순세계잉여금 전액 감액\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 75935,
+  "tokens": 105
+}

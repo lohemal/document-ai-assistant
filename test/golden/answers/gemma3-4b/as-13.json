@@ -1,0 +1,8 @@
+{
+  "questionId": "as-13",
+  "model": "gemma3:4b",
+  "promptHash": "690735ff4c7cfd5f",
+  "raw": "{\n\"answer\": \"단위학교는 특정 종교교육과 관련이 있는 방과후학교 프로그램을 편성·운영하는 경우 학생·학부모의 동의와 학교운영위원회 심의를 거쳐야 한다. (근거3)\",\n\"claims\": [\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거3\"],\n    \"text\": \"단위학교는 특정 종교교육과 관련이 있는 방과후학교 프로그램을 편성·운영하는 경우 학생·학부모의 동의와 학교운영위원회 심의를 거쳐야 한다.\"\n  }\n],\n\"insufficientEvidence\": true\n}",
+  "llmMs": 68262,
+  "tokens": 150
+}

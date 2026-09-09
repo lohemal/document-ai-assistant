@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-12",
+  "model": "gemma3:4b",
+  "promptHash": "b0d1894be5cf5873",
+  "raw": "{\n  \"answer\": \"근거 4에 따르면, 근무지내 국내출장이 4시간 이상이면 실비 상한액은 2만원이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"운임 위 1만원, 식비 위 1/3, 숙박비 위 25,000원\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 74637,
+  "tokens": 119
+}

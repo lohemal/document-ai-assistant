@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-17",
+  "model": "gemma3:4b",
+  "promptHash": "59e04b1c069e05e4",
+  "raw": "{\n  \"answer\": \"물품 검사와 검수는 사업부서 담당자가 실시한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"물품 검사․검수는 사업부서 담당자가 실시\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 67879,
+  "tokens": 90
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "et-05",
+  "model": "gemma3:4b",
+  "promptHash": "2f3deb3bc91ccde3",
+  "raw": "{\n  \"answer\": \"초 3학년, 4학년, 6학년, 중 1학년, 3학년, 고 1학년\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거1\"\n      ],\n      \"text\": \"초 3·4·6학년, 중 1·3학년, 고 1학년\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 50771,
+  "tokens": 116
+}

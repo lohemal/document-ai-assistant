@@ -1,0 +1,8 @@
+{
+  "questionId": "as-06",
+  "model": "gemma3:4b",
+  "promptHash": "5c85e175d4abbed1",
+  "raw": "{\n  \"answer\": \"no\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"개인위탁 외부강사의 경우 강사료만을 대상으로 함\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"강사가 직접 학생·학부모를 상대로 수강료(재료비, 도서비 등 포함)를 징수하지 않도록 해야 함\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"학교회계출납원이 수납하는 것을 원칙으로 함\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"수강료는 강사료와 도서구입비, 재료구입비, 수용비로 구성\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"수강료는 프로그램 특성과 지역 여건에 따라 책정\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"수용비는 강사료의 5%이내에서 학교운영위원회 심의를 거쳐 결정해야 함\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 90036,
+  "tokens": 352
+}

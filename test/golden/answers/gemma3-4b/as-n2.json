@@ -1,0 +1,8 @@
+{
+  "questionId": "as-n2",
+  "model": "gemma3:4b",
+  "promptHash": "4ce603b229cb69ac",
+  "raw": "{\n\"answer\": \"insufficientEvidence\",\n\"claims\": [\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거1\"],\n    \"text\": \"단위학교는 특정 종교교육과 관련이 있는 방과후학교 프로그램을 편성·운영하는 경우 학생·학부모의 동의와 학교운영위원회 심의를 거쳐야 한다.\"\n  },\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거2\"],\n    \"text\": \"방과후학교 프로그램 강사는 교육의 중립성을 준수하여야 한다.\"\n  },\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거4\"],\n    \"text\": \"방과후학교 프로그램의 도서는 자체 개발하여 사용하는 것이 원칙이나, 학교운영위원회의 심의를 거쳐 외부 도서(단가 포함) 및 재료를 활용할 수 있다.\"\n  },\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거6\"],\n    \"text\": \"방과후학교 운영에 대한 이해를 도모하기 위해 학생과 학부모 대상 설명회 개최 권장한다.\"\n  },\n  {\n    \"kind\": \"fact\",\n    \"sources\": [\"근거7\"],\n    \"text\": \"방과후학교 보조인력에 대해서도 반드시 성범죄 경력 및 아동학대관련범죄 전력 조회는 실시해야 한다.\"\n  }\n],\n\"insufficientEvidence\": true\n}",
+  "llmMs": 94861,
+  "tokens": 351
+}

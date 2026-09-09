@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n3",
+  "model": "gemma3:4b",
+  "promptHash": "83e9a41dfff26547",
+  "raw": "{\n  \"answer\": \"4\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거2\"\n      ],\"text\": \"중심의 정보통신 윤리교육 내실화 (주체성 강화) 디지털 기기의 외부적 통제 중심이 아닌, 학생의 디지털 주체성 강화에 중점을 둔 지능정보서비스 과의존 예방교육 실시 (AI 윤리 교육 활성화) 인공지능(AI) 관련 윤리 위협 및 역기능 관련 교육 활성화 방안 마련\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 53380,
+  "tokens": 151
+}

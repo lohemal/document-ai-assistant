@@ -1,0 +1,8 @@
+{
+  "questionId": "et-16",
+  "model": "gemma3:4b",
+  "promptHash": "019b2b3e9e2da2ba",
+  "raw": "{\n  \"answer\": \"스마트쉼센터(한국지능정보사회진흥원(NIA) 소속)\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"과의존 예방교육을 맡는 전담 기관은 스마트쉼센터(한국지능정보사회진흥원(NIA) 소속)이다.\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 49915,
+  "tokens": 113
+}

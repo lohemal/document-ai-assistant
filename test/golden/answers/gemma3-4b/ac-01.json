@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-01",
+  "model": "gemma3:4b",
+  "promptHash": "42e44199cbf7999d",
+  "raw": "{\n  \"answer\": \"학교 누리집에 10일 이내에 공개해야 한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"∘ 학교 누리집 심의확정 후, 세입․세출에 관한 사무는 3월 20일을 기준으로 폐쇄\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 76098,
+  "tokens": 109
+}

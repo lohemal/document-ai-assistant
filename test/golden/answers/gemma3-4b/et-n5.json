@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n5",
+  "model": "gemma3:4b",
+  "promptHash": "50496c2ab3596667",
+  "raw": "{\n  \"answer\": \"6만원\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\n        \"근거3\"\n      ],\n      \"text\": \"인터넷·스마트폰과의존 예방교육(세출예산 집행기준 강사수당-3 기준) 1회기당 4만원\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 49881,
+  "tokens": 108
+}

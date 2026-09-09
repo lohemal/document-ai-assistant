@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-n1",
+  "model": "gemma3:4b",
+  "promptHash": "0fe2c451d982145f",
+  "raw": "{\n  \"answer\": \"1인당 3만원 이하\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"소속 교직원의 생일시 소액(1인당 3만원 이하)의 상품권, 케이크 등 지급 경비\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 79176,
+  "tokens": 100
+}

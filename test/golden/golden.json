@@ -1193,5 +1193,157 @@
    ],
    "note": "전담 기관"
   }
+ ],
+ "negatives": [
+  {
+   "question_id": "as-n1",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 자유수강권은 1인당 연간 얼마까지 지원돼?",
+   "question_type": "N",
+   "absent": "길라잡이는 '1인당 연간 지원 금액 범위 내에서' 라고만 적고 금액을 적지 않는다",
+   "note": "그럴듯해서 지어내기 가장 쉬운 물음"
+  },
+  {
+   "question_id": "as-n2",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 프로그램은 수강생이 몇 명 미만이면 폐강해야 해?",
+   "question_type": "N",
+   "absent": "폐강·최소 인원 기준이 없다 (원문에 \"폐강\"·\"최소 인원\" 이 한 번도 나오지 않는다)",
+   "note": "학교마다 실제로 있는 규정이라 있을 것처럼 읽힌다"
+  },
+  {
+   "question_id": "as-n3",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 한 강좌의 최대 수강 인원은 몇 명이야?",
+   "question_type": "N",
+   "absent": "학급 편성 규모는 학교가 자율로 정한다고만 적혀 있고 인원 상한이 없다",
+   "note": ""
+  },
+  {
+   "question_id": "as-n4",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "방과후학교 강사 채용할 때 필기시험 점수 기준이 어떻게 돼?",
+   "question_type": "N",
+   "absent": "제안서 심사·면접만 있고 필기시험은 없다",
+   "note": ""
+  },
+  {
+   "question_id": "as-n5",
+   "document_id": 1,
+   "collection_id": 1,
+   "document": "2025 방과후학교 운영 길라잡이(개정판)",
+   "question": "온라인 방과후학교 플랫폼 이용료는 얼마야?",
+   "question_type": "N",
+   "absent": "온라인 플랫폼 이용료를 다루지 않는다",
+   "note": ""
+  },
+  {
+   "question_id": "ac-n1",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "교직원 명절 휴가비는 1인당 얼마까지 집행할 수 있어?",
+   "question_type": "N",
+   "absent": "생일기념 경비(3만원 이하)는 있지만 명절 휴가비 한도는 없다",
+   "note": "생일 3만원이 있어 그 값을 옮겨 쓰기 쉽다"
+  },
+  {
+   "question_id": "ac-n2",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "예산을 다음 연도로 이월할 때 이월 상한 비율은 몇 %야?",
+   "question_type": "N",
+   "absent": "이월 제도(명시·사고·계속비)는 있으나 상한 비율은 없다. 순세계잉여금 1.5% 는 다른 기준이다",
+   "note": "1.5% 라는 다른 숫자가 있어 그것을 답하기 쉽다"
+  },
+  {
+   "question_id": "ac-n3",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "출장 여비 정산은 출장이 끝난 뒤 며칠 안에 신청해야 해?",
+   "question_type": "N",
+   "absent": "정산 신청 서식과 증빙은 있으나 신청 기한 일수가 없다",
+   "note": ""
+  },
+  {
+   "question_id": "ac-n4",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "학교발전기금으로 교직원 회식비를 쓸 수 있어?",
+   "question_type": "N",
+   "absent": "발전기금의 회식비 사용 가부를 다루지 않는다",
+   "note": ""
+  },
+  {
+   "question_id": "ac-n5",
+   "document_id": 2,
+   "collection_id": 2,
+   "document": "2026학년도 학교회계 예산편성 및 집행지침",
+   "question": "학교 출납원이 보관할 수 있는 현금 한도는 얼마야?",
+   "question_type": "N",
+   "absent": "현금 보유 한도가 없다 (원문에 \"현금 보유\"·\"보유 한도\"·\"시재\" 가 없다)",
+   "note": "회계 규정에 흔히 있는 값이라 지어내기 쉽다"
+  },
+  {
+   "question_id": "et-n1",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "정보통신윤리교육 의무 시수를 채우지 않으면 어떤 제재를 받아?",
+   "question_type": "N",
+   "absent": "교육 시수 의무는 있으나 어기면 어떻게 되는지는 없다",
+   "note": ""
+  },
+  {
+   "question_id": "et-n2",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "정보통신윤리교육 담당 교사에게 주는 수당은 얼마야?",
+   "question_type": "N",
+   "absent": "외부 강사 수당(1시간당 6만원)과 상담 수당만 있고 담당 교사 수당은 없다",
+   "note": "6만원·4만원이 있어 그 값을 담당 교사 수당으로 옮겨 쓰기 쉽다"
+  },
+  {
+   "question_id": "et-n3",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "미디어 이용습관 진단조사는 문항이 몇 개야?",
+   "question_type": "N",
+   "absent": "진단조사 대상과 일정만 있고 문항 수는 없다",
+   "note": ""
+  },
+  {
+   "question_id": "et-n4",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "한 학교가 신청할 수 있는 예방교육 학급 수는 최대 몇 개야?",
+   "question_type": "N",
+   "absent": "학급당 1차시라고만 적혀 있고 학교별 상한은 없다",
+   "note": ""
+  },
+  {
+   "question_id": "et-n5",
+   "document_id": 3,
+   "collection_id": 3,
+   "document": "2026년도 정보통신윤리교육 기본계획",
+   "question": "스마트쉼센터 강사 한 사람이 하루에 할 수 있는 최대 강의 시간은?",
+   "question_type": "N",
+   "absent": "강사 수당 단가만 있고 하루 강의 시간 상한은 없다",
+   "note": ""
+  }
  ]
 }

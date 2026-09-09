@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-13",
+  "model": "gemma3:4b",
+  "promptHash": "b8479d143dbad714",
+  "raw": "{\n  \"answer\": \"근거6 제2호 근무지내 국내출장 시의 여비에 따르면, 4시간 미만인 경우 1만원, 4시간 이상인 경우 2만원을 지급한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"근무지내 국내출장의 경우 별도의 여비의 구분 없이, 출장 여행시간이 4시간 미만인 경우 1만원, 4시간 이상인 경우 2만원을 지급\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 71027,
+  "tokens": 149
+}

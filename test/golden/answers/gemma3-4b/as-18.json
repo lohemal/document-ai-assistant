@@ -1,0 +1,8 @@
+{
+  "questionId": "as-18",
+  "model": "gemma3:4b",
+  "promptHash": "5afb96885e9e8699",
+  "raw": "{\n  \"answer\": \"강사료는 원천징수 금액(소득세, 보험료 등)을 제외한 금액을 월별로 계약상대자에게 지급한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"개인위탁 외부강사의 경우 강사료는 원천징수 금액(소득세, 보험료 등)을 제외한 금액을 월별로 계약상대자에게 지급\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 77453,
+  "tokens": 137
+}

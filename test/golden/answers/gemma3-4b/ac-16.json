@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-16",
+  "model": "gemma3:4b",
+  "promptHash": "6f2925db77be03c5",
+  "raw": "{\n  \"answer\": \"일반수용비에 계상하여 집행하되, 계상 한도 준수\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"학교 관리 퇴직금 계좌 명의는 ‘○○학교세입세출외 현금출납원’으로 하고, 인감은 세입세출외현금출납원 직ㆍ사인 4) 기타수당\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 72819,
+  "tokens": 133
+}

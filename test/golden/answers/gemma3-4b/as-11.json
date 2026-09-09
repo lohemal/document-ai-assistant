@@ -1,0 +1,8 @@
+{
+  "questionId": "as-11",
+  "model": "gemma3:4b",
+  "promptHash": "c091db0dc7d27dbe",
+  "raw": "{\n\"answer\": \"7인\",\n\"claims\": [\n    {\n        \"kind\": \"fact\",\n        \"sources\": [\"근거2\"],\n        \"text\": \"평가위원 구성 인원은 해당 시도교육청의 2단계 입찰 규격·기술 평가위원회 구성 및 운영에 관한 기준에 따르되, 최소 7인 이상으로 함\"\n    }\n],\n\"insufficientEvidence\": true\n}",
+  "llmMs": 78890,
+  "tokens": 103
+}

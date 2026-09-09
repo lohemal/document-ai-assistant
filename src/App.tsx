@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
 import Placeholder from '@/components/Placeholder'
+import Ask from '@/pages/Ask'
 import AiGate from '@/components/AiGate'
 import Collections from '@/pages/Collections'
 import Documents from '@/pages/Documents'
@@ -63,17 +64,7 @@ export default function App() {
           <Route path="/collections" element={<Collections />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/search" element={<Search />} />
-          <Route
-            path="/ask"
-            element={
-              <div className="page">
-                <h1 className="page-title">규정 해석</h1>
-                <AiGate status={ai} need="chat" what="AI 답변">
-                  <Placeholder title="규정 해석" phase="P5" note="근거를 읽고 답합니다." />
-                </AiGate>
-              </div>
-            }
-          />
+          <Route path="/ask" element={<Ask />} />
           <Route
             path="/draft"
             element={

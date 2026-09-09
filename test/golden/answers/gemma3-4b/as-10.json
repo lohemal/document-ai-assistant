@@ -1,0 +1,8 @@
+{
+  "questionId": "as-10",
+  "model": "gemma3:4b",
+  "promptHash": "80c150dee428b875",
+  "raw": "{\n  \"answer\": \"1억 1775만원\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"강사료 원가 비목은 ① 인건비, ② 경비, ③ 일반관리비, ④ 이윤으로 구분한다.\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 79336,
+  "tokens": 100
+}

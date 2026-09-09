@@ -1,8 +1,33 @@
-node_modules
-dist
-src-tauri/target
-release
+node_modules/
+dist/
+dist-ssr/
+*.local
+.DS_Store
 
-# 서명 키는 절대 저장소에 들어가면 안 된다 (%USERPROFILE%\.docaid-release 에 둔다)
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+
+# 릴리스 워크플로가 만드는 임시 폴더
+release/
+
+# 개발용 로컬 DB
+*.db
+*.db-shm
+*.db-wal
+
+# 업데이터 서명 키 (절대 커밋 금지)
 *.key
 *.key.pub
+.tauri/
+
+# 서명 키 폴더 (혹시 프로젝트 안으로 옮겨도 막히도록)
+.docaid-release/
+
+# 자료 백업 · 내보내기
+backups/
+exports/
+
+.vscode/*
+!.vscode/extensions.json
+.idea/

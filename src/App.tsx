@@ -37,6 +37,13 @@ export default function App() {
 
   useEffect(refreshAi, [refreshAi])
 
+  // 쓰는 도중 Ollama 가 꺼지면 사이드바가 "AI 준비됨" 인 채로 남는다 (P8 R6 실측).
+  // 1분마다 한 번 뒤에서 다시 본다 — 실패해도 화면은 막히지 않는다.
+  useEffect(() => {
+    const t = setInterval(refreshAi, 60_000)
+    return () => clearInterval(t)
+  }, [refreshAi])
+
   // AI 화면을 들렀다 **나올 때만** 다시 본다.
   //
   // 화면을 옮길 때마다 확인하지 않는 까닭은, 실행환경이 없을 때 붙어 보는 데

@@ -259,7 +259,23 @@ fn 자료집을_한_줄로_요약한다() {
     let s = collection_summary(&c, MODEL, DIM, 1).unwrap();
     assert_eq!(s.documents, 3);
     assert_eq!(s.ready, 2, "일부 색인도 쓸 수 있는 것으로 센다");
-    assert_eq!(s.summary, "문서 3개 중 2개 의미 검색 준비됨");
+    assert_eq!(s.summary, "문서 3개 중 2개 의미 검색 준비됨 · 1개 색인 이어서 필요");
+}
+
+#[test]
+fn 멈춘_색인이_있으면_모두_준비됨이라_하지_않는다() {
+    let c = db();
+    doc(&c, 1, 2);
+    doc(&c, 2, 2);
+    for id in chunk_ids(&c, 1) {
+        embed(&c, id, MODEL);
+    }
+    embed(&c, chunk_ids(&c, 2)[0], MODEL);
+    set_work_state(&c, 2, PAUSED, None).unwrap();
+
+    let s = collection_summary(&c, MODEL, DIM, 1).unwrap();
+    assert_eq!(s.ready, 2, "멈춘 문서도 만든 부분까지는 쓸 수 있다");
+    assert_eq!(s.summary, "문서 2개 의미 검색 가능 · 1개 색인 이어서 필요");
 }
 
 #[test]

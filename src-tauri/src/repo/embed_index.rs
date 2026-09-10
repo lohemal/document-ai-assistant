@@ -303,12 +303,32 @@ pub fn collection_summary(
     let usable = docs.iter().filter(|d| d.state.semantic_usable()).count() as i64;
     let action = docs.iter().filter(|d| d.state.needs_action()).count() as i64;
     let total = docs.len() as i64;
+    // 멈추거나 일부만 된 문서는 "쓸 수는 있지만 끝나지 않았다" — 이걸 "모두 준비됨" 이라
+    // 부르면 사용자가 색인을 이어서 하지 않는다 (P8 실측: 32/441 멈춤이 "모두 준비됨" 으로 보임)
+    let unfinished = docs
+        .iter()
+        .filter(|d| {
+            matches!(
+                d.state,
+                IndexState::Paused | IndexState::Partial | IndexState::Running | IndexState::Queued
+            )
+        })
+        .count();
     let summary = if total == 0 {
         "자료가 없습니다".to_string()
-    } else if usable == total {
+    } else if usable == total && unfinished == 0 {
         format!("문서 {total}개 모두 의미 검색 준비됨")
     } else {
-        format!("문서 {total}개 중 {usable}개 의미 검색 준비됨")
+        let head = if usable == total {
+            format!("문서 {total}개 의미 검색 가능")
+        } else {
+            format!("문서 {total}개 중 {usable}개 의미 검색 준비됨")
+        };
+        if unfinished > 0 {
+            format!("{head} · {unfinished}개 색인 이어서 필요")
+        } else {
+            head
+        }
     };
     Ok(CollectionIndex {
         collection_id,

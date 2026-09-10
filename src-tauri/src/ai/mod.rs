@@ -157,17 +157,15 @@ pub fn status() -> AiStatus {
         Ok(list) => {
             for m in &list {
                 if let Some(spec) = catalog::by_tag(&m.tag) {
-                    match spec.role {
-                        catalog::Role::Chat if s.chat_ready.is_none() => {
-                            s.chat_ready = Some(m.tag.clone())
-                        }
-                        catalog::Role::Embed if s.embed_ready.is_none() => {
-                            s.embed_ready = Some(m.tag.clone())
-                        }
-                        _ => {}
+                    if spec.role == catalog::Role::Embed && s.embed_ready.is_none() {
+                        s.embed_ready = Some(m.tag.clone())
                     }
                 }
             }
+            // 답변 모델은 답할 때와 같은 규칙으로 고른다 (catalog::pick_chat)
+            s.chat_ready = catalog::pick_chat(list.iter().map(|m| m.tag.as_str()), s.ram_gb)
+                .and_then(|spec| list.iter().find(|m| catalog::by_tag(&m.tag).map(|x| x.id) == Some(spec.id)))
+                .map(|m| m.tag.clone());
             s.installed = list;
         }
         Err(e) => {

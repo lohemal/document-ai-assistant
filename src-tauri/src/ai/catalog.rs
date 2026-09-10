@@ -128,6 +128,34 @@ pub fn recommended(ram_gb: Option<u64>) -> (&'static ModelSpec, &'static ModelSp
     (by_id(chat).unwrap(), by_id(embed).unwrap())
 }
 
+/// 받아 둔 답변 모델 가운데 **실제로 쓸** 것을 고른다.
+///
+/// 메모리에 맞는 것 중 큰 쪽을 먼저. 답변(commands::answer)과 상태 화면(ai::status)이
+/// 같은 규칙을 써야 한다 — 따로 고르면 설정 화면은 gemma 라 하고 답은 qwen 이 하는
+/// 일이 생긴다 (P8 실측).
+pub fn pick_chat<'a, I>(installed_tags: I, ram_gb: Option<u64>) -> Option<&'static ModelSpec>
+where
+    I: IntoIterator<Item = &'a str>,
+{
+    let mut ready: Vec<&'static ModelSpec> = installed_tags
+        .into_iter()
+        .filter_map(by_tag)
+        .filter(|m| m.role == Role::Chat)
+        .collect();
+    if ready.is_empty() {
+        return None;
+    }
+    ready.sort_by_key(|m| std::cmp::Reverse(m.min_ram_gb));
+    let ram = ram_gb.unwrap_or(8);
+    Some(
+        ready
+            .iter()
+            .find(|m| m.min_ram_gb <= ram)
+            .copied()
+            .unwrap_or(ready[ready.len() - 1]),
+    )
+}
+
 /// 권하는 까닭을 사람 말로.
 pub fn reason(ram_gb: Option<u64>) -> String {
     match ram_gb {
@@ -141,6 +169,15 @@ pub fn reason(ram_gb: Option<u64>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn 받아_둔_답변_모델_중_메모리에_맞는_큰_쪽을_쓴다() {
+        let both = ["gemma3:4b", "qwen3:8b", "bge-m3:latest"];
+        assert_eq!(pick_chat(both, Some(31)).unwrap().tag, "qwen3:8b");
+        assert_eq!(pick_chat(both, Some(8)).unwrap().tag, "gemma3:4b", "8GB 에서는 큰 것을 피한다");
+        assert_eq!(pick_chat(["qwen3:8b"], Some(8)).unwrap().tag, "qwen3:8b", "하나뿐이면 그것");
+        assert!(pick_chat(["bge-m3:latest"], Some(31)).is_none(), "검색 모델만 있으면 답변 모델은 없다");
+    }
 
     #[test]
     fn 메모리에_따라_다른_것을_권한다() {

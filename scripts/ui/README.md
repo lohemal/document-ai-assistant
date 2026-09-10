@@ -52,3 +52,18 @@ for i in $(seq 1 40); do
   grep -q '검증 상태' d.txt && break
 done
 ```
+
+## 외부 통신 표본 (`net-watch.ps1`)
+
+앱(`DocAid.exe`)과 그 자식 프로세스(WebView2)의 TCP 연결을 2초마다 떠서 CSV 로
+남깁니다. 오프라인 검증(설계안 10-6·10-8)에 씁니다 — 뒤에서 돌려 두고 전 기능을 돕니다.
+
+```bash
+powershell -File scripts/ui/net-watch.ps1 -Seconds 420 -Out net.csv
+# process,remote,state,samples_seen,total_samples
+# DocAid,127.0.0.1:11434,Established,1,172      ← Ollama (루프백)
+# DocAid,20.200.245.247:443,Established,1,172   ← [업데이트 확인] 을 눌렀을 때의 github.com
+```
+
+`127.0.0.1` 밖 주소는 전부 설명할 수 있어야 합니다. 앱만 켜 두었을 때 나가는 것이 있으면
+실패입니다.

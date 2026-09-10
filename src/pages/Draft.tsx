@@ -67,6 +67,9 @@ export default function Draft() {
     setError(null)
     setCopied(false)
     setLive({ phase: 'searching', note: '자료를 찾고 있습니다…', chars: 0 })
+    answerExpect()
+      .then((e) => setExpect(expectLine(e)))
+      .catch(() => {})
     try {
       setOut(await makeDraft(text, collectionId === 'all' ? [] : [collectionId], format))
     } catch (err) {

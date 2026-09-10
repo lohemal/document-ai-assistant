@@ -116,28 +116,12 @@ fn chat_model(state: &AppState) -> Result<&'static catalog::ModelSpec, String> {
     if s.engine != ai::EngineState::Ready {
         return Err(format!("{} {}", s.detail, s.hint));
     }
-    // 받아 둔 답변 모델 가운데 아무 것 (권장하는 것을 먼저 본다)
-    let mut ready: Vec<&'static catalog::ModelSpec> = s
-        .installed
-        .iter()
-        .filter_map(|m| catalog::by_tag(&m.tag))
-        .filter(|m| m.role == catalog::Role::Chat)
-        .collect();
-    if ready.is_empty() {
-        return Err(
-            "답변 모델이 아직 없습니다. [AI 기능 설치] 에서 답변 모델을 받아 주세요. \
-             그때까지도 검색과 원문 보기는 그대로 됩니다."
-                .to_string(),
-        );
-    }
-    // 메모리에 맞는 큰 쪽을 먼저
-    ready.sort_by_key(|m| std::cmp::Reverse(m.min_ram_gb));
-    let ram = s.ram_gb.unwrap_or(8);
-    Ok(ready
-        .iter()
-        .find(|m| m.min_ram_gb <= ram)
-        .copied()
-        .unwrap_or(ready[ready.len() - 1]))
+    // 받아 둔 답변 모델 가운데 메모리에 맞는 큰 쪽 — 상태 화면과 같은 규칙 (catalog::pick_chat)
+    catalog::pick_chat(s.installed.iter().map(|m| m.tag.as_str()), s.ram_gb).ok_or_else(|| {
+        "답변 모델이 아직 없습니다. [AI 기능 설치] 에서 답변 모델을 받아 주세요. \
+         그때까지도 검색과 원문 보기는 그대로 됩니다."
+            .to_string()
+    })
 }
 
 #[tauri::command]

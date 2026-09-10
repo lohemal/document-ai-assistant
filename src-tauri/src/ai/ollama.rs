@@ -157,7 +157,25 @@ fn describe(e: ureq::Error) -> String {
                 format!("Ollama 가 {code} 를 돌려주었습니다: {body}")
             }
         }
-        ureq::Error::Transport(t) => format!("Ollama 에 연결하지 못했습니다: {t}"),
+        ureq::Error::Transport(t) => {
+            // 답하는 도중 Ollama 가 꺼지면 "원격 호스트에 의해 강제로 끊겼습니다 (os error 10054)"
+            // 같은 말이 그대로 올라온다 (P8 R6 실측). 사용자가 할 일을 먼저 적고 원문은 뒤에 둔다.
+            let raw = t.to_string();
+            let low = raw.to_lowercase();
+            let gone = low.contains("10054")
+                || low.contains("10061")
+                || low.contains("connection refused")
+                || low.contains("connection reset")
+                || low.contains("timed out")
+                || low.contains("강제로 끊");
+            if gone {
+                format!(
+                    "AI 실행환경(Ollama)에 연결하지 못했습니다. 꺼졌거나 답하는 도중 끊긴 것 같습니다. Ollama 를 다시 실행한 뒤 다시 시도해 주세요. ({raw})"
+                )
+            } else {
+                format!("Ollama 에 연결하지 못했습니다: {raw}")
+            }
+        }
     }
 }
 
@@ -355,14 +373,20 @@ fn step_name(status: &str) -> String {
 /// **업무자료는 보내지 않는다.** 모델이 살아 있는지만 본다.
 pub fn test_chat(tag: &str) -> Result<String, String> {
     guard().map_err(|_| "루프백이 아닌 주소는 쓰지 않습니다.".to_string())?;
+    let mut body = ureq::json!({
+        "model": tag,
+        "prompt": "1 + 1 = ? 숫자만 답하세요.",
+        "stream": false,
+        "options": { "temperature": 0, "num_predict": 8 }
+    });
+    // qwen3 는 생각을 먼저 쓴다 — 여덟 토큰 안에 답이 안 나와 "아무 답도 하지 않았습니다"
+    // 로 잘못 판정했다 (P8 에서 실제로 봄). 답변 때와 같이 생각을 끈다.
+    if tag.starts_with("qwen3") {
+        body["think"] = serde_json::Value::Bool(false);
+    }
     let resp = agent(GENERATE_TIMEOUT)
         .post(&endpoint("/api/generate"))
-        .send_json(ureq::json!({
-            "model": tag,
-            "prompt": "1 + 1 = ? 숫자만 답하세요.",
-            "stream": false,
-            "options": { "temperature": 0, "num_predict": 8 }
-        }))
+        .send_json(body)
         .map_err(describe)?;
     let json: serde_json::Value = resp.into_json().map_err(|e| e.to_string())?;
     let text = json

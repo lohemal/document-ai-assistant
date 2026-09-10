@@ -66,6 +66,10 @@ export default function Ask() {
     setOut(null)
     setError(null)
     setLive({ phase: 'searching', note: '자료를 찾고 있습니다…', chars: 0 })
+    // 지난 실측은 물을 때마다 다시 읽는다 — 첫 답이 끝나면 그 시간이 바로 다음 안내가 된다
+    answerExpect()
+      .then((e) => setExpect(expectLine(e)))
+      .catch(() => {})
     try {
       setOut(await ask(text, collectionId === 'all' ? [] : [collectionId]))
     } catch (err) {

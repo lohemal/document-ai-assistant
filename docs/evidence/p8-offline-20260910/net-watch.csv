@@ -1,0 +1,14 @@
+process,remote,state,samples_seen,total_samples,first_seen,last_seen
+DocAid,127.0.0.1:11434,Established,261,608,17:14:42,17:32:16
+llama-server,127.0.0.1:49268,Established,81,608,17:28:36,17:32:16
+llama-server,127.0.0.1:52374,Established,75,608,17:17:10,17:20:37
+llama-server,127.0.0.1:60935,Established,97,608,17:22:23,17:26:47
+msedgewebview2,::1:80,SynSent,2,608,17:12:23,17:12:23
+ollama,127.0.0.1:49263,Established,81,608,17:28:36,17:32:16
+ollama,127.0.0.1:49348,Established,39,608,17:10:43,17:12:21
+ollama,127.0.0.1:53531,Established,79,608,17:16:58,17:20:37
+ollama,127.0.0.1:53532,Established,253,608,17:17:10,17:32:16
+ollama,127.0.0.1:56771,Established,1,608,17:28:33,17:28:33
+ollama,127.0.0.1:60906,Established,1,608,17:22:20,17:22:20
+ollama,127.0.0.1:60930,Established,97,608,17:22:23,17:26:47
+ollama,127.0.0.1:64808,Established,2,608,17:14:42,17:14:45

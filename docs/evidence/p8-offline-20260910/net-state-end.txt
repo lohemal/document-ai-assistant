@@ -1,0 +1,27 @@
+taken 2026-09-10 17:38:41
+
+== adapters ==
+  Bluetooth 네트워크 연결            Disconnected   Bluetooth Device (Personal Area Network)
+  Wi-Fi                        Disconnected   MediaTek Wi-Fi 6E MT7922 (RZ616) 160MHz Wireless LAN Card
+  이더넷 2                        Disconnected   TAP-Win32 Adapter V9
+
+== default gateways ==
+  Wi-Fi -> 192.168.0.1
+
+== ping 8.8.8.8 ==
+  unreachable
+
+== dns github.com ==
+  not resolved
+
+== ollama on 127.0.0.1:11434 ==
+  version 0.33.3
+  model gemma3:4b                   3.1 GB
+  model qwen3:8b                    4.9 GB
+  model bge-m3:latest               1.1 GB
+
+== processes ==
+  DocAid           1
+  ollama           1
+  ollama app       1
+  msedgewebview2   12

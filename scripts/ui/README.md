@@ -60,10 +60,26 @@ done
 
 ```bash
 powershell -File scripts/ui/net-watch.ps1 -Seconds 420 -Out net.csv
-# process,remote,state,samples_seen,total_samples
-# DocAid,127.0.0.1:11434,Established,1,172      ← Ollama (루프백)
-# DocAid,20.200.245.247:443,Established,1,172   ← [업데이트 확인] 을 눌렀을 때의 github.com
+# process,remote,state,samples_seen,total_samples,first_seen,last_seen
+# DocAid,127.0.0.1:11434,Established,1,172,15:02:11,15:02:11   ← Ollama (루프백)
+# DocAid,20.200.245.247:443,Established,1,172,15:06:40,15:06:40 ← [업데이트 확인] 을 눌렀을 때의 github.com
 ```
+
+`-ProcessName DocAid,ollama*` 처럼 여러 프로세스(와일드카드 가능)를 함께 볼 수 있고,
+`-StopOnKey` 를 주면 콘솔에서 아무 키를 눌러 일찍 끝냅니다. `first_seen`·`last_seen` 은
+체크리스트의 단계 시각과 맞춰 "어느 단계에서 생긴 연결인가" 를 가릅니다.
 
 `127.0.0.1` 밖 주소는 전부 설명할 수 있어야 합니다. 앱만 켜 두었을 때 나가는 것이 있으면
 실패입니다.
+
+## 오프라인 검증 한 번에 (`offline-run.ps1`)
+
+사용자가 비행기 모드를 켠 뒤 실행하는 기록기입니다. 시작·끝의 네트워크 상태(어댑터·게이트웨이·
+ping·DNS·Ollama 버전과 모델)를 파일로 남기고, `net-watch.ps1` 을 `DocAid,ollama*` 로 돌린 뒤,
+CSV 를 **DocAid 외부 / DocAid→localhost Ollama / WebView2 외부 / Ollama 외부** 네 갈래로 나눠
+`summary.txt` 에 PASS/CHECK 로 적습니다. 결과는 `C:\Temp\docaid-p8\offline\<날짜-시각>\`.
+따라 할 절차와 체크리스트는 `docs/03-오프라인-검증-절차.md` 입니다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\ui\offline-run.ps1
+```

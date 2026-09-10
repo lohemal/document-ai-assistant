@@ -67,6 +67,9 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             commands::system::app_info,
+            commands::system::app_open_data_dir,
+            commands::system::app_backup_now,
+            commands::answer::answer_expect,
             commands::collection::collection_list,
             commands::collection::collection_create,
             commands::collection::collection_rename,

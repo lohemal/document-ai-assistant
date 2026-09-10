@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listCollections, type Collection } from '@/ipc/collections'
 import {
+  answerExpect,
   cancelAsk,
   decisionLabel,
+  expectLine,
   makeDraft,
   onAnswerProgress,
   type AnswerEvent,
@@ -37,7 +39,14 @@ export default function Draft() {
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [dev, setDev] = useState(false)
+  const [expect, setExpect] = useState<string | null>(null)
   const unlisten = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    answerExpect()
+      .then((e) => setExpect(expectLine(e)))
+      .catch(() => setExpect(null))
+  }, [])
 
   useEffect(() => {
     listCollections()
@@ -159,6 +168,7 @@ export default function Draft() {
             <div className="progress-fill progress-idle" />
           </div>
           {live.chars > 0 && <div className="progress-line muted small">{live.chars}자</div>}
+          {expect && <div className="progress-line muted small">{expect}</div>}
         </div>
       )}
 

@@ -110,13 +110,22 @@ fn migrate(conn: &mut Connection, data_dir: &Path) -> AppResult<()> {
     Ok(())
 }
 
-/// 자료를 파일 하나로 복사한다. 마이그레이션 직전과 사용자가 백업을 누를 때 쓴다.
+/// 자료를 파일 하나로 복사한다. 마이그레이션 직전에 쓴다.
 pub fn backup(conn: &Connection, data_dir: &Path, version: i64) -> AppResult<PathBuf> {
+    backup_named(conn, data_dir, &format!("pre-migration-v{version}"))
+}
+
+/// 이름을 붙여 백업한다 — 사용자가 [지금 백업] 을 누를 때는 `manual`.
+///
+/// SQLite 의 온라인 백업 API 를 쓰므로 앱이 쓰는 도중에도 온전한 사본이 나온다.
+/// 파일을 그냥 복사하면 WAL 에 남은 변경이 빠질 수 있다 — 그래서 손으로 복사할
+/// 때는 앱을 끄라고 안내한다 (README).
+pub fn backup_named(conn: &Connection, data_dir: &Path, label: &str) -> AppResult<PathBuf> {
     let dir = backups_dir(data_dir);
     std::fs::create_dir_all(&dir)?;
 
     let stamp = Local::now().format("%Y%m%d-%H%M%S");
-    let path = dir.join(format!("pre-migration-v{version}-{stamp}.db"));
+    let path = dir.join(format!("{label}-{stamp}.db"));
 
     let mut dest = Connection::open(&path)?;
     let backup = rusqlite::backup::Backup::new(conn, &mut dest)?;

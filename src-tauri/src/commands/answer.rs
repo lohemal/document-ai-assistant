@@ -187,6 +187,69 @@ pub async fn draft_make(
     Ok(out)
 }
 
+/// 답변 시간 통계의 설정 열쇠. 모델별로 (걸린 밀리초 합, 횟수) 를 담는다.
+fn duration_key(tag: &str) -> String {
+    format!("answer_ms:{tag}")
+}
+
+/// 이번 답변에 걸린 시간을 더해 둔다. 마지막 20번만 무게를 두려고 오래된 것은
+/// 조금씩 잊는다 — PC 가 바뀌거나 모델이 바뀌면 옛 값이 오래 남으면 안 된다.
+fn remember_duration(conn: &rusqlite::Connection, tag: &str, ms: u64) -> AppResult<()> {
+    use crate::repo::setting;
+    let key = duration_key(tag);
+    let (sum, n): (u64, u64) = setting::get(conn, &key)
+        .ok()
+        .and_then(|v| {
+            let mut it = v.split(',');
+            Some((it.next()?.parse().ok()?, it.next()?.parse().ok()?))
+        })
+        .unwrap_or((0, 0));
+    let (sum, n) = if n >= 20 {
+        // 평균 하나만큼 잊고 새것을 넣는다
+        (sum - sum / n + ms, n)
+    } else {
+        (sum + ms, n + 1)
+    };
+    setting::set(conn, &key, &format!("{sum},{n}"))
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AnswerExpect {
+    /// 지금 쓸 답변 모델 (화면 이름)
+    pub model: String,
+    pub tag: String,
+    /// 이 PC 에서 이 모델로 답한 평균 시간. 아직 한 번도 안 했으면 None
+    pub avg_ms: Option<u64>,
+    pub samples: u64,
+}
+
+/// 답을 기다리는 동안 보여 줄 "이 PC 에서는 보통 얼마" — 지난 실행의 실측이다.
+#[tauri::command]
+pub fn answer_expect(state: State<'_, AppState>) -> AppResult<Option<AnswerExpect>> {
+    use crate::repo::setting;
+    let Ok(model) = chat_model(&state) else {
+        return Ok(None);
+    };
+    let db = state.db()?;
+    let stat = db.with(|c| Ok(setting::get(c, &duration_key(model.tag)).ok()))?;
+    let (avg, n) = stat
+        .and_then(|v| {
+            let mut it = v.split(',');
+            let sum: u64 = it.next()?.parse().ok()?;
+            let n: u64 = it.next()?.parse().ok()?;
+            if n == 0 { None } else { Some((sum / n, n)) }
+        })
+        .map(|(a, n)| (Some(a), n))
+        .unwrap_or((None, 0));
+    Ok(Some(AnswerExpect {
+        model: model.name.to_string(),
+        tag: model.tag.to_string(),
+        avg_ms: avg,
+        samples: n,
+    }))
+}
+
 /// 답변을 작업 기록으로 담는다 — **당시 근거를 통째로 복사한다.**
 ///
 /// 문서 이름·쪽·원문·형광펜 자리·파일 지문(sha256)·자료집 이름까지 지금 값으로
@@ -636,6 +699,16 @@ async fn run(
             });
         }
     };
+    // 이 PC 에서 이 모델이 실제로 얼마나 걸리는지 적어 둔다 — 다음 물음의 진행 표시에
+    // "이 PC 에서는 보통 N분" 으로 쓴다. 고정 문구가 아니라 실측이다 (설계안 결정 39).
+    if chat.elapsed_ms > 0 {
+        let tag = model.tag.to_string();
+        let ms = chat.elapsed_ms;
+        if let Err(e) = db.with(|c| remember_duration(c, &tag, ms)) {
+            log::warn!("답변 시간을 적어 두지 못했습니다: {e}");
+        }
+    }
+
     let verdict = verify::verify(&draft, &evidence);
     let mut judgement = refuse::decide(
         &draft,

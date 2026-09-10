@@ -132,6 +132,29 @@ export function makeDraft(text: string, collectionIds: number[], format: 'letter
   return invoke<AnswerOut>('draft_make', { text, collectionIds, format })
 }
 
+/** 이 PC 에서 이 모델로 답한 평균 시간 — 진행 표시의 "보통 N분" 에 쓴다 */
+export type AnswerExpect = {
+  model: string
+  tag: string
+  avgMs: number | null
+  samples: number
+}
+
+export function answerExpect(): Promise<AnswerExpect | null> {
+  return invoke<AnswerExpect | null>('answer_expect')
+}
+
+/** "이 PC 에서는 보통 2~3분 걸립니다" 꼴. 실측이 없으면 null */
+export function expectLine(e: AnswerExpect | null): string | null {
+  if (!e || e.avgMs === null) return null
+  const s = e.avgMs / 1000
+  const range =
+    s < 45
+      ? `${Math.max(10, Math.round(s / 10) * 10 - 10)}~${Math.round(s / 10) * 10 + 10}초`
+      : `${Math.max(1, Math.floor(s / 60))}~${Math.floor(s / 60) + 1}분`
+  return `이 PC 에서는 ${e.model}(${e.tag})로 답하는 데 보통 ${range} 걸립니다 (지난 ${e.samples}번 평균 ${Math.round(s)}초).`
+}
+
 export function cancelAsk(): Promise<boolean> {
   return invoke<boolean>('answer_cancel')
 }

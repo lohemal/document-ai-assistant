@@ -200,6 +200,18 @@ pub fn finish(
     Ok(())
 }
 
+/// 등록하다 앱이 꺼진 문서를 '등록 중단' 으로 돌린다 (P8 복구).
+///
+/// 등록은 시작(begin) → 쪽 저장 → 마침(finish) 세 걸음이고, 중간에 꺼지면 `indexing`
+/// 이 영원히 남아 화면에 "등록 중" 으로 보인다. 켤 때 `aborted` 로 바꿔 사용자가
+/// 지우고 다시 등록할 수 있게 한다. 자료를 고치지는 않는다 — 상태만 바꾼다.
+pub fn reset_aborted(conn: &Connection) -> AppResult<usize> {
+    Ok(conn.execute(
+        "UPDATE document SET status = 'aborted' WHERE status = 'indexing'",
+        [],
+    )?)
+}
+
 /// 이름이 같은 옛 문서를 이 문서의 앞선 판으로 이어 붙인다.
 ///
 /// 지우지 않는 까닭은 과거 작업 기록이 그 문서의 원문을 가리키고 있을 수 있기

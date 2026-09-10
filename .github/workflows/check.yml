@@ -44,6 +44,11 @@ jobs:
       - name: 배포 이름·버전 검사
         run: npm run check:model
 
+      # 업데이터가 조용히 깨지는 경우 — pubkey 어긋남 · endpoint 어긋남 · latest.json 꼴.
+      # (CI 에는 서명 키가 없어 키 일치와 .sig 검증은 건너뛴다고 말하고 나머지를 본다)
+      - name: 업데이터 설정 검사
+        run: npm run check:updater
+
       # 이 프로젝트에서 가장 중요한 검사.
       # 원문 문장 -> 추출 텍스트 -> 쪽 번호 -> 문자 위치가 서로 맞는지 본다.
       - name: PDF 추출 검사

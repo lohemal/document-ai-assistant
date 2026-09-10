@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listCollections, type Collection } from '@/ipc/collections'
 import {
+  answerExpect,
   ask,
   cancelAsk,
   decisionLabel,
+  expectLine,
   onAnswerProgress,
   type AnswerEvent,
   type AnswerOut,
@@ -36,7 +38,15 @@ export default function Ask() {
   const [live, setLive] = useState<AnswerEvent | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [dev, setDev] = useState(false)
+  // 이 PC 에서 이 모델이 실제로 걸리는 시간 — 기다리는 동안 "보통 N분" 으로 보여 준다
+  const [expect, setExpect] = useState<string | null>(null)
   const unlisten = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    answerExpect()
+      .then((e) => setExpect(expectLine(e)))
+      .catch(() => setExpect(null))
+  }, [])
 
   useEffect(() => {
     listCollections()
@@ -112,6 +122,7 @@ export default function Ask() {
             <div className="progress-fill progress-idle" />
           </div>
           {live.chars > 0 && <div className="progress-line muted small">{live.chars}자</div>}
+          {expect && <div className="progress-line muted small">{expect}</div>}
         </div>
       )}
 

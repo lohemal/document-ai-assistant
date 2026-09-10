@@ -22,6 +22,12 @@ impl AppState {
                 if let Err(e) = db.with(|c| crate::repo::embed_index::reset_running(c)) {
                     log::warn!("색인 상태를 되돌리지 못했습니다: {e}");
                 }
+                // 등록하다 꺼진 문서도 같다 — '등록 중' 이 영원히 남지 않게 '등록 중단' 으로
+                match db.with(|c| crate::repo::document::reset_aborted(c)) {
+                    Ok(0) => {}
+                    Ok(n) => log::warn!("등록이 끝나지 않은 문서 {n}개를 '등록 중단' 으로 표시했습니다."),
+                    Err(e) => log::warn!("등록 상태를 되돌리지 못했습니다: {e}"),
+                }
                 Self {
                     data_dir,
                     db: Some(db),

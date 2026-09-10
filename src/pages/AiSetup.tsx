@@ -33,6 +33,9 @@ export default function AiSetup() {
   const [tested, setTested] = useState<Record<string, string>>({})
   const [copied, setCopied] = useState(false)
   const unlisten = useRef<(() => void) | null>(null)
+  /** 받기 속도를 재는 표본 (시각, 받은 바이트) */
+  const samples = useRef<{ t: number; b: number }[]>([])
+  const [eta, setEta] = useState<{ bps: number; left: number } | null>(null)
 
   const refresh = useCallback(async () => {
     setChecking(true)
@@ -49,7 +52,25 @@ export default function AiSetup() {
   useEffect(() => {
     void refresh()
     aiInstallHelp().then(setHelp).catch(() => {})
-    onPullProgress((e) => setPulling(e.done ? null : e)).then((un) => {
+    onPullProgress((e) => {
+      setPulling(e.done ? null : e)
+      // 남은 시간 — 최근 20초 남짓의 실제 속도로 어림한다. 크기가 큰 모델(qwen3:8b 5.2GB,
+      // bge-m3 1.2GB)은 몇 분 걸리므로, 멈춘 것으로 오해하지 않게 숫자를 보여 준다.
+      if (e.done || e.totalBytes === 0) {
+        samples.current = []
+        setEta(null)
+        return
+      }
+      const now = Date.now()
+      samples.current.push({ t: now, b: e.completedBytes })
+      samples.current = samples.current.filter((s) => now - s.t < 25_000)
+      const first = samples.current[0]
+      if (first && now - first.t > 3_000 && e.completedBytes > first.b) {
+        const bps = ((e.completedBytes - first.b) * 1000) / (now - first.t)
+        const left = (e.totalBytes - e.completedBytes) / bps
+        setEta({ bps, left })
+      }
+    }).then((un) => {
       unlisten.current = un
     })
     return () => unlisten.current?.()
@@ -214,10 +235,20 @@ export default function AiSetup() {
                 style={{ width: pulling.percent !== null ? `${pulling.percent}%` : '8%' }}
               />
             </div>
-            <span className="muted">{pulling.percent !== null ? `${pulling.percent}%` : ''}</span>
+            <span className="muted">
+              {pulling.percent !== null ? `${pulling.percent}%` : ''}
+              {eta && (
+                <>
+                  {' '}
+                  · {(eta.bps / 1024 / 1024).toFixed(1)}MB/s · 남은 시간 약{' '}
+                  {eta.left < 90 ? `${Math.max(5, Math.round(eta.left / 5) * 5)}초` : `${Math.ceil(eta.left / 60)}분`}
+                </>
+              )}
+            </span>
             <button className="btn btn-tiny" onClick={() => void aiCancelPull()}>
               멈추기
             </button>
+            <span className="muted small">멈춰도 받은 부분은 남아, 다시 누르면 이어서 받습니다.</span>
           </div>
         )}
 

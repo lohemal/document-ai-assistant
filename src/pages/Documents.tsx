@@ -20,6 +20,8 @@ const STATUS_LABEL: Record<string, string> = {
   scanned: '스캔본',
   extract_failed: '글자 못 읽음',
   indexing: '등록 중',
+  // 등록하다 앱이 꺼진 것 — 켤 때 이렇게 바뀐다. 지우고 다시 등록하면 된다.
+  aborted: '등록 중단됨 · 지우고 다시 등록',
 }
 
 export default function Documents() {

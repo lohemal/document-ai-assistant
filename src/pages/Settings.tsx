@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getAppInfo, type AppInfo } from '@/ipc/app'
 import EmbedModelPick from '@/components/EmbedModelPick'
+import RetentionPick from '@/components/RetentionPick'
 
 export default function Settings() {
   const [info, setInfo] = useState<AppInfo | null>(null)
@@ -54,6 +55,8 @@ export default function Settings() {
       </section>
 
       <EmbedModelPick />
+
+      <RetentionPick />
 
       <section className="card">
         <h2 className="card-title">아직 만들지 않은 설정</h2>

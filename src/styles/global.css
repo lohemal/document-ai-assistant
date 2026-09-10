@@ -1179,3 +1179,109 @@ select.input {
   font-size: 12px;
   white-space: pre-wrap;
 }
+
+/* ── 작업 기록 (P6) ─────────────────────────────────────────── */
+.joblist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.jobrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 8px;
+}
+
+.jobrow.is-pinned {
+  border-color: #e6c979;
+  background: #fffaf0;
+}
+
+.jobmain {
+  flex: 1;
+  min-width: 0;
+}
+
+.jobq {
+  display: block;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.jobq:hover {
+  text-decoration: underline;
+}
+
+.jobmeta {
+  margin-top: 2px;
+}
+
+.pinbtn {
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: #b8b8b8;
+  padding: 2px 4px;
+}
+
+.pinbtn.is-on {
+  color: #d9a400;
+}
+
+.pinbtn.inline {
+  font-size: 14px;
+  margin-left: 10px;
+  color: var(--ink-faint);
+}
+
+.pinbtn.inline.is-on {
+  color: #b58900;
+}
+
+.chip-warn {
+  background: #fff6e0;
+  border: 1px solid #f0d78a;
+  color: #8a6400;
+}
+
+.chip-bad {
+  background: #fdecec;
+  border: 1px solid #f0b7b7;
+  color: #a02626;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.banner.small {
+  padding: 6px 10px;
+  font-size: 13px;
+  margin-top: 8px;
+}

@@ -5,7 +5,7 @@
 //! 만들어져 있기 때문이다.
 
 /// (버전, 이 버전으로 올리는 SQL)
-pub const MIGRATIONS: &[(i64, &str)] = &[(1, V1), (2, V2), (3, V3)];
+pub const MIGRATIONS: &[(i64, &str)] = &[(1, V1), (2, V2), (3, V3), (4, V4)];
 
 const V1: &str = r#"
 -- 자료집 -----------------------------------------------------------------
@@ -193,4 +193,27 @@ UPDATE document SET embed_state = 'idle';
 
 -- 검색에 쓸 모델. 카탈로그의 id 를 담는다 (태그가 아니라 id — 태그는 바뀔 수 있다).
 INSERT OR IGNORE INTO setting(key, value) VALUES ('embed_model', 'embed-standard');
+"#;
+
+/// P6 에서 더한 것 — 작업 기록의 상태와 근거 스냅샷의 나머지.
+///
+/// `job_evidence` 는 V1 부터 "당시 근거를 통째로 복사" 하기로 되어 있었지만
+/// 형광펜 자리(`spans`)와 쪽 범위가 없어, 과거 기록에서 원문을 **그 자리에**
+/// 다시 열 수 없었다. 여기서 채운다. 답변 전체(검증·판단까지)는 `job.answer_json`
+/// 에 그대로 담고, 이 표는 문서 판(sha256)을 견주고 목록을 빨리 그리는 데 쓴다.
+const V4: &str = r#"
+-- answer | limited | refuse | no_model | cancelled
+ALTER TABLE job ADD COLUMN status TEXT NOT NULL DEFAULT 'answer';
+-- hybrid | keyword — 당시 검색 방식
+ALTER TABLE job ADD COLUMN search_mode TEXT NOT NULL DEFAULT '';
+
+ALTER TABLE job_evidence ADD COLUMN page_end INTEGER NOT NULL DEFAULT 0;
+-- 당시 형광펜 자리 [{page, charStart, charEnd}] — 문서 판이 같을 때만 쓴다
+ALTER TABLE job_evidence ADD COLUMN spans_json TEXT NOT NULL DEFAULT '[]';
+-- 답변이 부른 이름 (근거1 …)
+ALTER TABLE job_evidence ADD COLUMN source_id TEXT NOT NULL DEFAULT '';
+-- 답변이 인용했는가
+ALTER TABLE job_evidence ADD COLUMN cited INTEGER NOT NULL DEFAULT 0;
+-- 당시 자료집 이름 (자료집이 지워져도 남는다)
+ALTER TABLE job_evidence ADD COLUMN collection_name TEXT NOT NULL DEFAULT '';
 "#;

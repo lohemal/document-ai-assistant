@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
 import Placeholder from '@/components/Placeholder'
+import Jobs from '@/pages/Jobs'
+import JobDetail from '@/pages/JobDetail'
 import Ask from '@/pages/Ask'
 import AiGate from '@/components/AiGate'
 import Collections from '@/pages/Collections'
@@ -76,7 +78,8 @@ export default function App() {
               </div>
             }
           />
-          <Route path="/jobs" element={<Placeholder title="작업 기록" phase="P6" note="최근 작업과 중요 기록." />} />
+          <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetail />} />
           <Route path="/settings/ai" element={<AiSetup />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Navigate to="/collections" replace />} />

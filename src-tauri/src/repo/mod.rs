@@ -4,6 +4,7 @@ pub mod document;
 pub mod embed_index;
 pub mod hits;
 pub mod hybrid;
+pub mod job;
 pub mod search;
 pub mod setting;
 pub mod vector;

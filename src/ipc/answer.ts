@@ -79,6 +79,8 @@ export type FocusCheck = {
 
 export type AnswerOut = {
   question: string
+  /** 이 물음이 남은 작업 기록 번호. 못 남겼으면 null */
+  jobId: number | null
   focus: FocusCheck | null
   decision: Decision
   answer: string

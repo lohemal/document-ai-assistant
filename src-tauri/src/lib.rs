@@ -101,6 +101,13 @@ pub fn run() {
             commands::index::index_drop_unusable,
             commands::answer::answer_ask,
             commands::answer::answer_cancel,
+            commands::job::job_list,
+            commands::job::job_get,
+            commands::job::job_pin,
+            commands::job::job_delete,
+            commands::job::job_retention,
+            commands::job::job_set_retention,
+            commands::job::job_purge,
         ])
         .setup(|app| {
             // 자료를 여는 데 실패해도 앱은 뜬다. 화면에서 이유를 보여 준다.
@@ -115,6 +122,8 @@ pub fn run() {
             app.manage(commands::index::IndexControl::default());
             // 답변 만들기를 멈출 수 있게 들고 있는다
             app.manage(commands::answer::AskControl::default());
+            // 보존기간이 지난 작업 기록은 켠 뒤 몇 초 있다가 따로 지운다 — 시작을 기다리게 하지 않는다
+            commands::job::purge_later(app.handle().clone());
             Ok(())
         })
         .run(tauri::generate_context!())

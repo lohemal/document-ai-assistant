@@ -71,6 +71,8 @@ pub struct SearchMeta {
 #[serde(rename_all = "camelCase")]
 pub struct AnswerOut {
     pub question: String,
+    /// 이 물음이 남은 작업 기록 번호 (P6). 기록을 못 남겼으면 None — 답은 그대로 돌려준다.
+    pub job_id: Option<i64>,
     /// 물음의 초점 낱말이 자료집·근거·인용 청크에 있는가 (P5b). 거부 사유와 경고의 바탕.
     pub focus: Option<focus::FocusCheck>,
     pub decision: refuse::Decision,
@@ -140,6 +142,106 @@ pub async fn answer_ask(
     text: String,
     collection_ids: Vec<i64>,
 ) -> AppResult<AnswerOut> {
+    let ids = collection_ids.clone();
+    let mut out = ask_inner(app, &state, &control, text, collection_ids).await?;
+
+    // ── ⑧ 기록 (P6) — **어떤 결과든 남긴다.** ────────────────────────
+    //
+    // 답한 것, 제한적으로 답한 것, 거부한 것, AI 가 없어 근거만 보여 준 것,
+    // 사용자가 멈춘 것까지. 멈춘 것도 물음과 그때 찾은 근거는 업무 기록으로
+    // 쓸모가 있다 — '답변 생성 중지' 로 담는다. 기록에 실패해도 답은 그대로
+    // 돌려준다: 기록은 답을 돕는 것이고, 답을 막는 것이 아니다.
+    match state.db().and_then(|db| save_job(db, &out, &ids)) {
+        Ok(id) => out.job_id = Some(id),
+        Err(e) => log::warn!("작업 기록을 남기지 못했습니다: {e}"),
+    }
+    Ok(out)
+}
+
+/// 답변을 작업 기록으로 담는다 — **당시 근거를 통째로 복사한다.**
+///
+/// 문서 이름·쪽·원문·형광펜 자리·파일 지문(sha256)·자료집 이름까지 지금 값으로
+/// 굳혀 둔다. 나중에 문서가 바뀌거나 지워져도 이 기록은 그대로다 (`repo::job`).
+fn save_job(db: &crate::db::Db, out: &AnswerOut, collection_ids: &[i64]) -> AppResult<i64> {
+    use crate::repo::{collection, document, job, setting};
+
+    let status = if out.cancelled {
+        "cancelled"
+    } else {
+        match out.decision {
+            refuse::Decision::Answer => "answer",
+            refuse::Decision::Limited => "limited",
+            refuse::Decision::Refuse => "refuse",
+            refuse::Decision::NoModel => "no_model",
+        }
+    };
+
+    db.with_mut(|c| {
+        // 자료집 이름은 지금 것을 굳힌다 — 자료집이 지워져도 기록에는 남는다
+        let mut colls: Vec<serde_json::Value> = Vec::new();
+        for id in collection_ids {
+            if let Ok(col) = collection::get(c, *id) {
+                colls.push(serde_json::json!({ "id": id, "name": col.name }));
+            }
+        }
+        let embed_model = if out.search.mode == "hybrid" {
+            setting::get(c, "embed_model")
+                .ok()
+                .and_then(|id| catalog::by_id(&id).map(|m| m.tag.to_string()))
+        } else {
+            None
+        };
+
+        let mut evidence: Vec<job::EvidenceIn> = Vec::with_capacity(out.evidence.len());
+        for e in &out.evidence {
+            let (sha, coll_name) = match document::get(c, e.document_id) {
+                Ok(d) => (
+                    d.sha256,
+                    collection::get(c, d.collection_id).map(|x| x.name).unwrap_or_default(),
+                ),
+                Err(_) => (String::new(), String::new()),
+            };
+            evidence.push(job::EvidenceIn {
+                source_id: e.source_id.clone(),
+                document_id: e.document_id,
+                doc_title: e.doc_title.clone(),
+                doc_sha256: sha,
+                collection_name: coll_name,
+                page_start: e.page_start,
+                page_end: e.page_end,
+                heading_path: e.heading_path.clone(),
+                quoted_text: e.text.clone(),
+                chunk_id: Some(e.chunk_id),
+                spans_json: serde_json::to_string(&e.spans).unwrap_or_else(|_| "[]".into()),
+                cited: out.cited.contains(&e.source_id),
+            });
+        }
+
+        job::save(
+            c,
+            &job::JobIn {
+                kind: "interpret".into(),
+                question: out.question.clone(),
+                collections_json: serde_json::to_string(&colls).unwrap_or_else(|_| "[]".into()),
+                llm_model: out.model.clone(),
+                embed_model,
+                search_mode: out.search.mode.clone(),
+                status: status.into(),
+                answer_json: serde_json::to_string(out)
+                    .map_err(|e| AppError::msg(format!("답변을 기록으로 옮기지 못했습니다: {e}")))?,
+                evidence,
+            },
+        )
+    })
+}
+
+async fn ask_inner(
+    app: tauri::AppHandle,
+    state: &State<'_, AppState>,
+    control: &State<'_, AskControl>,
+    text: String,
+    collection_ids: Vec<i64>,
+) -> AppResult<AnswerOut> {
     let began = std::time::Instant::now();
     let db = state.db()?;
 
@@ -165,6 +267,7 @@ pub async fn answer_ask(
         Err(why) => {
             return Ok(AnswerOut {
                 question: text,
+                job_id: None,
                 focus: None,
                 decision: refuse::Decision::NoModel,
                 answer: String::new(),
@@ -199,6 +302,7 @@ pub async fn answer_ask(
         };
         return Ok(AnswerOut {
             question: text,
+            job_id: None,
             focus: None,
             decision: refuse::Decision::Refuse,
             answer: refuse::REFUSAL.to_string(),
@@ -246,6 +350,7 @@ pub async fn answer_ask(
         };
         return Ok(AnswerOut {
             question: text,
+            job_id: None,
             focus: Some(focus_check),
             decision: refuse::Decision::Refuse,
             answer: refuse::REFUSAL.to_string(),
@@ -363,6 +468,7 @@ pub async fn answer_ask(
     if chat.cancelled {
         return Ok(AnswerOut {
             question: text,
+            job_id: None,
             focus: None,
             decision: refuse::Decision::NoModel,
             answer: String::new(),
@@ -399,6 +505,7 @@ pub async fn answer_ask(
             log::warn!("모델 답을 읽지 못했습니다: {why}");
             return Ok(AnswerOut {
                 question: text,
+                job_id: None,
                 focus: None,
                 decision: refuse::Decision::Refuse,
                 answer: String::new(),
@@ -458,6 +565,7 @@ pub async fn answer_ask(
 
     Ok(AnswerOut {
         question: text,
+        job_id: None,
         focus: Some(focus_check),
         decision: judgement.decision,
         answer,

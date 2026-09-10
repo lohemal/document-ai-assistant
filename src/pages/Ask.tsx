@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { listCollections, type Collection } from '@/ipc/collections'
 import {
   ask,
@@ -233,6 +234,13 @@ export default function Ask() {
                 ))}
               </ul>
             </section>
+          )}
+
+          {out.jobId !== null && (
+            <p className="muted small">
+              이 물음과 그때의 근거는 작업 기록에 남았습니다.{' '}
+              <Link to={`/jobs/${out.jobId}`}>기록 보기</Link>
+            </p>
           )}
 
           {/* ── 검증 상태 ──────────────────────────────────────── */}

@@ -1,0 +1,8 @@
+{
+  "questionId": "as-n4",
+  "model": "qwen3:8b",
+  "promptHash": "0089bbf500c88d82",
+  "raw": "{\n  \"answer\": \"\",\n  \"claims\": [],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 130146,
+  "tokens": 21
+}

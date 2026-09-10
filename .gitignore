@@ -35,3 +35,6 @@ public/pdfjs/
 
 # 골든 셋의 쪽·청크 덤프 (사람이 질문을 만들 때만 보는 파생 파일)
 test/golden/text/
+
+# 평가 전용 빌드 폴더 (CARGO_TARGET_DIR=target-eval 로 돌린 것)
+src-tauri/target-eval/

@@ -1,0 +1,8 @@
+{
+  "questionId": "as-12",
+  "model": "qwen3:8b",
+  "promptHash": "6f461fa72173a293",
+  "raw": "{\n  \"answer\": \"교육(지원)청에 서면으로 보고해야 합니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"학교의 장은 성범죄, 아동학대관련범죄 등으로 계약을 해지한 경우 교육(지원)청에 서면으로 보고\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 166901,
+  "tokens": 101
+}

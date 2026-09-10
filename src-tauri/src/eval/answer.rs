@@ -1,6 +1,7 @@
-//! 답변 품질을 **숫자로** 잰다 (P5).
+//! 답변 품질을 **숫자로** 잰다 (P5 · P5b).
 //!
 //!     cargo test --lib eval::answer -- --nocapture
+//!     DOCAID_EVAL_MODEL=qwen3:8b cargo test --lib eval::answer -- --nocapture
 //!
 //! 재는 것은 "답을 잘 썼는가" 가 아니다. **없는 것을 지어냈는가** 다.
 //! 그래서 답이 있는 물음 52개와 **답이 없는 물음 15개**를 함께 돌린다.
@@ -12,28 +13,31 @@
 //!
 //! **거부율만 높은 것은 좋은 것이 아니다.** 둘을 함께 봐야 뜻이 있다.
 //!
+//! 표는 **두 판**을 나란히 찍는다 — P5 판단 그대로, 그리고 P5b 의 초점 낱말
+//! 규칙(A1+B1)을 더한 것. 모델의 답은 한 번만 받아 두 판에 같이 쓰므로, 규칙의
+//! 효과와 모델의 효과를 갈라 볼 수 있다.
+//!
 //! ## 답을 갈무리해 둔다
 //!
-//! 4B 모델이 이 PC(CPU)에서 한 물음에 20~40초 걸린다. 67문항이면 30분이다.
-//! 그래서 모델이 내놓은 글을 `test/golden/answers/` 에 갈무리해 두고, 물음과
-//! 근거가 그대로면 다시 부르지 않는다. 갈무리를 저장소에 넣어 두면 Ollama 가
-//! 없는 곳(CI)에서도 같은 평가를 다시 돌릴 수 있다 — 벡터와 같은 방식이다.
+//! 4B 모델이 이 PC(CPU)에서 한 물음에 20~110초 걸린다. 그래서 모델이 내놓은 글을
+//! `test/golden/answers/<모델>/` 에 갈무리해 두고, 물음과 근거가 그대로면 다시
+//! 부르지 않는다. 갈무리를 저장소에 넣어 두면 Ollama 가 없는 곳(CI)에서도 같은
+//! 평가를 다시 돌릴 수 있다 — 벡터와 같은 방식이다.
 
 use super::*;
 use crate::ai::ollama;
-use crate::answer::{context, parse, prompt, refuse, verify};
-use crate::repo::hybrid;
+use crate::answer::{context, focus, parse, prompt, refuse, verify};
+use crate::repo::{chunk, hybrid};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::sync::atomic::AtomicBool;
 use std::sync::Arc;
 
-/// 재는 데 쓸 답변 모델. 카탈로그의 가벼운 쪽이다.
-const MODEL: &str = "gemma3:4b";
-
-/// 물음 핵심어 덮임을 어디서 자르면 좋을지 보려고 함께 재는 기준들.
-/// **어느 하나도 아직 판단에 쓰지 않는다** — 수치를 보고 정한다.
-const COV: [f64; 5] = [0.001, 0.2, 0.26, 0.34, 0.4];
+/// 재는 데 쓸 답변 모델. 기본은 카탈로그의 가벼운 쪽이다.
+/// 큰 쪽으로 재려면 `DOCAID_EVAL_MODEL=qwen3:8b cargo test …`. 갈무리는 모델별로 나뉜다.
+fn model() -> String {
+    std::env::var("DOCAID_EVAL_MODEL").unwrap_or_else(|_| "gemma3:4b".to_string())
+}
 
 #[derive(Debug, Deserialize)]
 pub(super) struct Negative {
@@ -75,7 +79,7 @@ struct Cached {
 }
 
 fn cache_path(qid: &str) -> String {
-    let stem = MODEL.replace(':', "-");
+    let stem = model().replace(':', "-");
     format!("{ROOT}/answers/{stem}/{qid}.json")
 }
 
@@ -92,14 +96,14 @@ fn ask_model(qid: &str, user_prompt: &str) -> Result<(String, u64, bool), String
 
     if let Ok(text) = std::fs::read_to_string(&path) {
         if let Ok(c) = serde_json::from_str::<Cached>(&text) {
-            if c.prompt_hash == want && c.model == MODEL {
+            if c.prompt_hash == want && c.model == model() {
                 return Ok((c.raw, c.llm_ms, false));
             }
         }
     }
 
     let out = ollama::chat_stream(
-        MODEL,
+        &model(),
         prompt::SYSTEM,
         user_prompt,
         Some(prompt::schema()),
@@ -111,7 +115,7 @@ fn ask_model(qid: &str, user_prompt: &str) -> Result<(String, u64, bool), String
     std::fs::create_dir_all(&dir).ok();
     let c = Cached {
         question_id: qid.to_string(),
-        model: MODEL.to_string(),
+        model: model(),
         prompt_hash: want,
         raw: out.text.clone(),
         llm_ms: out.elapsed_ms,
@@ -124,10 +128,11 @@ fn ask_model(qid: &str, user_prompt: &str) -> Result<(String, u64, bool), String
 // ── 한 물음 돌리기 ───────────────────────────────────────────────────
 
 pub(super) struct Ran {
+    /// P5 판단 (초점 낱말 규칙을 더하기 전)
     pub(super) decision: refuse::Decision,
     /// 근거로 넘어간 청크 id
     pub(super) evidence_ids: Vec<i64>,
-    /// LLM 에게 실제로 넘긴 근거의 원문 (핵심 개념 실험용 — `eval::concept`)
+    /// LLM 에게 실제로 넘긴 근거의 원문
     pub(super) evidence_texts: Vec<String>,
     /// 답변이 인용한 청크 id
     pub(super) cited_ids: Vec<i64>,
@@ -137,18 +142,31 @@ pub(super) struct Ran {
     pub(super) llm_ms: u64,
     pub(super) fresh: bool,
     /// **주장 뒷받침 검사** 때문에 거부했는가.
-    /// 이 신호를 빼면 어떻게 되는지 함께 재려고 담아 둔다.
     pub(super) refused_by_support: bool,
     /// 뒷받침되지 않은 주장 수
     pub(super) unsupported: usize,
-    /// **아직 판단에 쓰지 않는 신호** — 물음의 핵심어를 인용 근거가 얼마나 덮는가.
-    /// 넣을지 말지를 이 수치로 정한다 (`refuse::question_gap`).
-    pub(super) gap: refuse::KeyWords,
+    /// 초점 낱말 검사 (P5b). 앱과 같은 자로 잰다.
+    pub(super) focus: focus::FocusCheck,
     /// 왜 그렇게 판단했는지 (첫 까닭)
     pub(super) reason: String,
     /// 형식을 못 읽었으면 그 까닭
     pub(super) parse_error: Option<String>,
     pub(super) answer: String,
+}
+
+impl Ran {
+    /// 초점 낱말 규칙(A1+B1)까지 더한 판단. 앱은 이 경우 모델을 부르지 않는다.
+    pub(super) fn decision_with_focus(&self) -> refuse::Decision {
+        if self.focus.refusal().is_some() {
+            refuse::Decision::Refuse
+        } else {
+            self.decision
+        }
+    }
+}
+
+fn answered(d: refuse::Decision) -> bool {
+    matches!(d, refuse::Decision::Answer | refuse::Decision::Limited)
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -180,12 +198,21 @@ pub(super) fn run_one(
     // ② 근거 고르기
     let evidence = context::build(conn, &found.hits, context::DEFAULT_PLAN).unwrap();
     let evidence_ids: Vec<i64> = evidence.iter().map(|e| e.chunk_id).collect();
+    let evidence_texts: Vec<String> = evidence.iter().map(|e| e.text.clone()).collect();
+
+    // ②′ 초점 낱말 — 앱과 같은 자. 여기서는 모델에게도 **물어 둔다** — 규칙을
+    // 뺀 판(P5 그대로)도 같은 답으로 함께 재기 위해서다.
+    let mut fc = focus::FocusCheck::before_answer(
+        question,
+        |w| chunk::any_contains(conn, &[collection_id], &focus::needles(w)).unwrap_or(true),
+        &evidence_texts,
+    );
 
     if evidence.is_empty() {
         return Some(Ran {
             decision: refuse::Decision::Refuse,
             evidence_ids,
-            evidence_texts: evidence.iter().map(|e| e.text.clone()).collect(),
+            evidence_texts,
             cited_ids: vec![],
             citations_ok: false,
             numbers_total: 0,
@@ -193,8 +220,8 @@ pub(super) fn run_one(
             llm_ms: 0,
             fresh: false,
             refused_by_support: false,
-            gap: refuse::KeyWords::default(),
             unsupported: 0,
+            focus: fc,
             reason: String::new(),
             parse_error: None,
             answer: String::new(),
@@ -220,7 +247,7 @@ pub(super) fn run_one(
             return Some(Ran {
                 decision: refuse::Decision::Refuse,
                 evidence_ids,
-                evidence_texts: evidence.iter().map(|e| e.text.clone()).collect(),
+                evidence_texts,
                 cited_ids: vec![],
                 citations_ok: false,
                 numbers_total: 0,
@@ -228,8 +255,8 @@ pub(super) fn run_one(
                 llm_ms,
                 fresh,
                 refused_by_support: false,
-                gap: refuse::KeyWords::default(),
                 unsupported: 0,
+                focus: fc,
                 reason: String::new(),
                 parse_error: Some(e),
                 answer: String::new(),
@@ -239,37 +266,39 @@ pub(super) fn run_one(
 
     // ⑥ 검증 ⑦ 판단
     let verdict = verify::verify(&draft, &evidence);
-    let judgement = refuse::decide(&draft, &verdict, evidence.len(), found.hits.len());
+    // 모델의 insufficientEvidence 를 믿는지는 카탈로그가 안다 — 앱과 같은 자
+    let trust = crate::ai::catalog::by_tag(&model()).is_some_and(|m| m.trusts_insufficient);
+    let mut judgement = refuse::decide(&draft, &verdict, evidence.len(), found.hits.len(), trust);
 
-    let cited_ids: Vec<i64> = verdict
-        .sources
+    let cited_ids: Vec<i64> = verdict.sources.iter().filter_map(|s| s.chunk_id).collect();
+    let cited_texts: Vec<String> = cited_ids
         .iter()
-        .filter_map(|s| s.chunk_id)
-        .collect();
-
-    // 아직 판단에 넣지 않은 신호를 함께 담는다 — 넣을지는 수치를 보고 정한다
-    let cited_texts: Vec<String> = verdict
-        .sources
-        .iter()
-        .filter_map(|s| s.chunk_id)
-        .filter_map(|id| evidence.iter().find(|e| e.chunk_id == id))
+        .filter_map(|c| evidence.iter().find(|e| e.chunk_id == *c))
         .map(|e| e.text.clone())
         .collect();
+    // C — 앱과 같이 경고만 (판단은 제한적으로 답함)
+    fc.after_answer(question, &cited_texts);
+    if let Some(w) = fc.warning() {
+        if judgement.decision == refuse::Decision::Answer {
+            judgement.decision = refuse::Decision::Limited;
+        }
+        judgement.reasons.push(w);
+    }
 
     Some(Ran {
         refused_by_support: judgement.decision == refuse::Decision::Refuse
             && verdict.nothing_supported(),
         unsupported: verdict.unsupported_claims().len(),
-        gap: refuse::question_gap(question, &cited_texts),
         decision: judgement.decision,
         evidence_ids,
-        evidence_texts: evidence.iter().map(|e| e.text.clone()).collect(),
+        evidence_texts,
         cited_ids,
         citations_ok: verdict.citations_ok,
         numbers_total: verdict.numbers.len(),
         numbers_missing: verdict.numbers_missing(),
         llm_ms,
         fresh,
+        focus: fc,
         reason: judgement.reasons.first().cloned().unwrap_or_default(),
         parse_error: None,
         answer: draft.answer,
@@ -292,13 +321,12 @@ struct Tally {
     /// 형식을 못 읽었다
     parse_failed: usize,
     citations_ok: usize,
-    /// 주장 뒷받침 검사를 **빼면** 답이 되는 것 (지금은 거부한 것)
+    /// 주장 뒷받침 검사 때문에 거부한 것
     refused_by_support: usize,
+    /// 초점 낱말 규칙(A1+B1) 때문에 거부한 것 (이 판에서 규칙을 켠 경우)
+    refused_by_focus: usize,
     /// 인용한 근거에서 확인되지 않은 주장 수 (모두 더한 것)
     unsupported: usize,
-    /// 답한 것 가운데 물음 핵심어 덮임이 각 기준보다 낮은 것 (아직 안 쓰는 신호).
-    /// 기준을 어디로 두면 지어낸 답만 걸리는지 보려고 여러 값을 함께 센다.
-    cov_below: [usize; COV.len()],
     numbers_total: usize,
     numbers_missing: usize,
     ms: u64,
@@ -311,51 +339,35 @@ impl Tally {
     }
 }
 
-#[test]
-fn 답변_품질을_실제_자료로_잰다() {
-    let Ok(vs) = load_vectors() else {
-        println!("\n[답변 품질] 벡터가 없어 재지 못했습니다. npm run golden:embed 를 먼저 돌리세요.");
-        return;
-    };
-    let corpus = load_corpus();
-    let (conn, ids) = build(&corpus, Some(&vs));
-    let all = load_all();
+/// 한 판을 셈하고 찍는다. `with_focus` 가 true 면 초점 낱말 규칙(A1+B1)을 더한 판단으로 센다.
+struct Report {
+    pos: Tally,
+    neg: Tally,
+}
 
-    println!(
-        "\n── 답변 모델 {MODEL} · 검색 {} · 청크 {}개",
-        vs.model,
-        corpus.documents.iter().map(|d| d.chunks.len()).sum::<usize>()
-    );
-    println!(
-        "   답이 있는 물음 {}개 · 답이 없는 물음 {}개",
-        all.questions.len(),
-        all.negatives.len()
-    );
+fn report(
+    title: &str,
+    corpus: &Corpus,
+    ids: &HashMap<(i64, i64), i64>,
+    pos_runs: &[(&Question, Ran)],
+    neg_runs: &[(&Negative, Ran)],
+    with_focus: bool,
+) -> Report {
+    let decide = |r: &Ran| if with_focus { r.decision_with_focus() } else { r.decision };
 
-    // ── 답이 있는 물음 ──────────────────────────────────────────────
     let mut pos = Tally::default();
     let mut by_doc: HashMap<i64, Tally> = HashMap::new();
     let mut by_type: HashMap<String, Tally> = HashMap::new();
     let mut false_refusals: Vec<(&Question, String)> = Vec::new();
     let mut wrong_answers: Vec<(&Question, String)> = Vec::new();
 
-    for q in &all.questions {
-        let want = wanted(q, &ids);
-        let Some(r) = run_one(&conn, &vs, &q.question_id, &q.question, q.collection_id) else {
-            println!(
-                "
-[답변 품질] 재지 못했습니다 — 갈무리해 둔 답이 없고 Ollama 에 붙지도 못했습니다.
-\n                 Ollama 를 켜고 `ollama pull {MODEL}` 을 한 뒤 다시 돌리세요."
-            );
-            return;
-        };
-
+    for (q, r) in pos_runs {
+        let want = wanted(q, ids);
         let hit = r.evidence_ids.iter().any(|id| want.contains(id));
         let cited_right = r.cited_ids.iter().any(|id| want.contains(id));
-        let answered = matches!(
-            r.decision,
-            refuse::Decision::Answer | refuse::Decision::Limited
-        );
+        let d = decide(r);
+        let ans = answered(d);
+        let by_focus = with_focus && answered(r.decision) && !ans;
 
         for t in [
             Some(&mut pos),
@@ -366,7 +378,8 @@ fn 답변_품질을_실제_자료로_잰다() {
         .flatten()
         {
             t.n += 1;
-            t.ms += r.llm_ms;
+            // 규칙이 막은 물음은 앱에서 모델을 부르지 않는다 — 시간도 그렇게 센다
+            t.ms += if by_focus { 0 } else { r.llm_ms };
             if r.fresh {
                 t.fresh += 1;
             }
@@ -379,12 +392,8 @@ fn 답변_품질을_실제_자료로_잰다() {
             if r.refused_by_support {
                 t.refused_by_support += 1;
             }
-            if answered {
-                for (k, min) in COV.iter().enumerate() {
-                    if r.gap.coverage() < *min {
-                        t.cov_below[k] += 1;
-                    }
-                }
+            if by_focus {
+                t.refused_by_focus += 1;
             }
             t.unsupported += r.unsupported;
             t.numbers_total += r.numbers_total;
@@ -392,7 +401,7 @@ fn 답변_품질을_실제_자료로_잰다() {
             if r.parse_error.is_some() {
                 t.parse_failed += 1;
             }
-            if answered {
+            if ans {
                 if cited_right {
                     t.answered_right += 1;
                 } else {
@@ -403,57 +412,48 @@ fn 답변_품질을_실제_자료로_잰다() {
             }
         }
 
-        if !answered && hit {
-            false_refusals.push((q, r.reason.clone()));
+        if !ans && hit {
+            let why = if by_focus { r.focus.refusal().unwrap_or_default() } else { r.reason.clone() };
+            false_refusals.push((q, why));
         }
-        if answered && !cited_right {
+        if ans && !cited_right {
             wrong_answers.push((q, r.answer.chars().take(60).collect()));
         }
     }
 
-    // ── 답이 없는 물음 ──────────────────────────────────────────────
     let mut neg = Tally::default();
-    let mut false_answers: Vec<(&Negative, String)> = Vec::new();
+    let mut false_answers: Vec<(&Negative, String, String)> = Vec::new();
+    let mut caught: Vec<(&Negative, String)> = Vec::new();
 
-    for q in &all.negatives {
-        let Some(r) = run_one(&conn, &vs, &q.question_id, &q.question, q.collection_id) else {
-            println!("
-[답변 품질] 답이 없는 물음을 재지 못했습니다 (모델에 붙지 못함).");
-            return;
-        };
-        let answered = matches!(
-            r.decision,
-            refuse::Decision::Answer | refuse::Decision::Limited
-        );
+    for (q, r) in neg_runs {
+        let d = decide(r);
+        let ans = answered(d);
+        let by_focus = with_focus && answered(r.decision) && !ans;
         neg.n += 1;
-        neg.ms += r.llm_ms;
-        // **숫자를 지어낸 답이 가장 위험하다.** 사람이 그대로 옮겨 쓰기 때문이다.
-        // 값 없이 두루뭉술하게 넘어간 답과는 해가 다르다.
+        neg.ms += if by_focus { 0 } else { r.llm_ms };
         neg.numbers_total += r.numbers_total;
         neg.numbers_missing += r.numbers_missing;
         if r.refused_by_support {
             neg.refused_by_support += 1;
         }
-        if answered {
-            for (k, min) in COV.iter().enumerate() {
-                if r.gap.coverage() < *min {
-                    neg.cov_below[k] += 1;
-                }
-            }
+        if by_focus {
+            neg.refused_by_focus += 1;
+            caught.push((q, r.focus.refusal().unwrap_or_default()));
         }
         neg.unsupported += r.unsupported;
         if r.fresh {
             neg.fresh += 1;
         }
-        if answered {
+        if ans {
             neg.answered_wrong += 1;
-            false_answers.push((q, r.answer.chars().take(70).collect()));
+            false_answers.push((q, r.answer.chars().take(70).collect(), r.reason.clone()));
         } else {
             neg.refused += 1;
         }
     }
 
     // ── 표 ──────────────────────────────────────────────────────────
+    println!("\n══ {title} ══");
     println!("\n[답이 있는 물음 {}개]", pos.n);
     println!("  정답 근거를 근거로 넘긴 비율   {:>5.1}%  ({}/{})", pos.pct(pos.evidence_hit), pos.evidence_hit, pos.n);
     println!("  정답 근거를 인용해 답한 비율   {:>5.1}%  ({}/{})", pos.pct(pos.answered_right), pos.answered_right, pos.n);
@@ -464,20 +464,11 @@ fn 답변_품질을_실제_자료로_잰다() {
     println!("  인용한 근거에서 확인되지 않은 주장 {}개", pos.unsupported);
     println!(
         "  숫자 확인                      {}개 가운데 {}개 확인 안 됨",
-        pos.numbers_total,
-        pos.numbers_missing
+        pos.numbers_total, pos.numbers_missing
     );
-    println!(
-        "  ── 주장 뒷받침 검사를 빼면 ─ 잘못 거부 {:.1}% → {:.1}%  (이 검사가 {}건을 거부했다)",
-        pos.pct(pos.refused),
-        pos.pct(pos.refused.saturating_sub(pos.refused_by_support)),
-        pos.refused_by_support
-    );
-    print!("  ── 물음 핵심어 덮임으로 자르면 ─ 잘못 거부 {:.1}%", pos.pct(pos.refused));
-    for (k, min) in COV.iter().enumerate() {
-        print!(" · <{min:.2} → {:.1}%", pos.pct(pos.refused + pos.cov_below[k]));
+    if with_focus {
+        println!("  초점 낱말 규칙이 거부한 positive {}개", pos.refused_by_focus);
     }
-    println!();
 
     println!("\n[답이 없는 물음 {}개]", neg.n);
     println!("  올바르게 거부한 비율           {:>5.1}%  ({}/{})", neg.pct(neg.refused), neg.refused, neg.n);
@@ -486,20 +477,12 @@ fn 답변_품질을_실제_자료로_잰다() {
         "  답하면서 숫자를 들이댄 것        {}개 · 그 가운데 근거에 없는 숫자 {}개",
         neg.numbers_total, neg.numbers_missing
     );
-    println!(
-        "  ── 주장 뒷받침 검사를 빼면 ─ 지어내 답함 {:.1}% → {:.1}%  (이 검사가 {}건을 잡았다)",
-        neg.pct(neg.answered_wrong),
-        neg.pct(neg.answered_wrong + neg.refused_by_support),
-        neg.refused_by_support
-    );
-    print!("  ── 물음 핵심어 덮임으로 자르면 ─ 지어내 답함 {:.1}%", neg.pct(neg.answered_wrong));
-    for (k, min) in COV.iter().enumerate() {
-        print!(
-            " · <{min:.2} → {:.1}%",
-            neg.pct(neg.answered_wrong.saturating_sub(neg.cov_below[k]))
-        );
+    if with_focus {
+        println!("  초점 낱말 규칙이 막은 negative {}개", neg.refused_by_focus);
+        for (q, why) in &caught {
+            println!("    {} {} ← {}", q.question_id, q.question, why);
+        }
     }
-    println!();
 
     println!("\n  자료별 (근거 도달 / 정답 인용 / 거부)");
     for d in &corpus.documents {
@@ -530,22 +513,28 @@ fn 답변_품질을_실제_자료로_잰다() {
     let total_ms = pos.ms + neg.ms;
     let total_n = pos.n + neg.n;
     println!(
-        "\n  한 물음에 걸린 시간 평균 {:.1}초 (새로 물은 것 {}개)",
+        "\n  한 물음에 걸린 시간 평균 {:.1}초{}",
         total_ms as f64 / total_n as f64 / 1000.0,
-        pos.fresh + neg.fresh
+        if with_focus { " (규칙이 막은 물음은 모델을 부르지 않으므로 0초로 센다)" } else { "" }
     );
 
     if !false_answers.is_empty() {
         println!("\n[지어낸 답 — 가장 나쁜 고장]");
-        for (q, a) in &false_answers {
-            println!("  {} {}\n      없는 것: {}\n      답: {}", q.question_id, q.question, q.absent, a);
+        for (q, a, why) in &false_answers {
+            println!(
+                "  {} {}\n      없는 것: {}\n      답: {}{}",
+                q.question_id,
+                q.question,
+                q.absent,
+                a,
+                if why.is_empty() { String::new() } else { format!("\n      판단: {why}") }
+            );
         }
     }
     if !false_refusals.is_empty() {
         println!("\n[잘못 거부 — 근거는 넘어갔는데 답하지 않음]");
         for (q, why) in &false_refusals {
-            println!("  {} {}
-      까닭: {}", q.question_id, q.question, why);
+            println!("  {} {}\n      까닭: {}", q.question_id, q.question, why);
         }
     }
     if !wrong_answers.is_empty() {
@@ -555,15 +544,86 @@ fn 답변_품질을_실제_자료로_잰다() {
         }
     }
 
+    Report { pos, neg }
+}
+
+#[test]
+fn 답변_품질을_실제_자료로_잰다() {
+    let Ok(vs) = load_vectors() else {
+        println!("\n[답변 품질] 벡터가 없어 재지 못했습니다. npm run golden:embed 를 먼저 돌리세요.");
+        return;
+    };
+    let corpus = load_corpus();
+    let (conn, ids) = build(&corpus, Some(&vs));
+    let all = load_all();
+
+    println!(
+        "\n── 답변 모델 {} · 검색 {} · 청크 {}개",
+        model(),
+        vs.model,
+        corpus.documents.iter().map(|d| d.chunks.len()).sum::<usize>()
+    );
+    println!(
+        "   답이 있는 물음 {}개 · 답이 없는 물음 {}개",
+        all.questions.len(),
+        all.negatives.len()
+    );
+
+    // 모델의 답은 한 번만 받는다 (갈무리를 먼저 본다)
+    let mut pos_runs: Vec<(&Question, Ran)> = Vec::new();
+    for q in &all.questions {
+        let Some(r) = run_one(&conn, &vs, &q.question_id, &q.question, q.collection_id) else {
+            println!(
+                "\n[답변 품질] 재지 못했습니다 — 갈무리해 둔 답이 없고 Ollama 에 붙지도 못했습니다.\
+                 \n                 Ollama 를 켜고 `ollama pull {}` 을 한 뒤 다시 돌리세요.",
+                model()
+            );
+            return;
+        };
+        pos_runs.push((q, r));
+    }
+    let mut neg_runs: Vec<(&Negative, Ran)> = Vec::new();
+    for q in &all.negatives {
+        let Some(r) = run_one(&conn, &vs, &q.question_id, &q.question, q.collection_id) else {
+            println!("\n[답변 품질] 답이 없는 물음을 재지 못했습니다 (모델에 붙지 못함).");
+            return;
+        };
+        neg_runs.push((q, r));
+    }
+    println!(
+        "   새로 물은 것 {}개",
+        pos_runs.iter().filter(|(_, r)| r.fresh).count() + neg_runs.iter().filter(|(_, r)| r.fresh).count()
+    );
+
+    // 두 판 — 규칙 없이 / 규칙(A1+B1) 더해서
+    let base = report("기존 P5 판단", &corpus, &ids, &pos_runs, &neg_runs, false);
+    let with = report("초점 낱말 규칙(A1+B1) 더함 — 앱이 쓰는 판단", &corpus, &ids, &pos_runs, &neg_runs, true);
+
+    println!(
+        "\n══ 두 판 견주기 ══\n  지어내 답함  {:.1}% → {:.1}%\n  잘못 거부    {:.1}% → {:.1}%\n  정답 인용    {:.1}% → {:.1}%",
+        base.neg.pct(base.neg.answered_wrong),
+        with.neg.pct(with.neg.answered_wrong),
+        base.pos.pct(base.pos.refused),
+        with.pos.pct(with.pos.refused),
+        base.pos.pct(base.pos.answered_right),
+        with.pos.pct(with.pos.answered_right),
+    );
+
     // 내려가면 안 되는 선. 실제로 잰 값보다 넉넉히 아래에 둔다.
     assert!(
-        pos.pct(pos.evidence_hit) >= 60.0,
+        with.pos.pct(with.pos.evidence_hit) >= 60.0,
         "정답 근거가 근거로 넘어가는 비율이 {:.1}% 로 떨어졌습니다",
-        pos.pct(pos.evidence_hit)
+        with.pos.pct(with.pos.evidence_hit)
     );
     assert!(
-        neg.pct(neg.refused) >= 40.0,
+        with.neg.pct(with.neg.refused) >= 40.0,
         "자료에 없는 물음을 거부하는 비율이 {:.1}% 로 떨어졌습니다",
-        neg.pct(neg.refused)
+        with.neg.pct(with.neg.refused)
+    );
+    // 규칙이 맞는 답을 버리기 시작하면 여기서 걸린다 — 골든 셋에서는 0건이었다
+    assert!(
+        with.pos.answered_right >= base.pos.answered_right.saturating_sub(1),
+        "초점 낱말 규칙이 정답 답변을 {}건 버렸습니다",
+        base.pos.answered_right - with.pos.answered_right
     );
 }

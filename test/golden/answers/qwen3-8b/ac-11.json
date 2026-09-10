@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-11",
+  "model": "qwen3:8b",
+  "promptHash": "f05d994d56756447",
+  "raw": "{\n  \"answer\": \"아니요.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거9\"],\n      \"text\": \"교직원 생일기념 경비는 소액(1인당 3만원이하)의 상품권, 케익 등 지급 경비\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거9\"],\n      \"text\": \"1인당 3만원이하의 상품권을 지급 경비로 편성 가능\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 169930,
+  "tokens": 142
+}

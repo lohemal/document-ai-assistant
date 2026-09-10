@@ -69,8 +69,17 @@ export type Verdict = {
   numberMessage: string
 }
 
+/** 물음의 초점 낱말이 어디에 있는가 (P5b). 거부 사유 A·B 와 경고 C 의 바탕 */
+export type FocusCheck = {
+  word: string | null
+  inCollection: boolean
+  inEvidence: boolean
+  inCited: boolean | null
+}
+
 export type AnswerOut = {
   question: string
+  focus: FocusCheck | null
   decision: Decision
   answer: string
   claims: Claim[]

@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-n1",
+  "model": "qwen3:8b",
+  "promptHash": "0fe2c451d982145f",
+  "raw": "{\n  \"answer\": \"1인당 3만원 이내\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"교직원 생일기념 경비는 소속 교직원의 생일시 소액(1인당 3만원이하)의 상품권, 케익 등 지급 경비\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"명절휴가비는 월정액으로 지급하는 제수당\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"명절휴가비는 월정액으로 지급하는 제수당\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 170714,
+  "tokens": 194
+}

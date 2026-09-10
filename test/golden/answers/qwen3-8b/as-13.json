@@ -1,0 +1,8 @@
+{
+  "questionId": "as-13",
+  "model": "qwen3:8b",
+  "promptHash": "690735ff4c7cfd5f",
+  "raw": "{\n  \"answer\": \"학생·학부모의 동의와 학교운영위원회 심의를 거쳐야 한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"단위학교는 특정 종교교육과 관련이 있는 방과후학교 프로그램을 편성·운영하는 경우 학생·학부모의 동의와 학교운영위원회 심의를 거쳐야 한다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 177307,
+  "tokens": 128
+}

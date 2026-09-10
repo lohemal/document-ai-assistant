@@ -191,6 +191,44 @@ pub fn count(conn: &Connection, document_id: i64) -> AppResult<i64> {
     )?)
 }
 
+/// 이 낱말 조각들 가운데 하나라도 **자료집 안 어느 청크에든** 있는가.
+///
+/// 물음의 초점 낱말이 자료 어디에도 없는지 보는 데 쓴다 (`answer::focus`, A 범위).
+/// 빈칸·줄바꿈을 지운 글에서 찾는다 — 청크 안에서 낱말이 줄바꿈으로 갈라져 있어도
+/// 찾도록 (`answer::verify::appears` 와 같은 자). `collection_ids` 가 비어 있으면
+/// 모든 자료집이다. 대체된 문서는 빼고 본다 — 검색과 같다.
+///
+/// trigram 색인을 쓰지 않는 까닭: 초점 낱말은 `제재`·`문항`·`최대` 처럼 **두 글자**가
+/// 잦고, trigram 은 세 글자부터다. 청크를 한 번 훑는다. 학교 자료 규모(수천 청크)
+/// 에서는 몇 ms 다.
+pub fn any_contains(conn: &Connection, collection_ids: &[i64], needles: &[String]) -> AppResult<bool> {
+    if needles.is_empty() {
+        return Ok(false);
+    }
+    let coll = if collection_ids.is_empty() {
+        String::new()
+    } else {
+        format!(
+            " AND d.collection_id IN ({})",
+            collection_ids.iter().map(|id| id.to_string()).collect::<Vec<_>>().join(",")
+        )
+    };
+    let conds: Vec<String> = (0..needles.len())
+        .map(|i| format!("instr(t, ?{}) > 0", i + 1))
+        .collect();
+    let sql = format!(
+        "SELECT 1 FROM (
+           SELECT replace(replace(replace(c.text_norm, ' ', ''), char(10), ''), char(9), '') AS t
+             FROM chunk c JOIN document d ON d.id = c.document_id
+            WHERE d.superseded_by IS NULL{coll}
+         ) WHERE {} LIMIT 1",
+        conds.join(" OR ")
+    );
+    let mut st = conn.prepare(&sql)?;
+    let found = st.exists(rusqlite::params_from_iter(needles.iter()))?;
+    Ok(found)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

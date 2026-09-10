@@ -1,0 +1,8 @@
+{
+  "questionId": "et-10",
+  "model": "qwen3:8b",
+  "promptHash": "8226c52308a20dae",
+  "raw": "{\n  \"answer\": \"청소년 미디어 이용습관 진단조사 대상은 초1(보호자), 초4, 중1, 고1이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"청소년 미디어 이용습관 진단조사 대상은 초1(보호자), 초4, 중1, 고1이다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 80563,
+  "tokens": 107
+}

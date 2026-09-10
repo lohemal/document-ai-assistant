@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-05",
+  "model": "qwen3:8b",
+  "promptHash": "c9409f7cfcd77444",
+  "raw": "{\n  \"answer\": \"출납폐쇄정리는 회계연도 종료 후 20일까지 해야 한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"출납폐쇄정리는 회계연도 종료 후 20일까지 당해 회계연도 징수행위 및 지출원인행위가 된 사항의 세입금 수납 및 세출금 지출 마감\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 146852,
+  "tokens": 124
+}

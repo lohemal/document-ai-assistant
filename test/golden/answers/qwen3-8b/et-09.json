@@ -1,0 +1,8 @@
+{
+  "questionId": "et-09",
+  "model": "qwen3:8b",
+  "promptHash": "376117fc89dd55f1",
+  "raw": "{\n  \"answer\": \"예방교육은 3월 신청하고 4월~11월 운영한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"예방교육은 3월 신청, 4월~11월 운영\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 15267,
+  "tokens": 88
+}

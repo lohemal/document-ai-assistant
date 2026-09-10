@@ -1,0 +1,8 @@
+{
+  "questionId": "et-05",
+  "model": "qwen3:8b",
+  "promptHash": "2f3deb3bc91ccde3",
+  "raw": "{\n  \"answer\": \"2026년도 과의존 예방교육 대상 학년은 초3·4·6학년, 중1·3학년, 고1학년이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"2026년도 과의존 예방교육 대상은 초3·4·6학년, 중1·3학년, 고1학년이다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 87713,
+  "tokens": 128
+}

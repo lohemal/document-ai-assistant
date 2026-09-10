@@ -1,0 +1,8 @@
+{
+  "questionId": "as-05",
+  "model": "qwen3:8b",
+  "promptHash": "377eed325d98550f",
+  "raw": "{\n  \"answer\": \"네\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"수용비는 강사료의 5%이내로 정할 수 있다.\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"수용비는 강사료의 5%이내에서 책정\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거7\"],\n      \"text\": \"수용비는 강사료의 5%이내에서 학교운영위원회 심의를 거쳐 결정해야 함\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 190003,
+  "tokens": 169
+}

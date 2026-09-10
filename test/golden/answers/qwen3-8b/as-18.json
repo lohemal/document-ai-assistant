@@ -1,0 +1,8 @@
+{
+  "questionId": "as-18",
+  "model": "qwen3:8b",
+  "promptHash": "5afb96885e9e8699",
+  "raw": "{\n  \"answer\": \"강사료는 월별지급을 원칙으로 한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"강사료는 월별지급을 원칙으로 한다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 154304,
+  "tokens": 79
+}

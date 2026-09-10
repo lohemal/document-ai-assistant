@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-n5",
+  "model": "qwen3:8b",
+  "promptHash": "b9563b79b155fe96",
+  "raw": "{\n  \"answer\": \"\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"출납원은 법령이 정하는 바에 따라 현금이나 물품을 출납·보관하여야 한다.\"\n    },\n    {\n      \"kind\": \"interpretation\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"출납원이 보관할 수 있는 현금 한도는 명시적으로 제시되지 않았다.\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 160207,
+  "tokens": 126
+}

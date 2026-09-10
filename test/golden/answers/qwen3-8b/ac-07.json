@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-07",
+  "model": "qwen3:8b",
+  "promptHash": "d1248218880a6d4d",
+  "raw": "{\n  \"answer\": \"간담회 경비는 1인 1회당 4만원 이하 범위에서 집행함\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"간담회 및 협의회 경비는 1인 1회당 4만원 이하 범위에서 집행함\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 158733,
+  "tokens": 108
+}

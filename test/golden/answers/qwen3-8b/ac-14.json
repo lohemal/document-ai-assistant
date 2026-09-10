@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-14",
+  "model": "qwen3:8b",
+  "promptHash": "7f4a7432b640c7e1",
+  "raw": "{\n  \"answer\": \"일비는 공무원여비규정상 현지교통비, 통신비, 세탁비, 음료수비 등 잡비에 사용되는 여비항목으로 현지교통비가 50%를 차지한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"일비는 공무원여비규정상 현지교통비, 통신비, 세탁비, 음료수비 등 잡비에 사용되는 여비항목으로 현지교통비가 50%를 차지하고 있으므로\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 155505,
+  "tokens": 161
+}

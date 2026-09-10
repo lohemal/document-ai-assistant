@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-n3",
+  "model": "qwen3:8b",
+  "promptHash": "613ba9436aaa191c",
+  "raw": "{\n  \"answer\": \"\",\n  \"claims\": [\n    {\n      \"kind\": \"interpretation\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"출장 여비 정산은 출장이 끝난 뒤 며칠 안에 신청해야 한다.\"\n    }\n  ],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 154585,
+  "tokens": 80
+}

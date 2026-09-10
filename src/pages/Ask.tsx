@@ -344,6 +344,18 @@ export default function Ask() {
                     ))}
                   </ul>
                 </dd>
+                <dt>초점 낱말</dt>
+                <dd>
+                  {out.focus?.word ? (
+                    <>
+                      <code>{out.focus.word}</code> · 자료집 {out.focus.inCollection ? '있음' : '없음'} · 넘긴
+                      근거 {out.focus.inEvidence ? '있음' : '없음'} · 인용 청크{' '}
+                      {out.focus.inCited === null ? '—' : out.focus.inCited ? '있음' : '없음'}
+                    </>
+                  ) : (
+                    '물음에서 개념 낱말을 고르지 못했습니다'
+                  )}
+                </dd>
                 <dt>뒷받침 검사</dt>
                 <dd>
                   <ul className="notes">

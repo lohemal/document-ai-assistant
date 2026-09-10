@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-04",
+  "model": "qwen3:8b",
+  "promptHash": "4911192944a0a946",
+  "raw": "{\n  \"answer\": \"결산서는 회계연도 종료 후 2월 이내에 학교운영위원회에 제출해야 합니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"결산서는 회계연도 종료 후 2월 이내에 학교운영위원회에 제출해야 합니다.\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"학교장은 회계연도 종료 후 2월 이내에 학교회계 세입·세출결산서를 작성하여 학교운영위원회에 제출하여야 한다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 165118,
+  "tokens": 177
+}

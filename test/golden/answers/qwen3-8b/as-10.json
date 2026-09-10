@@ -1,0 +1,8 @@
+{
+  "questionId": "as-10",
+  "model": "qwen3:8b",
+  "promptHash": "80c150dee428b875",
+  "raw": "{\n  \"answer\": \"3개 프로그램을 위탁하는 학교의 기초금액은 1억 1775만원이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거8\"],\n      \"text\": \"1. 강사료 총액으로 기초금액을 산정하는 경우: 기초금액은 117,750,000원\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 205265,
+  "tokens": 119
+}

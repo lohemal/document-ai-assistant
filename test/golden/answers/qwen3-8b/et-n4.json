@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n4",
+  "model": "qwen3:8b",
+  "promptHash": "f53a151a6fd5d457",
+  "raw": "{\n  \"answer\": \"최대 1개\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"학급당 1차시 과의존 예방 교육(레몬 교실) 시행\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 76261,
+  "tokens": 78
+}

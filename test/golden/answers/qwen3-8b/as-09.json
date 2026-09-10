@@ -1,0 +1,8 @@
+{
+  "questionId": "as-09",
+  "model": "qwen3:8b",
+  "promptHash": "cd600c251300e7e5",
+  "raw": "{\n  \"answer\": \"영어회화 프로그램의 학생 1인당 강사료는 5만 2천원입니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거7\"],\n      \"text\": \"영어회화 프로그램의 학생 1인당 강사료는 52,000원입니다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 202424,
+  "tokens": 106
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "et-12",
+  "model": "qwen3:8b",
+  "promptHash": "95f09668ada45956",
+  "raw": "{\n  \"answer\": \"네\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"심층상담: 과의존 학생에 대한 원인 분석 및 인지, 정서, 행동 관련 상담\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"지원 내용: 개인·집단 상담, 부모상담, 병원치료 지원, 기숙 치유 프로그램, 치유 캠프 등\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"지원 방법: 보호자 동의서(치유서비스 제공 동의서) 징구 후 상담·치료 지원\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 81475,
+  "tokens": 198
+}

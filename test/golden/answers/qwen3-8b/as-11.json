@@ -1,0 +1,8 @@
+{
+  "questionId": "as-11",
+  "model": "qwen3:8b",
+  "promptHash": "c091db0dc7d27dbe",
+  "raw": "{\n  \"answer\": \"제안서 평가위원회의 평가위원 수는 7인 이상이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"평가위원 수 - 7인\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"평가위원 구성 인원은 해당 시도교육청의 2단계 입찰 규격·기술 평가위원회 구성 및 운영에 관한 기준에 따르되, 최소 7인 이상으로 함\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 193232,
+  "tokens": 150
+}

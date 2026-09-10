@@ -500,6 +500,12 @@ pub fn chat_stream(
     if let Some(f) = format {
         body["format"] = f;
     }
+    // qwen3 는 기본으로 "생각" 을 먼저 길게 쓴다. CPU 에서는 그 시간이 그대로
+    // 기다리는 시간이고, 우리는 JSON 하나만 받으면 된다. 생각을 끈다.
+    // 생각 기능이 없는 모델(gemma3)에 이 값을 보내면 Ollama 가 거절하므로 가려 보낸다.
+    if tag.starts_with("qwen3") {
+        body["think"] = serde_json::Value::Bool(false);
+    }
 
     let resp = ureq::AgentBuilder::new()
         .timeout_connect(CONNECT_TIMEOUT)

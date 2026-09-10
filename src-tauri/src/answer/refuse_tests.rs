@@ -28,9 +28,28 @@ fn ev(source_id: &str, text: &str) -> Evidence {
 
 /// 답변 JSON + 근거로 판단까지 한 번에
 fn judge(json: &str, evidence: &[Evidence], hits: usize) -> Judgement {
+    judge_as(json, evidence, hits, false)
+}
+
+/// `trust` — 모델의 insufficientEvidence 를 믿는 판 (qwen3:8b 처럼)
+fn judge_as(json: &str, evidence: &[Evidence], hits: usize, trust: bool) -> Judgement {
     let d = parse(json).unwrap();
     let v = verify(&d, evidence);
-    decide(&d, &v, evidence.len(), hits)
+    decide(&d, &v, evidence.len(), hits, trust)
+}
+
+#[test]
+fn 믿는_모델이_없다고_하면_답이_있어도_거부한다() {
+    // ★ qwen3:8b 가 실제로 이렇게 했다 — insufficientEvidence 를 true 로 두고
+    // answer 에 "정보는 근거에 제공되지 않음" 을 적었다. 그 글을 답으로 보여 주면
+    // 화면에는 "제한적으로 답함" 이 뜬다. 이 모델의 표시는 믿을 수 있으므로(0/52
+    // 헛표시) 표시대로 거부한다. 못 믿는 모델(gemma3:4b)에서는 예전 그대로다.
+    let e = vec![ev("근거1", "명시이월·사고이월·계속비이월")];
+    let json = r#"{"answer":"이월 상한 비율에 대한 정보는 근거에 제공되지 않음",
+        "claims":[{"text":"명시이월·사고이월·계속비이월이 있다","sources":["근거1"],"kind":"fact"}],
+        "insufficientEvidence":true}"#;
+    assert_eq!(judge_as(json, &e, 5, true).decision, Decision::Refuse);
+    assert_eq!(judge_as(json, &e, 5, false).decision, Decision::Limited);
 }
 
 const GOOD: &str = r#"{"answer":"1인당 50,000원 이내입니다.",

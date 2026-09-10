@@ -1,0 +1,8 @@
+{
+  "questionId": "as-08",
+  "model": "qwen3:8b",
+  "promptHash": "ce116cbe0838491c",
+  "raw": "{\n  \"answer\": \"개인위탁 외부강사 모집 공고기간은 최소 5일 이상이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"공고기간은 접수마감일까지 최소 5일(등록일 제외) 이상의 기간\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 175464,
+  "tokens": 99
+}

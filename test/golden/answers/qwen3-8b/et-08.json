@@ -1,0 +1,8 @@
+{
+  "questionId": "et-08",
+  "model": "qwen3:8b",
+  "promptHash": "b192840c4c15db26",
+  "raw": "{\n  \"answer\": \"아니요.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"심층상담(세출예산 집행기준 상담수당 기준) 1회기당 4만원\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 77797,
+  "tokens": 82
+}

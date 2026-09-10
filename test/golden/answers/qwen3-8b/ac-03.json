@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-03",
+  "model": "qwen3:8b",
+  "promptHash": "9d8a594e41ccfb40",
+  "raw": "{\n  \"answer\": \"업무추진비를 다른 목에서 끌어와 쓸 수 없다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"예산의 목적 외 사용금지 및 예산의 이․전용 규칙 제17조, 제18조\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"신규사업 추진, 업무추진비, 인건비, 시설비는 다른 목으로 이·전용 불가\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"업무추진비성 경비 등은 신용카드 사용이 원칙임\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"업무추진비는 격려금, 축의․부의금 등 현금 집행이 불가피한 경우를 제외하고는 신용카드 사용을 원칙으로 함\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거7\"],\n      \"text\": \"업무추진비 집행 관련 유의사항\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 179622,
+  "tokens": 308
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-12",
+  "model": "qwen3:8b",
+  "promptHash": "b0d1894be5cf5873",
+  "raw": "{\n  \"answer\": \"실비 상한액은 2만원입니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"근무지내 국내출장 중 왕복 2km이내*의 근거리 출장인 경우 실비로 지급함. 구분 실비 상한액 4시간 이상 2만원(운임, 식비 1/3)\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 156591,
+  "tokens": 121
+}

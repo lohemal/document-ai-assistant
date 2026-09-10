@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-10",
+  "model": "qwen3:8b",
+  "promptHash": "803058224274dfbe",
+  "raw": "{\n  \"answer\": \"특근매식비 단가는 9,000원(1인 1식) 이내입니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"특근매식비의 예산편성 및 집행단가는 교직원 9,000원(1인 1식) 이내\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 161632,
+  "tokens": 108
+}

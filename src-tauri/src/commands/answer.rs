@@ -19,8 +19,9 @@
 //! 막히는 일은 없다.
 
 use crate::ai::{self, catalog, ollama};
-use crate::answer::{context, parse, prompt, refuse, verify};
+use crate::answer::{context, focus, parse, prompt, refuse, verify};
 use crate::error::{AppError, AppResult};
+use crate::repo::chunk;
 use crate::repo::search::SearchResult;
 use crate::state::AppState;
 use serde::Serialize;
@@ -70,6 +71,8 @@ pub struct SearchMeta {
 #[serde(rename_all = "camelCase")]
 pub struct AnswerOut {
     pub question: String,
+    /// 물음의 초점 낱말이 자료집·근거·인용 청크에 있는가 (P5b). 거부 사유와 경고의 바탕.
+    pub focus: Option<focus::FocusCheck>,
     pub decision: refuse::Decision,
     /// 화면에 보여 줄 답. 거부면 정해진 거부 문구가 들어간다.
     pub answer: String,
@@ -162,6 +165,7 @@ pub async fn answer_ask(
         Err(why) => {
             return Ok(AnswerOut {
                 question: text,
+                focus: None,
                 decision: refuse::Decision::NoModel,
                 answer: String::new(),
                 claims: vec![],
@@ -195,6 +199,54 @@ pub async fn answer_ask(
         };
         return Ok(AnswerOut {
             question: text,
+            focus: None,
+            decision: refuse::Decision::Refuse,
+            answer: refuse::REFUSAL.to_string(),
+            claims: vec![],
+            cited: vec![],
+            evidence,
+            verdict: None,
+            judgement,
+            interpretation: false,
+            interpretation_notes: vec![],
+            confidence: None,
+            search,
+            model: Some(model.name.to_string()),
+            model_note: None,
+            tokens: 0,
+            llm_ms: 0,
+            total_ms: began.elapsed().as_millis() as u64,
+            cancelled: false,
+            raw: None,
+        });
+    }
+
+    // ── ②′ 초점 낱말 — 모델을 부르기 **전에** 본다 (P5b) ─────────────
+    //
+    // 물음이 묻는 그 낱말이 자료집 어디에도 없으면(A), 또는 자료집엔 있는데
+    // 찾아온 근거에 없으면(B) 모델을 불러도 답이 나올 수 없다 — 있는 근거를
+    // 인용해 물음과 다른 이야기를 답으로 내놓을 뿐이다 (P5 에서 실제로 그랬다:
+    // "제재" 를 물었는데 "연 2회" 라고 답했다). 여기서 멈추면 CPU 에서 1분
+    // 남짓을 아끼고, **근거는 그대로 보여 준다.** 사유는 A·B 가 다르다.
+    // 자료집을 훑는 데 문제가 있으면 "있다" 로 보아 거부하지 않는다 — 검사가
+    // 고장났다고 답까지 막으면 안 된다.
+    let evidence_texts: Vec<String> = evidence.iter().map(|e| e.text.clone()).collect();
+    let mut focus_check = focus::FocusCheck::before_answer(
+        &text,
+        |w| {
+            db.with(|c| chunk::any_contains(c, &collection_ids, &focus::needles(w)))
+                .unwrap_or(true)
+        },
+        &evidence_texts,
+    );
+    if let Some(why) = focus_check.refusal() {
+        let judgement = refuse::Judgement {
+            decision: refuse::Decision::Refuse,
+            reasons: vec![why],
+        };
+        return Ok(AnswerOut {
+            question: text,
+            focus: Some(focus_check),
             decision: refuse::Decision::Refuse,
             answer: refuse::REFUSAL.to_string(),
             claims: vec![],
@@ -311,6 +363,7 @@ pub async fn answer_ask(
     if chat.cancelled {
         return Ok(AnswerOut {
             question: text,
+            focus: None,
             decision: refuse::Decision::NoModel,
             answer: String::new(),
             claims: vec![],
@@ -346,6 +399,7 @@ pub async fn answer_ask(
             log::warn!("모델 답을 읽지 못했습니다: {why}");
             return Ok(AnswerOut {
                 question: text,
+                focus: None,
                 decision: refuse::Decision::Refuse,
                 answer: String::new(),
                 claims: vec![],
@@ -371,7 +425,30 @@ pub async fn answer_ask(
         }
     };
     let verdict = verify::verify(&draft, &evidence);
-    let judgement = refuse::decide(&draft, &verdict, evidence.len(), found.hits.len());
+    let mut judgement = refuse::decide(
+        &draft,
+        &verdict,
+        evidence.len(),
+        found.hits.len(),
+        model.trusts_insufficient,
+    );
+
+    // 초점 낱말 C — 근거엔 있는데 **답이 인용한 청크**에는 없다. 거부하지 않는다
+    // (골든 셋에서 맞는 답을 버렸다: `하루` 대 `1일`). 답은 보이되 경고를 단다.
+    let cited_texts: Vec<String> = verdict
+        .sources
+        .iter()
+        .filter_map(|s| s.chunk_id)
+        .filter_map(|id| evidence.iter().find(|e| e.chunk_id == id))
+        .map(|e| e.text.clone())
+        .collect();
+    focus_check.after_answer(&text, &cited_texts);
+    if let Some(warn) = focus_check.warning() {
+        if judgement.decision == refuse::Decision::Answer {
+            judgement.decision = refuse::Decision::Limited;
+        }
+        judgement.reasons.push(warn);
+    }
 
     let answer = if judgement.decision == refuse::Decision::Refuse {
         refuse::REFUSAL.to_string()
@@ -381,6 +458,7 @@ pub async fn answer_ask(
 
     Ok(AnswerOut {
         question: text,
+        focus: Some(focus_check),
         decision: judgement.decision,
         answer,
         claims: draft.claims.clone(),

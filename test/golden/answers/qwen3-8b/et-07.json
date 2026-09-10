@@ -1,0 +1,8 @@
+{
+  "questionId": "et-07",
+  "model": "qwen3:8b",
+  "promptHash": "814951775ef43029",
+  "raw": "{\n  \"answer\": \"아니요.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"과의존 예방교육 강사 수당은 1시간당 6만원.\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"1회기당 4만원.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 83401,
+  "tokens": 108
+}

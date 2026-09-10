@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-13",
+  "model": "qwen3:8b",
+  "promptHash": "b8479d143dbad714",
+  "raw": "{\n  \"answer\": \"여비를 줄 수 있다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"근무지내 국내출장 중 왕복 2km이내*의 근거리 출장인 경우 실비로 지급함.\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"4시간 미만의 출장은 1만원, 4시간 이상의 출장은 2만원을 지급.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 149633,
+  "tokens": 147
+}

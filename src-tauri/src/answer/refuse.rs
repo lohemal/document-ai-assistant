@@ -154,11 +154,18 @@ pub fn question_gap(question: &str, texts: &[String]) -> KeyWords {
 }
 
 /// `evidence_count` 는 LLM 에게 넘긴 근거 수, `hit_count` 는 검색이 찾은 수.
+///
+/// `trust_flag` — 이 모델의 `insufficientEvidence` 를 거부 신호로 믿는가
+/// (`ai::catalog::ModelSpec::trusts_insufficient`). 모델마다 다르다: gemma3:4b 는
+/// 답을 제대로 쓰고도 늘 true 로 적어 못 믿고(49/49), qwen3:8b 는 답이 있는
+/// 52문항에서 한 번도 true 를 적지 않았다(0/52). 믿는 모델에서는 true 면 답을
+/// 보이지 않는다 — "정보는 근거에 제공되지 않음" 같은 글을 답으로 내놓는 경우다.
 pub fn decide(
     draft: &Draft,
     verdict: &Verdict,
     evidence_count: usize,
     hit_count: usize,
+    trust_flag: bool,
 ) -> Judgement {
     let mut reasons: Vec<String> = Vec::new();
 
@@ -188,7 +195,7 @@ pub fn decide(
     // 그 밖에는 표시를 그대로 따른다.
     if draft.insufficient_evidence {
         let substantive =
-            !cited.is_empty() && verdict.unknown_sources.is_empty();
+            !trust_flag && !cited.is_empty() && verdict.unknown_sources.is_empty();
         if !substantive {
             reasons.push("AI 가 근거만으로는 답할 수 없다고 판단했습니다.".to_string());
             return Judgement { decision: Decision::Refuse, reasons };

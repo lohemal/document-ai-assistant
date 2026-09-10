@@ -1,0 +1,8 @@
+{
+  "questionId": "et-15",
+  "model": "qwen3:8b",
+  "promptHash": "d726f410ed30a7ab",
+  "raw": "{\n  \"answer\": \"건강하고 안전한 디지털 환경 조성, 주체적인 지능정보서비스 이용 습관 형성\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"건강하고 안전한 디지털 환경 조성\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"주체적인 지능정보서비스 이용 습관 형성\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 84846,
+  "tokens": 135
+}

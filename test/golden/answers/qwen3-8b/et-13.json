@@ -1,0 +1,8 @@
+{
+  "questionId": "et-13",
+  "model": "qwen3:8b",
+  "promptHash": "968d6f53b699bc2e",
+  "raw": "{\n  \"answer\": \"한국 저작권 위원회\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"2026년도 정보통신윤리교육 기본계획 6~7쪽 · 물음과 가까운 순서 1위 · 1. 찾아가는 저작권 교육\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"1. 찾아가는 저작권 교육 - 주관: 한국 저작권 위원회\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 70330,
+  "tokens": 145
+}

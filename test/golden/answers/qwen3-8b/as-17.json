@@ -1,0 +1,8 @@
+{
+  "questionId": "as-17",
+  "model": "qwen3:8b",
+  "promptHash": "ff7d376397fc01ad",
+  "raw": "{\n  \"answer\": \"전년도 강사료 원가 30,000원에서 3,000원을 올리면 원가는 33,000원이 됨\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"금년도 강사료 원가는 33,000원으로 산정\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"전년도 원가계산서의 강사료: 30,000원\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"3,000원 인상의 경우 전년도 원가계산서의 강사료 30,000원을 기준으로 금년도 강사료 원가는 33,000원으로 산정\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 174703,
+  "tokens": 243
+}

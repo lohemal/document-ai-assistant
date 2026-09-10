@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-16",
+  "model": "qwen3:8b",
+  "promptHash": "6f2925db77be03c5",
+  "raw": "{\n  \"answer\": \"일반수용비로 업무추진비성 경비를 쓰는 것은 불가능합니다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"업무추진비성 경비는 일반수용비에서 집행하지 않도록 할 것\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"업무추진비성 경비 등은 신용카드 사용이 원칙임\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거3\"],\n      \"text\": \"업무추진비성 경비를 일반운영비에서 집행하지 않도록 할 것\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거4\"],\n      \"text\": \"업무추진비성 경비는 일반수용비에서 집행하지 않아야 함\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 170567,
+  "tokens": 239
+}

@@ -44,6 +44,13 @@ pub struct ModelSpec {
     /// 학교 PC 는 대개 CPU 로 돈다. 남은 시간을 처음 보여 줄 때만 쓰고,
     /// 그 뒤에는 실제 속도로 고친다.
     pub ms_per_chunk: i64,
+    /// 이 모델이 스스로 적는 `insufficientEvidence` 를 **거부 신호로 믿어도 되는가.**
+    ///
+    /// 골든 셋 67문항으로 잰 값이다 (P5b). 모델마다 다르다 —
+    ///   gemma3:4b : 답을 제대로 쓴 52문항에서 **49/49 true** → 믿으면 전부 거부한다. 못 믿는다.
+    ///   qwen3:8b  : 답이 있는 52문항 **0/52 true** · 자료에 없는 14문항 **9/14 true** → 믿는다.
+    /// 믿는 모델에서는 true 면 답을 보이지 않는다. 안 믿는 모델에서는 표시만 한다 (`answer::refuse`).
+    pub trusts_insufficient: bool,
 }
 
 pub const MODELS: &[ModelSpec] = &[
@@ -58,6 +65,7 @@ pub const MODELS: &[ModelSpec] = &[
         note: "메모리가 넉넉하지 않은 PC 에서도 돕니다. 요약과 자료 검색 답변에 쓸 만합니다.",
         dim: 0,
         ms_per_chunk: 0,
+        trusts_insufficient: false,
     },
     ModelSpec {
         id: "chat-standard",
@@ -69,6 +77,7 @@ pub const MODELS: &[ModelSpec] = &[
         note: "규정 해석처럼 길게 따져야 하는 일에서 가벼운 모델보다 낫습니다.",
         dim: 0,
         ms_per_chunk: 0,
+        trusts_insufficient: true,
     },
     // ── 검색용 모델 ──────────────────────────────────────────────────
     ModelSpec {
@@ -81,6 +90,7 @@ pub const MODELS: &[ModelSpec] = &[
         note: "한국어를 포함해 여러 말을 다룹니다. 긴 문서에 강합니다.",
         dim: 1024,
         ms_per_chunk: 770,
+        trusts_insufficient: false,
     },
     ModelSpec {
         id: "embed-light",
@@ -92,6 +102,7 @@ pub const MODELS: &[ModelSpec] = &[
         note: "메모리가 아주 적은 PC 용입니다. 찾는 솜씨는 기본 모델보다 떨어집니다.",
         dim: 768,
         ms_per_chunk: 90,
+        trusts_insufficient: false,
     },
 ];
 

@@ -1,0 +1,8 @@
+{
+  "questionId": "as-04",
+  "model": "qwen3:8b",
+  "promptHash": "67e7bd877b32febf",
+  "raw": "{\n  \"answer\": \"방과후학교 수강료는 강사료, 도서구입비, 재료구입비, 수용비로 구성된다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\", \"근거2\", \"근거5\", \"근거8\"],\n      \"text\": \"방과후학교 수강료는 강사료, 도서구입비, 재료구입비, 수용비로 구성된다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 185933,
+  "tokens": 126
+}

@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n2",
+  "model": "qwen3:8b",
+  "promptHash": "002c78e8c8a1d9bf",
+  "raw": "{\n  \"answer\": \"정보통신윤리교육 담당 교사에게 주는 수당은 6,000천원이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"정보통신윤리교육 담당 교사에게 주는 수당은 6,000천원이다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 48304,
+  "tokens": 101
+}

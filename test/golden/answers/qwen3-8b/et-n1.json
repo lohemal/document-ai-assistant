@@ -1,0 +1,8 @@
+{
+  "questionId": "et-n1",
+  "model": "qwen3:8b",
+  "promptHash": "99da9d6748d79bb0",
+  "raw": "{\n  \"answer\": \"\",\n  \"claims\": [],\n  \"insufficientEvidence\": true\n}",
+  "llmMs": 77082,
+  "tokens": 21
+}

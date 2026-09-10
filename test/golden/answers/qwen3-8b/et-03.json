@@ -1,0 +1,8 @@
+{
+  "questionId": "et-03",
+  "model": "qwen3:8b",
+  "promptHash": "e953e438f2312a2b",
+  "raw": "{\n  \"answer\": \"초·중·고등학교의 의무 교육시수는 반기별 1회(연 2회)이다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거2\"],\n      \"text\": \"초·중·고등학교: 반기별 1회(연 2회)\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 94835,
+  "tokens": 98
+}

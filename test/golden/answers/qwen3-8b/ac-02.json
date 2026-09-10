@@ -1,0 +1,8 @@
+{
+  "questionId": "ac-02",
+  "model": "qwen3:8b",
+  "promptHash": "cab6f1107fa667ed",
+  "raw": "{\n  \"answer\": \"순세계잉여금이 세입결산액의 1.5% 이상이면 감액된다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거1\"],\n      \"text\": \"순세계잉여금이 세입결산액의 1.5% 이상 발생학교는 1.5%를 초과하는 순세계잉여금 전액 감액\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 167739,
+  "tokens": 116
+}

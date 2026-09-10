@@ -1,0 +1,8 @@
+{
+  "questionId": "as-07",
+  "model": "qwen3:8b",
+  "promptHash": "f2cdd924eb42f80b",
+  "raw": "{\n  \"answer\": \"수강료를 쓰고 남은 돈은 수강생에게 반환하는 것을 원칙으로 한다.\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"수강료는 학교회계규칙에 따라 징수하며, 수강료 집행 잔액은 수강생에게 반환이 원칙\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"수강료 집행 잔액은 수강생에게 반환하는 것을 원칙으로 한다.\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 204143,
+  "tokens": 157
+}

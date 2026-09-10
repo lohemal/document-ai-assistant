@@ -1,0 +1,8 @@
+{
+  "questionId": "as-06",
+  "model": "qwen3:8b",
+  "promptHash": "5c85e175d4abbed1",
+  "raw": "{\n  \"answer\": \"아니요\",\n  \"claims\": [\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거5\"],\n      \"text\": \"수강료는 강사가 직접 수납할 수 없으며, 학교회계출납원이 수납하는 것을 원칙으로 함\"\n    },\n    {\n      \"kind\": \"fact\",\n      \"sources\": [\"근거6\"],\n      \"text\": \"강사가 직접 학생·학부모를 상대로 수강료(재료비, 도서비 등 포함)를 징수하지 않도록 해야 함\"\n    }\n  ],\n  \"insufficientEvidence\": false\n}",
+  "llmMs": 199702,
+  "tokens": 150
+}

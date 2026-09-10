@@ -4,6 +4,7 @@ import {
   collectionNames,
   deleteJob,
   jobRetention,
+  kindLabel,
   listJobs,
   pinJob,
   statusClass,
@@ -103,7 +104,8 @@ export default function Jobs() {
                   {r.question}
                 </Link>
                 <div className="jobmeta muted small">
-                  {when(r.createdAt)} · {collectionNames(r.collectionsJson)} · 근거 {r.evidenceCount}개 ·{' '}
+                  <span className={'kindtag kind-' + r.kind}>{kindLabel(r.kind)}</span> {when(r.createdAt)} ·{' '}
+                  {collectionNames(r.collectionsJson)} · 근거 {r.evidenceCount}개 ·{' '}
                   {modeLabel(r.searchMode)}
                   {r.llmModel ? ` · ${r.llmModel}` : ''}
                 </div>

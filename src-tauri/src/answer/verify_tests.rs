@@ -340,3 +340,77 @@ fn 해석은_뒷받침_검사에_넣지_않는다() {
     assert!(!v.nothing_supported());
     assert!(v.has_interpretation, "해석은 대신 화면에 밝힌다");
 }
+
+#[test]
+fn 문체_주장은_뒷받침을_묻지_않되_숫자는_본다() {
+    // 문서 작성(P7): 인사말·마무리는 근거가 없어도 되는 말이다. 그러나 그 안에 숫자를
+    // 적으면 그 숫자는 여전히 인용 근거에 있어야 한다 — 문장 종류로 검사를 피할 수 없다.
+    let e = vec![ev("근거1", 11, "신청 기간은 3월 2일부터 3월 31일까지")];
+    let d = draft(
+        r#"{"answer":"학부모님 안녕하십니까. 신청 기간은 3월 31일까지입니다. 기한은 4월 5일까지 넉넉합니다.",
+            "claims":[{"text":"학부모님 안녕하십니까","sources":[],"kind":"style"},
+                      {"text":"신청 기간은 3월 31일까지다","sources":["근거1"],"kind":"fact"},
+                      {"text":"기한은 4월 5일까지 넉넉합니다","sources":[],"kind":"style"}],
+            "insufficientEvidence":false}"#,
+    );
+    let v = verify(&d, &e);
+    // 문체 주장은 뒷받침되지 않은 주장으로 세지 않는다
+    assert!(v.unsupported_claims().is_empty(), "{:?}", v.claims);
+    assert!(!v.nothing_supported());
+    // 그러나 문체 문장에 숨긴 `4월 5일` 은 근거에 없다고 잡힌다
+    // (날짜는 `4월`·`5일` 처럼 조각으로 뽑힌다)
+    let missing: Vec<&str> = v.numbers.iter().filter(|n| !n.found).map(|n| n.raw.as_str()).collect();
+    assert!(missing.contains(&"4월") && missing.contains(&"5일"), "{:?}", v.numbers);
+    assert!(v.numbers.iter().any(|n| n.found && n.raw == "31일"), "{:?}", v.numbers);
+}
+
+#[test]
+fn 주장에_적히지_않은_본문_문장을_찾는다() {
+    // ★ 문서 작성에서 실제로 본 고장 — claims 에는 근거 문장을 베껴 넣고(검사 통과),
+    // 본문에는 근거에 없는 축제 날짜와 장소를 지어 썼다.
+    let claims = vec![
+        crate::answer::parse::Claim {
+            text: "[학교명]입니다".into(),
+            sources: vec![],
+            kind: ClaimKind::Style,
+        },
+        crate::answer::parse::Claim {
+            text: "단위학교는 특정 종교교육과 관련이 있는 방과후학교 프로그램을 편성·운영할 수 없다".into(),
+            sources: vec!["근거3".into()],
+            kind: ClaimKind::Fact,
+        },
+    ];
+    let body = "[학교명]입니다. 학교 축제는 10월 15일(월)에 학교 운동장에서 진행됩니다. 많은 참여 부탁드립니다.";
+    let cov = uncovered_sentences(body, &claims);
+    let u = &cov.uncovered;
+    assert_eq!(cov.total, 3);
+    assert!(!cov.nothing_covered(), "인사말은 주장에 있으므로 전부 비어 있지는 않다");
+    assert!(u.iter().any(|s| s.contains("축제")), "{u:?}");
+    assert!(u.iter().any(|s| s.contains("참여")), "{u:?}");
+    assert!(!u.iter().any(|s| s.contains("학교명")), "주장에 있는 문장은 걸리지 않는다: {u:?}");
+}
+
+#[test]
+fn 주장을_옮겨_쓴_본문은_걸리지_않는다() {
+    let claims = vec![crate::answer::parse::Claim {
+        text: "자유수강권은 소득을 기준으로 저소득층 학생을 우선 지원한다".into(),
+        sources: vec!["근거1".into()],
+        kind: ClaimKind::Fact,
+    }];
+    let body = "자유수강권은 소득을 기준으로 저소득층 학생을 우선 지원합니다.";
+    assert!(uncovered_sentences(body, &claims).uncovered.is_empty());
+}
+
+#[test]
+fn 본문이_전부_주장에_없으면_근거_없는_초안이다() {
+    // 실제로 본 판 — 주장 6개는 근거 문장을 베껴 넣었고, 본문 네 문장은 하나도 거기 없었다
+    let claims = vec![crate::answer::parse::Claim {
+        text: "자유수강권은 소득을 기준으로 저소득층 학생을 우선 지원한다".into(),
+        sources: vec!["근거1".into()],
+        kind: ClaimKind::Fact,
+    }];
+    let body = "신청 기간은 2025년 2월 1일부터 2월 28일까지입니다. 자세한 사항은 학교 홈페이지를 참조해 주세요.";
+    let cov = uncovered_sentences(body, &claims);
+    assert_eq!(cov.total, 2);
+    assert!(cov.nothing_covered(), "{cov:?}");
+}

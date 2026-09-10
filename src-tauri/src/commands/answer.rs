@@ -71,6 +71,12 @@ pub struct SearchMeta {
 #[serde(rename_all = "camelCase")]
 pub struct AnswerOut {
     pub question: String,
+    /// interpret | letter | sms — 무엇을 만든 것인가 (`prompt::Task`)
+    pub task: &'static str,
+    /// 가정통신문 제목 (letter 에서만)
+    pub title: Option<String>,
+    /// 본문 문장 가운데 어느 주장에도 적히지 않은 것 — 근거 없이 쓴 문장 (문서 작성에서만 본다)
+    pub uncovered: Vec<String>,
     /// 이 물음이 남은 작업 기록 번호 (P6). 기록을 못 남겼으면 None — 답은 그대로 돌려준다.
     pub job_id: Option<i64>,
     /// 물음의 초점 낱말이 자료집·근거·인용 청크에 있는가 (P5b). 거부 사유와 경고의 바탕.
@@ -143,7 +149,7 @@ pub async fn answer_ask(
     collection_ids: Vec<i64>,
 ) -> AppResult<AnswerOut> {
     let ids = collection_ids.clone();
-    let mut out = ask_inner(app, &state, &control, text, collection_ids).await?;
+    let mut out = run(prompt::Task::Interpret, app, &state, &control, text, collection_ids).await?;
 
     // ── ⑧ 기록 (P6) — **어떤 결과든 남긴다.** ────────────────────────
     //
@@ -151,6 +157,29 @@ pub async fn answer_ask(
     // 사용자가 멈춘 것까지. 멈춘 것도 물음과 그때 찾은 근거는 업무 기록으로
     // 쓸모가 있다 — '답변 생성 중지' 로 담는다. 기록에 실패해도 답은 그대로
     // 돌려준다: 기록은 답을 돕는 것이고, 답을 막는 것이 아니다.
+    match state.db().and_then(|db| save_job(db, &out, &ids)) {
+        Ok(id) => out.job_id = Some(id),
+        Err(e) => log::warn!("작업 기록을 남기지 못했습니다: {e}"),
+    }
+    Ok(out)
+}
+
+/// 문서 초안 — 가정통신문(`letter`) · 문자(`sms`). 규정 해석과 **같은 길**을 간다 (설계안 5-6).
+#[tauri::command]
+pub async fn draft_make(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+    control: State<'_, AskControl>,
+    text: String,
+    collection_ids: Vec<i64>,
+    format: String,
+) -> AppResult<AnswerOut> {
+    let task = match prompt::Task::from_name(&format) {
+        Some(t) if t.is_draft() => t,
+        _ => return Err(AppError::msg("문서 형식은 가정통신문(letter) 또는 문자(sms) 입니다.")),
+    };
+    let ids = collection_ids.clone();
+    let mut out = run(task, app, &state, &control, text, collection_ids).await?;
     match state.db().and_then(|db| save_job(db, &out, &ids)) {
         Ok(id) => out.job_id = Some(id),
         Err(e) => log::warn!("작업 기록을 남기지 못했습니다: {e}"),
@@ -220,7 +249,7 @@ fn save_job(db: &crate::db::Db, out: &AnswerOut, collection_ids: &[i64]) -> AppR
         job::save(
             c,
             &job::JobIn {
-                kind: "interpret".into(),
+                kind: out.task.into(),
                 question: out.question.clone(),
                 collections_json: serde_json::to_string(&colls).unwrap_or_else(|_| "[]".into()),
                 llm_model: out.model.clone(),
@@ -235,7 +264,10 @@ fn save_job(db: &crate::db::Db, out: &AnswerOut, collection_ids: &[i64]) -> AppR
     })
 }
 
-async fn ask_inner(
+/// 한 길을 세 가지 일이 함께 쓴다 — 규정 해석 · 가정통신문 · 문자 (`prompt::Task`).
+/// 다른 것은 프롬프트와 검색에 넣는 글뿐이다. 찾기·근거·검증·판단·기록은 같다.
+async fn run(
+    task: prompt::Task,
     app: tauri::AppHandle,
     state: &State<'_, AppState>,
     control: &State<'_, AskControl>,
@@ -245,10 +277,13 @@ async fn ask_inner(
     let began = std::time::Instant::now();
     let db = state.db()?;
 
+    // 문서 요청은 지시어("가정통신문을 작성해줘")를 뗀 글로 찾는다 (설계안 5-6)
+    let query = task.query_text(&text);
+
     // ── ① 찾기 ─────────────────────────────────────────────────────
     tell(&app, "searching", "자료를 찾고 있습니다…", 0);
     let found: SearchResult =
-        super::search::best_search(db, &text, &collection_ids, context::DEFAULT_PLAN.top_k as i64 * 2)
+        super::search::best_search(db, &query, &collection_ids, context::DEFAULT_PLAN.top_k as i64 * 2)
             .await?;
 
     // ── ② 근거 고르기 ───────────────────────────────────────────────
@@ -267,6 +302,9 @@ async fn ask_inner(
         Err(why) => {
             return Ok(AnswerOut {
                 question: text,
+                task: task.name(),
+                title: None,
+                uncovered: vec![],
                 job_id: None,
                 focus: None,
                 decision: refuse::Decision::NoModel,
@@ -302,6 +340,9 @@ async fn ask_inner(
         };
         return Ok(AnswerOut {
             question: text,
+            task: task.name(),
+            title: None,
+            uncovered: vec![],
             job_id: None,
             focus: None,
             decision: refuse::Decision::Refuse,
@@ -336,7 +377,7 @@ async fn ask_inner(
     // 고장났다고 답까지 막으면 안 된다.
     let evidence_texts: Vec<String> = evidence.iter().map(|e| e.text.clone()).collect();
     let mut focus_check = focus::FocusCheck::before_answer(
-        &text,
+        &query,
         |w| {
             db.with(|c| chunk::any_contains(c, &collection_ids, &focus::needles(w)))
                 .unwrap_or(true)
@@ -350,6 +391,9 @@ async fn ask_inner(
         };
         return Ok(AnswerOut {
             question: text,
+            task: task.name(),
+            title: None,
+            uncovered: vec![],
             job_id: None,
             focus: Some(focus_check),
             decision: refuse::Decision::Refuse,
@@ -373,9 +417,57 @@ async fn ask_inner(
         });
     }
 
+    // ── ②″ 문서 요청은 주제 낱말을 **전부** 본다 (P7) ────────────────
+    //
+    // "학교 축제 일정과 장소" 에서 끝 낱말 `장소` 는 흔한 말이라 자료집에 있다. 그런데
+    // `축제` 는 없다. 끝 낱말만 보고 모델을 부르니 축제 날짜와 운동장을 지어냈다.
+    // 문서 요청의 남은 낱말은 사용자가 손수 적은 주제이므로 하나라도 없으면 쓰지 않는다.
+    if task.is_draft() {
+        let absent = focus::absent_concepts(&query, |w| {
+            db.with(|c| chunk::any_contains(c, &collection_ids, &focus::needles(w)))
+                .unwrap_or(true)
+        });
+        if !absent.is_empty() {
+            let judgement = refuse::Judgement {
+                decision: refuse::Decision::Refuse,
+                reasons: vec![format!(
+                    "이 자료집에는 '{}' 에 관한 내용이 없습니다. 자료에 없는 것으로 문서를 쓰지 않습니다.",
+                    absent.join("', '")
+                )],
+            };
+            return Ok(AnswerOut {
+                question: text,
+                task: task.name(),
+                title: None,
+                uncovered: vec![],
+                job_id: None,
+                focus: Some(focus_check),
+                decision: refuse::Decision::Refuse,
+                answer: refuse::REFUSAL.to_string(),
+                claims: vec![],
+                cited: vec![],
+                evidence,
+                verdict: None,
+                judgement,
+                interpretation: false,
+                interpretation_notes: vec![],
+                confidence: None,
+                search,
+                model: Some(model.name.to_string()),
+                model_note: None,
+                tokens: 0,
+                llm_ms: 0,
+                total_ms: began.elapsed().as_millis() as u64,
+                cancelled: false,
+                raw: None,
+            });
+        }
+    }
+
     // ── ③ 물음 만들기 ───────────────────────────────────────────────
     let rendered = context::render(&evidence);
-    let user_prompt = prompt::user(&text, &rendered);
+    let user_prompt = prompt::user_for(task, &text, &rendered);
+    let system = prompt::system(task);
 
     // ── ④ 답 받기 ──────────────────────────────────────────────────
     let cancel = Arc::new(AtomicBool::new(false));
@@ -416,11 +508,18 @@ async fn ask_inner(
         let watch = cancel2.clone();
         std::thread::spawn(move || {
             let mut chars = 0usize;
-            let r = ollama::chat_stream(
+            // 문서 초안은 본문 + 문장마다 주장이라 길다 — 900 으로는 JSON 이 잘렸다
+            let num_predict = if task.is_draft() {
+                ollama::DRAFT_NUM_PREDICT
+            } else {
+                ollama::DEFAULT_NUM_PREDICT
+            };
+            let r = ollama::chat_stream_with(
                 &tag,
-                prompt::SYSTEM,
+                &system,
                 &user_prompt,
-                Some(prompt::schema()),
+                Some(prompt::schema_for(task)),
+                num_predict,
                 cancel2,
                 |part| {
                     chars += part.chars().count();
@@ -468,6 +567,9 @@ async fn ask_inner(
     if chat.cancelled {
         return Ok(AnswerOut {
             question: text,
+            task: task.name(),
+            title: None,
+            uncovered: vec![],
             job_id: None,
             focus: None,
             decision: refuse::Decision::NoModel,
@@ -505,6 +607,9 @@ async fn ask_inner(
             log::warn!("모델 답을 읽지 못했습니다: {why}");
             return Ok(AnswerOut {
                 question: text,
+                task: task.name(),
+                title: None,
+                uncovered: vec![],
                 job_id: None,
                 focus: None,
                 decision: refuse::Decision::Refuse,
@@ -549,12 +654,41 @@ async fn ask_inner(
         .filter_map(|id| evidence.iter().find(|e| e.chunk_id == id))
         .map(|e| e.text.clone())
         .collect();
-    focus_check.after_answer(&text, &cited_texts);
+    focus_check.after_answer(&query, &cited_texts);
     if let Some(warn) = focus_check.warning() {
         if judgement.decision == refuse::Decision::Answer {
             judgement.decision = refuse::Decision::Limited;
         }
         judgement.reasons.push(warn);
+    }
+
+    // 문서 작성 — 본문 문장이 주장에 다 적혔는가 (P7).
+    //
+    // 모델이 `claims` 에는 근거 문장을 베껴 넣고(검사는 다 통과) 본문에는 없는 날짜를
+    // 지어 쓴 일이 있었다. 주장에 없는 본문 문장은 근거 없이 쓴 것으로 보고 '제한적'
+    // 으로 내리며 화면에 그 문장을 표시한다. 규정 해석의 짧은 답에는 걸지 않는다.
+    let coverage = if task.is_draft() {
+        verify::uncovered_sentences(&draft.answer, &draft.claims)
+    } else {
+        verify::Coverage::default()
+    };
+    let uncovered = coverage.uncovered.clone();
+    if coverage.nothing_covered() && judgement.decision != refuse::Decision::Refuse {
+        // 한 문장도 주장에 없다 — 근거 없이 쓴 초안이다. 문서로 내보내지 않는다.
+        // (실제로 본 판: 주장 6개는 근거를 베낀 것, 본문 네 문장은 지어낸 신청 기간)
+        judgement.decision = refuse::Decision::Refuse;
+        judgement.reasons.push(
+            "본문의 문장이 하나도 근거에서 온 주장과 이어지지 않습니다. 근거 없이 쓴 초안으로 보아 보여 주지 않습니다."
+                .to_string(),
+        );
+    } else if !uncovered.is_empty() {
+        if judgement.decision == refuse::Decision::Answer {
+            judgement.decision = refuse::Decision::Limited;
+        }
+        judgement.reasons.push(format!(
+            "본문 문장 {}개가 근거에서 온 주장으로 적히지 않았습니다. 근거 없이 쓴 문장일 수 있으니 확인해 주세요.",
+            uncovered.len()
+        ));
     }
 
     let answer = if judgement.decision == refuse::Decision::Refuse {
@@ -565,6 +699,9 @@ async fn ask_inner(
 
     Ok(AnswerOut {
         question: text,
+        task: task.name(),
+        title: draft.title.clone().filter(|t| !t.trim().is_empty()),
+        uncovered,
         job_id: None,
         focus: Some(focus_check),
         decision: judgement.decision,

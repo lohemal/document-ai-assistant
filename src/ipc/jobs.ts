@@ -113,6 +113,20 @@ export function statusClass(s: JobStatus): string {
   }
 }
 
+/** 작업 종류 — job.kind */
+export function kindLabel(kind: string): string {
+  switch (kind) {
+    case 'letter':
+      return '가정통신문'
+    case 'sms':
+      return '문자'
+    case 'interpret':
+      return '규정 해석'
+    default:
+      return kind
+  }
+}
+
 /** "2026-09-10T11:35:37+09:00" → "2026-09-10 11:35" */
 export function when(iso: string): string {
   const m = iso.match(/^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/)

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import Sidebar from '@/components/Sidebar'
-import Placeholder from '@/components/Placeholder'
+import Draft from '@/pages/Draft'
 import Jobs from '@/pages/Jobs'
 import JobDetail from '@/pages/JobDetail'
 import Ask from '@/pages/Ask'
@@ -70,12 +70,9 @@ export default function App() {
           <Route
             path="/draft"
             element={
-              <div className="page">
-                <h1 className="page-title">문서 작성</h1>
-                <AiGate status={ai} need="chat" what="문서 초안">
-                  <Placeholder title="문서 작성" phase="P7" note="가정통신문 · 문자메시지 초안." />
-                </AiGate>
-              </div>
+              <AiGate status={ai} need="chat" what="문서 초안">
+                <Draft />
+              </AiGate>
             }
           />
           <Route path="/jobs" element={<Jobs />} />

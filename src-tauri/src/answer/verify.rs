@@ -334,9 +334,10 @@ pub fn verify(draft: &Draft, evidence: &[Evidence]) -> Verdict {
         })
         .collect();
 
+    // 문체(style) 주장은 근거가 없어도 되는 말이다 — 인사말에 인용이 없다고 탓하지 않는다
     let claims_without_source: Vec<String> = claim_checks
         .iter()
-        .filter(|c| c.sources.is_empty())
+        .filter(|c| c.sources.is_empty() && c.kind != ClaimKind::Style)
         .map(|c| c.text.clone())
         .collect();
 
@@ -442,6 +443,52 @@ pub fn verify(draft: &Draft, evidence: &[Evidence]) -> Verdict {
             || draft.claims.iter().any(|c| c.kind == ClaimKind::Interpretation),
         citation_message,
         number_message,
+    }
+}
+
+/// **본문 문장 가운데 어느 주장에도 적히지 않은 것** (문서 작성, P7).
+///
+/// 문서 초안에서 실제로 본 고장: 모델이 `claims` 에는 근거 문장을 그대로 베껴 넣고
+/// (그래서 뒷받침 검사는 다 통과한다), `answer` 본문에는 근거에 없는 날짜와 장소를
+/// 지어 썼다("학교 축제는 10월 15일(월)에 학교 운동장에서 진행됩니다"). 주장만 보면
+/// 본문의 거짓이 보이지 않는다. 그래서 **본문의 문장마다 그 문장을 적은 주장이 있는지**
+/// 본다 — 문체(style) 주장이든 사실 주장이든, 문장의 낱말이 절반 넘게 겹치는 주장이
+/// 하나는 있어야 한다. 없으면 그 문장은 근거 없이 쓴 것이다.
+///
+/// 규정 해석(P5)의 짧은 답("네", "7인")에는 걸지 않는다 — 부르는 쪽이 문서 작성일 때만 쓴다.
+pub fn uncovered_sentences(answer: &str, claims: &[super::parse::Claim]) -> Coverage {
+    let claim_texts: Vec<String> = claims.iter().map(|c| c.text.clone()).collect();
+    let sentences: Vec<String> = answer
+        .split(|c: char| matches!(c, '.' | '!' | '?' | '\n'))
+        .map(|s| s.trim().trim_end_matches(['다', '요']).to_string())
+        .filter(|s| words(s).len() >= 2)
+        .collect();
+    let uncovered = sentences
+        .iter()
+        .filter(|s| {
+            // 어느 주장과도 절반 넘게 겹치지 않으면 근거 없이 쓴 문장이다
+            !claim_texts
+                .iter()
+                .any(|t| overlap(s, std::slice::from_ref(t)) >= SUPPORT_MIN)
+        })
+        .cloned()
+        .collect();
+    Coverage { total: sentences.len(), uncovered }
+}
+
+/// 본문 문장이 주장에 얼마나 적혔는가.
+#[derive(Debug, Clone, Default)]
+pub struct Coverage {
+    /// 본문 문장 수 (두 낱말 이상인 것)
+    pub total: usize,
+    /// 어느 주장에도 적히지 않은 문장
+    pub uncovered: Vec<String>,
+}
+
+impl Coverage {
+    /// 본문이 있는데 **한 문장도** 주장에 적히지 않았다 — 근거 없이 쓴 초안이다
+    pub fn nothing_covered(&self) -> bool {
+        self.total > 0 && self.uncovered.len() == self.total
     }
 }
 

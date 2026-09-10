@@ -279,6 +279,22 @@ impl FocusCheck {
     }
 }
 
+/// **요청의 개념 낱말 가운데 자료집 어디에도 없는 것** (문서 작성, P7).
+///
+/// 물음(P5)에서는 끝의 낱말 하나만 봤다 — 앞쪽은 바꿔 쓴 꾸밈말일 수 있어서.
+/// 문서 요청은 다르다. 지시어를 떼고 남은 것("학교 축제 일정과 장소")은 **사용자가
+/// 손수 적은 문서의 주제**이고, 그 가운데 하나라도 자료집에 없으면("축제") 그 문서는
+/// 자료로 쓸 수 없다. 끝 낱말(`장소`)만 보면 흔한 말이라 통과하고, 모델은 축제
+/// 날짜와 장소를 지어낸다 — 실제로 그랬다. 그래서 문서 작성에서는 전부 본다.
+/// 값(바꿔 쓴 주제어를 거부할 수 있음)은 문서를 지어내지 않는 쪽으로 치른다.
+pub fn absent_concepts(request: &str, in_collection: impl Fn(&Word) -> bool) -> Vec<String> {
+    concepts(request)
+        .into_iter()
+        .filter(|w| !in_collection(w))
+        .map(|w| w.forms.last().cloned().unwrap_or(w.raw))
+        .collect()
+}
+
 #[cfg(test)]
 #[path = "focus_tests.rs"]
 mod tests;

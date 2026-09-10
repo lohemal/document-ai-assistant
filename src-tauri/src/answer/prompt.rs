@@ -91,6 +91,148 @@ pub fn schema() -> serde_json::Value {
     })
 }
 
+// ── 문서 작성 (P7) — 같은 파이프라인, 다른 옷 ────────────────────────
+
+/// 무엇을 만들 것인가. 파이프라인은 하나고, 이 값이 프롬프트와 화면만 바꾼다.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Task {
+    /// 규정 해석 — 물음에 답한다 (P5)
+    Interpret,
+    /// 가정통신문 초안 — 제목 + 본문
+    Letter,
+    /// 문자 메시지 초안 — 짧은 본문
+    Sms,
+}
+
+impl Task {
+    pub fn from_name(s: &str) -> Option<Task> {
+        match s {
+            "interpret" => Some(Task::Interpret),
+            "letter" => Some(Task::Letter),
+            "sms" => Some(Task::Sms),
+            _ => None,
+        }
+    }
+
+    /// 기록(`job.kind`)과 화면에 쓰는 이름
+    pub fn name(self) -> &'static str {
+        match self {
+            Task::Interpret => "interpret",
+            Task::Letter => "letter",
+            Task::Sms => "sms",
+        }
+    }
+
+    pub fn is_draft(self) -> bool {
+        self != Task::Interpret
+    }
+
+    /// 검색과 초점 낱말 검사에 넣을 글.
+    ///
+    /// 물음은 그대로 쓴다. 문서 요청은 **지시문**이라("…학부모에게 안내할 가정통신문을
+    /// 간략하게 작성해줘") 지시어를 떼고 남은 것("3학년 지원금 관련 내용")으로 찾는다.
+    /// 그대로 넣으면 낱말 검색이 `가정통신문`·`작성` 같은 말을 찾고, 초점 낱말이
+    /// `작성` 이 되어 자료집에 없다고 모든 요청을 거부한다.
+    pub fn query_text(self, request: &str) -> String {
+        if !self.is_draft() {
+            return request.to_string();
+        }
+        strip_instruction(request)
+    }
+}
+
+/// 문서 요청에서 지시어를 뗀다. 물음말 목록(`domain::query`)과 같은 성격의 짧은 자다 —
+/// 동의어 사전이 아니라 "이 말은 무엇을 찾을지가 아니라 어떻게 쓸지를 말한다" 는 목록.
+pub fn strip_instruction(request: &str) -> String {
+    const INSTRUCTION: &[&str] = &[
+        "가정통신문", "가정통신문을", "가정통신문으로", "통신문", "문자", "문자를", "문자로",
+        "메시지", "메시지를", "메세지", "안내문", "안내문을", "초안", "초안을", "초안으로",
+        "작성", "작성해", "작성해줘", "작성해주세요", "작성하여", "써", "써줘", "써주세요",
+        "만들어", "만들어줘", "만들어주세요", "정리해", "정리해줘", "요약해", "요약해줘",
+        "검토해서", "검토하여", "검토해", "참고해서", "바탕으로", "토대로", "이용해서",
+        "안내할", "안내하는", "안내", "알리는", "알릴", "보낼", "보내는", "발송할",
+        "학부모에게", "학부모께", "학부모님께", "학부모용", "학생에게", "교직원에게", "가정에",
+        "간략하게", "간단하게", "간단히", "짧게", "자세히", "정중하게", "친절하게", "부드럽게",
+        "내용을", "내용으로", "내용", "관련", "관련된", "관한", "대한", "대해", "형식으로",
+    ];
+    let kept: Vec<&str> = request
+        .split_whitespace()
+        .filter(|w| {
+            let bare = w.trim_matches(|c: char| !c.is_alphanumeric());
+            !INSTRUCTION.contains(&bare)
+        })
+        .collect();
+    let s = kept.join(" ");
+    // 다 떼어 버렸으면 원문으로 — 아무것도 못 찾는 것보다 낫다
+    if s.trim().is_empty() { request.to_string() } else { s }
+}
+
+/// 형식 규칙 — 규칙 ①~⑥(`SYSTEM`) 뒤에 붙는다. **근거 규칙은 바꾸지 않는다.**
+const LETTER_RULES: &str = "\
+
+[가정통신문 형식]
+- title 에 제목을, answer 에 본문을 쓴다. 본문은 300~500자, 존댓말.
+- 본문 차례: 인사 한 문장 → 안내 내용(근거에 있는 것만) → 마무리 한 문장.
+- 학교명·날짜·담당자·연락처·기간처럼 근거에 없는 값은 **지어내지 않는다.** 필요하면
+  [학교명], [안내 기간], [담당자 연락처] 처럼 대괄호로 사용자가 채울 자리를 두거나 뺀다.
+- claims 에는 본문의 문장을 하나씩 적는다. 근거에서 온 사실은 kind=fact 로 근거 이름을
+  붙이고, 인사말·마무리·문장 연결처럼 사실이 아닌 말은 kind=style 로 sources 를 비운다.
+- 금액·날짜·기한·횟수·비율·대상·학년은 근거의 표현을 그대로 옮긴다.";
+
+const SMS_RULES: &str = "\
+
+[문자 메시지 형식]
+- answer 에 본문만 쓴다. 90자 안팎, 길어도 200자를 넘기지 않는다. 제목은 없다.
+- 첫머리는 \"[학교명]입니다.\" 로 시작한다. 학교명을 지어내지 않는다.
+- 핵심만: 누구에게(대상) · 무엇을(내용) · 언제까지(기한) · 무엇을 해야 하는지(요청).
+  인사말과 설명은 넣지 않는다.
+- 근거에 없는 값은 지어내지 않는다. 필요하면 [안내 기간] 처럼 대괄호 자리를 둔다.
+- claims 에는 본문의 문장을 하나씩 적는다. 근거에서 온 사실은 kind=fact 로 근거 이름을
+  붙이고, 사실이 아닌 말(\"[학교명]입니다.\" 같은 것)은 kind=style 로 sources 를 비운다.
+- 금액·날짜·기한·횟수·비율·대상·학년은 근거의 표현을 그대로 옮긴다.";
+
+/// 일에 맞는 규칙 글.
+pub fn system(task: Task) -> String {
+    match task {
+        Task::Interpret => SYSTEM.to_string(),
+        Task::Letter => format!("{SYSTEM}{LETTER_RULES}"),
+        Task::Sms => format!("{SYSTEM}{SMS_RULES}"),
+    }
+}
+
+/// 일에 맞는 물음/요청 글.
+pub fn user_for(task: Task, request: &str, evidence: &str) -> String {
+    if !task.is_draft() {
+        return user(request, evidence);
+    }
+    let what = if task == Task::Letter { "가정통신문" } else { "문자 메시지" };
+    if evidence.trim().is_empty() {
+        return format!(
+            "[근거]\n(없음)\n\n[요청]\n{}\n\n근거가 없으므로 insufficientEvidence 를 true 로 하고 {what} 을 쓰지 않는다.",
+            request.trim()
+        );
+    }
+    format!(
+        "[근거]\n{}\n[요청]\n{}\n\n위 근거에 있는 내용만으로 {what} 초안을 쓴다.",
+        evidence.trim_end(),
+        request.trim()
+    )
+}
+
+/// 일에 맞는 JSON 꼴. 문서 작성은 `title` 과 `style` 주장이 더 있다.
+pub fn schema_for(task: Task) -> serde_json::Value {
+    let mut s = schema();
+    if task.is_draft() {
+        s["properties"]["claims"]["items"]["properties"]["kind"]["enum"] =
+            json!(["fact", "interpretation", "style"]);
+    }
+    if task == Task::Letter {
+        s["properties"]["title"] = json!({ "type": "string", "description": "가정통신문 제목" });
+        s["required"] = json!(["title", "answer", "claims", "insufficientEvidence"]);
+    }
+    s
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -142,3 +284,7 @@ mod tests {
         }
     }
 }
+
+#[cfg(test)]
+#[path = "prompt_task_tests.rs"]
+mod task_tests;

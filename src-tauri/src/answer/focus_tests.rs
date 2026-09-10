@@ -115,3 +115,12 @@ fn 개념을_못_고르면_아무_판단도_하지_않는다() {
     assert_eq!(c.refusal(), None);
     assert_eq!(c.warning(), None);
 }
+
+#[test]
+fn 문서_요청은_주제_낱말을_전부_본다() {
+    // "학교 축제 일정과 장소" — 끝 낱말 `장소` 는 흔해서 자료집에 있다. `축제` 는 없다.
+    // 끝 낱말만 보면 통과하고 모델은 축제 날짜를 지어냈다. 문서 작성은 전부 본다.
+    let absent = absent_concepts("학교 축제 일정과 장소를", |w| w.raw != "축제");
+    assert_eq!(absent, vec!["축제"]);
+    assert!(absent_concepts("자유수강권 지원 대상과 신청 절차를", |_| true).is_empty());
+}

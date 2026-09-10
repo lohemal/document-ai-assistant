@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import {
   collectionNames,
   getJob,
+  kindLabel,
   pinJob,
   statusClass,
   statusLabel,
@@ -71,6 +72,7 @@ export default function JobDetail() {
       </p>
       <h1 className="page-title">{d.job.question}</h1>
       <p className="page-lead">
+        <span className={'kindtag kind-' + d.job.kind}>{kindLabel(d.job.kind)}</span>{' '}
         <span className={'statuschip ' + statusClass(d.job.status)}>{statusLabel(d.job.status)}</span>{' '}
         <span className="muted">{when(d.job.createdAt)}</span>
         <button
@@ -115,7 +117,9 @@ export default function JobDetail() {
 
       {/* ── 답변 (그때 것) ───────────────────────────────────────── */}
       <section className="card card-answer">
-        <h2 className="card-title">답변</h2>
+        <h2 className="card-title">
+          {d.job.kind === 'letter' ? '가정통신문 초안' : d.job.kind === 'sms' ? '문자 초안' : '답변'}
+        </h2>
         {d.job.status === 'cancelled' && (
           <p className="muted">
             답변 만들기를 멈춘 기록입니다. 물음과 그때 찾은 근거만 남았습니다.
@@ -124,8 +128,26 @@ export default function JobDetail() {
         {d.job.status === 'no_model' && (
           <p className="muted">{then?.modelNote ?? 'AI 답변 없이 검색 결과와 근거만 본 기록입니다.'}</p>
         )}
-        {d.job.status !== 'cancelled' && d.job.status !== 'no_model' && (
+        {d.job.status !== 'cancelled' && d.job.status !== 'no_model' && d.job.kind === 'interpret' && (
           <p className="answer-body selectable">{then?.answer ?? '(답을 읽지 못했습니다)'}</p>
+        )}
+        {d.job.status !== 'cancelled' && d.job.status !== 'no_model' && d.job.kind !== 'interpret' && (
+          <>
+            {then?.title && <h3 className="draft-title selectable">{then.title}</h3>}
+            <pre className="draft-body selectable">{then?.answer ?? '(초안을 읽지 못했습니다)'}</pre>
+            {answered && then && (
+              <button
+                className="btn btn-sm"
+                onClick={() =>
+                  void navigator.clipboard
+                    .writeText(then.title ? `${then.title}\n\n${then.answer}` : then.answer)
+                    .catch((e) => setError(message(e)))
+                }
+              >
+                복사
+              </button>
+            )}
+          </>
         )}
         {then?.interpretation && (
           <div className="banner banner-warn small">자료 해석이 포함된 답변입니다.</div>

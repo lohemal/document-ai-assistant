@@ -25,7 +25,7 @@ export type Evidence = {
 export type Claim = {
   text: string
   sources: string[]
-  kind: 'fact' | 'interpretation'
+  kind: 'fact' | 'interpretation' | 'style'
 }
 
 export type SourceCheck = {
@@ -47,7 +47,7 @@ export type ClaimCheck = {
   text: string
   sources: string[]
   /** 해석에는 뒷받침 검사를 걸지 않는다 — 근거의 말을 옮긴 것이 아니므로 */
-  kind: 'fact' | 'interpretation'
+  kind: 'fact' | 'interpretation' | 'style'
   /** 주장의 낱말 가운데 인용한 근거에도 있는 것의 비율 */
   overlap: number
   supported: boolean
@@ -77,8 +77,16 @@ export type FocusCheck = {
   inCited: boolean | null
 }
 
+/** interpret(규정 해석) | letter(가정통신문) | sms(문자) */
+export type Task = 'interpret' | 'letter' | 'sms'
+
 export type AnswerOut = {
   question: string
+  task: Task
+  /** 가정통신문 제목 (letter 에서만) */
+  title: string | null
+  /** 본문 문장 가운데 어느 주장에도 적히지 않은 것 — 근거 없이 쓴 문장 (문서 작성에서만) */
+  uncovered: string[]
   /** 이 물음이 남은 작업 기록 번호. 못 남겼으면 null */
   jobId: number | null
   focus: FocusCheck | null
@@ -117,6 +125,11 @@ export type AnswerEvent = {
 
 export function ask(text: string, collectionIds: number[]): Promise<AnswerOut> {
   return invoke<AnswerOut>('answer_ask', { text, collectionIds })
+}
+
+/** 문서 초안 — 규정 해석과 같은 길을 간다. `format` 은 letter | sms */
+export function makeDraft(text: string, collectionIds: number[], format: 'letter' | 'sms'): Promise<AnswerOut> {
+  return invoke<AnswerOut>('draft_make', { text, collectionIds, format })
 }
 
 export function cancelAsk(): Promise<boolean> {

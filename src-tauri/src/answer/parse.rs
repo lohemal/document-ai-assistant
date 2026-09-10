@@ -17,6 +17,9 @@ pub enum ClaimKind {
     Fact,
     /// 근거를 그렇게 읽을 수 있다
     Interpretation,
+    /// 인사말·마무리·문장 연결 — 사실이 아닌 말 (문서 작성, P7).
+    /// 뒷받침·인용 검사에서 빼되, **숫자는 문장 종류를 가리지 않고** 본다.
+    Style,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -38,6 +41,9 @@ fn fact() -> ClaimKind {
 #[serde(rename_all = "camelCase")]
 pub struct Draft {
     pub answer: String,
+    /// 가정통신문 제목 (문서 작성에서만). 물음 답변에는 없다.
+    #[serde(default)]
+    pub title: Option<String>,
     #[serde(default)]
     pub claims: Vec<Claim>,
     #[serde(default)]

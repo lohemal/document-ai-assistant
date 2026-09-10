@@ -1285,3 +1285,100 @@ select.input {
   font-size: 13px;
   margin-top: 8px;
 }
+
+/* ── 문서 작성 (P7) ─────────────────────────────────────────── */
+.draftform {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.5;
+}
+
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.seg {
+  border: none;
+  background: #fff;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.seg + .seg {
+  border-left: 1px solid var(--line);
+}
+
+.seg.is-on {
+  background: var(--accent, #1d5fbf);
+  color: #fff;
+  font-weight: 700;
+}
+
+.draft-title {
+  margin: 8px 0 6px;
+  font-size: 17px;
+}
+
+.draft-body {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0 0 10px;
+  padding: 12px 14px;
+  background: #fafbfc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.record-link {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+}
+
+.kindtag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #eef2f7;
+  color: #3b4c66;
+}
+
+.kind-letter {
+  background: #eaf3ff;
+  color: #1d5fbf;
+}
+
+.kind-sms {
+  background: #f0f8ec;
+  color: #2e7d32;
+}
+
+.draft-uncovered {
+  background: #fff3e0;
+  box-shadow: 0 0 0 2px #fff3e0;
+  border-bottom: 2px dotted #e08a00;
+}
+
+.draft-badnum {
+  background: #ffd6d6;
+  color: #8a1c1c;
+  font-weight: 700;
+  padding: 0 2px;
+  border-radius: 3px;
+}

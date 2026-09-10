@@ -469,6 +469,27 @@ pub fn chat_stream(
     prompt: &str,
     format: Option<serde_json::Value>,
     cancel: Arc<AtomicBool>,
+    on_token: impl FnMut(&str),
+) -> Result<ChatOut, String> {
+    chat_stream_with(tag, system, prompt, format, DEFAULT_NUM_PREDICT, cancel, on_token)
+}
+
+/// 물음 답변에 넉넉한 길이. 짧게 쓰라고 시켰으므로 이만큼이면 된다. CPU 에서는 토큰
+/// 수가 그대로 기다리는 시간이다 — 4B 모델이 초당 4토큰쯤 낸다.
+pub const DEFAULT_NUM_PREDICT: u32 = 900;
+/// 문서 초안(가정통신문 300~500자 + 문장마다 주장)에 넉넉한 길이. 900 으로는 실제로
+/// JSON 이 중간에 잘려 "너무 길게 쓰다가 잘렸습니다" 로 거부된 일이 있었다 (P7).
+pub const DRAFT_NUM_PREDICT: u32 = 1800;
+
+/// `num_predict` 를 정해 받는 판. 대부분은 `chat_stream` 으로 충분하다.
+#[allow(clippy::too_many_arguments)]
+pub fn chat_stream_with(
+    tag: &str,
+    system: &str,
+    prompt: &str,
+    format: Option<serde_json::Value>,
+    num_predict: u32,
+    cancel: Arc<AtomicBool>,
     mut on_token: impl FnMut(&str),
 ) -> Result<ChatOut, String> {
     guard().map_err(|_| "루프백이 아닌 주소는 쓰지 않습니다.".to_string())?;
@@ -492,9 +513,8 @@ pub fn chat_stream(
             // 같은 물음에 같은 답이 나와야 검증도 뜻이 있다.
             "temperature": 0,
             "top_p": 0.9,
-            // 짧게 쓰라고 시켰으므로 이만큼이면 넉넉하다. CPU 에서는 토큰 수가
-            // 그대로 기다리는 시간이다 — 4B 모델이 초당 4토큰쯤 낸다.
-            "num_predict": 900
+            // 물음 답변은 900, 문서 초안은 1800 (`DEFAULT_NUM_PREDICT`·`DRAFT_NUM_PREDICT`)
+            "num_predict": num_predict
         }
     });
     if let Some(f) = format {

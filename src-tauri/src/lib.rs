@@ -101,6 +101,7 @@ pub fn run() {
             commands::index::index_drop_unusable,
             commands::answer::answer_ask,
             commands::answer::answer_cancel,
+            commands::answer::draft_make,
             commands::job::job_list,
             commands::job::job_get,
             commands::job::job_pin,
